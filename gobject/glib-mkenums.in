@@ -149,6 +149,7 @@ sub usage {
     print "  --vtail <text>        Value tail, produced after iterating over enum values\n";
     print "  --comments <text>     Comment structure\n";
     print "  --template file       Template file\n";
+    print "  --flist-env-var name  File list as an environment variable name\n";
     print "  -v, --version         Print version informations\n\n";
     print "Production text substitutions:\n";
     print "  \@EnumName\@            PrefixTheXEnum\n";
@@ -176,6 +177,7 @@ my $vprod = "";   # value text, produced for each enum value
 my $vtail = "";   # value tail, produced after iterating over enum values
 # other options
 my $comment_tmpl = "/* \@comment\@ */";
+my $flist_env_var = "";
 
 sub read_template_file {
   my ($file) = @_;
@@ -235,10 +237,18 @@ while ($_=$ARGV[0],/^-/) {
     elsif (/^--vprod$/)                      { $vprod = $vprod . shift }
     elsif (/^--vtail$/)                      { $vtail = $vtail . shift }
     elsif (/^--comments$/)                   { $comment_tmpl = shift }
+    elsif (/^--flist-env-var$/)              { $flist_env_var = shift }
     elsif (/^--help$/ || /^-h$/ || /^-h$/)   { usage; }
     elsif (/^--version$/ || /^-v$/)          { version; }
     else { usage; }
     last if not defined($ARGV[0]);
+}
+
+if (length($flist_env_var)) {
+    if (!exists($ENV{$flist_env_var})) {
+	die "Environment variable $flist_env_var not defined";
+    }
+    @ARGV = split(/;/, $ENV{$flist_env_var});
 }
 
 # put auto-generation comment
