@@ -973,6 +973,49 @@ g_set_print_handler (GPrintFunc func)
   return old_print_func;
 }
 
+static void
+fputs_console_encoding (const gchar *string,
+			FILE *f)
+{
+#ifdef G_OS_WIN32
+  const gchar *encoding;
+  gchar charset[7];
+  gchar *constring;
+  UINT codepage;
+
+  encoding = g_getenv ("G_WIN32_CONSOLE_ENCODING");
+  if (encoding != NULL && g_ascii_strcasecmp (encoding, "OEM") == 0)
+    {
+      codepage = GetOEMCP ();
+    }
+  else
+    {
+      if (encoding != NULL && g_ascii_strcasecmp (encoding, "ANSI") != 0)
+	g_warning ("G_WIN32_CONSOLE_ENCODING: Unknown encoding '%s'", encoding);
+
+      codepage = GetACP ();
+    }
+
+  g_snprintf (charset, sizeof (charset), "CP%u", codepage);
+
+  constring = strdup_convert (string, charset);
+  fputs (constring, f);
+  g_free (constring);
+#else
+  const gchar *charset;
+
+  if (g_get_charset (&charset))
+    fputs (string, f); /* charset is UTF-8 already */
+  else
+    {
+      gchar *lstring = strdup_convert (string, charset);
+
+      fputs (lstring, f);
+      g_free (lstring);
+    }
+#endif
+}
+
 void
 g_print (const gchar *format,
 	 ...)
@@ -995,17 +1038,7 @@ g_print (const gchar *format,
     local_glib_print_func (string);
   else
     {
-      const gchar *charset;
-
-      if (g_get_charset (&charset))
-	fputs (string, stdout); /* charset is UTF-8 already */
-      else
-	{
-	  gchar *lstring = strdup_convert (string, charset);
-
-	  fputs (lstring, stdout);
-	  g_free (lstring);
-	}
+      fputs_console_encoding (string, stdout);
       fflush (stdout);
     }
   g_free (string);
@@ -1046,17 +1079,7 @@ g_printerr (const gchar *format,
     local_glib_printerr_func (string);
   else
     {
-      const gchar *charset;
-
-      if (g_get_charset (&charset))
-	fputs (string, stderr); /* charset is UTF-8 already */
-      else
-	{
-	  gchar *lstring = strdup_convert (string, charset);
-
-	  fputs (lstring, stderr);
-	  g_free (lstring);
-	}
+      fputs_console_encoding (string, stderr);
       fflush (stderr);
     }
   g_free (string);
