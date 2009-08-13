@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id='gio2.0' Version='@VERSION@.0' Language="1033">
+		<Package Id="{B10A49DD-0549-458d-8456-6C3E6F4A3967}"
+				Description="GIO provides a modern and easy-to-use VFS API. It provides a file system abstraction which allows applications to access local and remote files with a single consistent API."
+				Manufacturer="The GNOME project" InstallerVersion="300" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='MODULE_DIR' Name='.'>
+				<Directory Id="FossBinDir" Name="bin">
+					<Component Id="libgio" Guid="{C1FDB4ED-686A-4a30-B3C2-9E96A47F3616}">
+						<File Id="libgio.dll" Source="..\Win32\Release\bin\libgio-2.0.dll" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

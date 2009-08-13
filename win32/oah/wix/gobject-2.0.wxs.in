@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id='gobject2.0' Version='@VERSION@.0' Language="1033">
+		<Package Id="{4C5C48B8-0971-4C61-A1BC-6E92D4E99215}"
+				Description="GObject provides the object system used for Pango and GTK+."
+				Manufacturer="The GNOME project" InstallerVersion="300" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='MODULE_DIR' Name='.'>
+				<Directory Id="FossBinDir" Name="bin">
+					<Component Id="libgobject" Guid="{C16B6E12-6B68-4236-916A-076613937E8F}">
+						<File Id="libgobject.dll" Source="..\Win32\Release\bin\libgobject-2.0.dll" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

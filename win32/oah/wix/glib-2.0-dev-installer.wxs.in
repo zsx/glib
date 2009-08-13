@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" UpgradeCode="{4B5904D5-6BE4-4ef6-8F71-8843EA8D8960}" Version="@VERSION@.0" Language="1033" Name="GLib 2.0" Manufacturer="Free Software">
+		<Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine"
+				Description="GLIB for the OAH Build System"
+				Manufacturer="Free Software" />
+		<Media Id="1" Cabinet="glib_2.0_dev_installer.cab" EmbedCab="yes" />
+
+		<Property Id="OAH_BUILD_PRODUCT_DIR">
+			<RegistrySearch Id="OAHBuildProductDir"
+							Root="HKLM" Key="SOFTWARE\OAH Build" Name="ProductDir"
+							Type="raw" />
+		</Property>
+
+		<Property Id="FOSS_PRODUCT_DIR">
+			<RegistrySearch Id="FOSSProductDir"
+							Root="HKLM" Key="SOFTWARE\Free Software" Name="ProductDir"
+							Type="raw" />
+		</Property>
+
+		<Condition Message="OAH Build was not found. You need to install OAH Build before installing [ProductName].">
+			<![CDATA[Installed OR OAH_BUILD_PRODUCT_DIR]]>
+		</Condition>
+
+		<Condition Message="OAH Build was found, but where to install FOSS components is unknown. You need to reinstall OAH Build before installing [ProductName].">
+			<![CDATA[Installed OR FOSS_PRODUCT_DIR]]>
+		</Condition>
+
+		<!-- Directory structure -->
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="FOSS_PRODUCT_DIR">
+				<Merge Id='GLib2.0' Language='1033' SourceFile='Win32\glib-2.0.msm' DiskId='1' />
+				<Merge Id='GObject2.0' Language='1033' SourceFile='Win32\gobject-2.0.msm' DiskId='1' />
+				<Merge Id='GIO2.0' Language='1033' SourceFile='Win32\gio-2.0.msm' DiskId='1' />
+				<Merge Id='GLib2.0Dev' Language='1033' SourceFile='Win32\glib-2.0-dev.msm' DiskId='1' />
+
+				<Directory Id="ModuleRedist" Name="redist">
+					<Component Id="GLib2.0DevRedist" Guid="{48577DFE-5223-4669-9621-C91A0F94AAE4}">
+						<File Id="glib2.0_dev.msm" Source="Win32\glib-2.0-dev.msm" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<Feature Id="Binaries" Title="GLib Binaries" Level="1">
+			<MergeRef Id='GLib2.0' />
+			<MergeRef Id='GObject2.0' />
+			<MergeRef Id='GIO2.0' />
+		</Feature>
+
+		<Feature Id="GLibDev" Title="GLib .h, .lib, .pc and redist files" Level="1">
+			<MergeRef Id='GLib2.0Dev' />
+			<ComponentRef Id="GLib2.0DevRedist" />
+		</Feature>
+	</Product>
+</Wix>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id='glib2.0' Version='@VERSION@.0' Language="1033">
+		<Package Id="{32064E59-11D8-4f93-847A-0124194B91AA}"
+				Description="General-purpose utility library, which provides many useful data types, macros, type conversions, string utilities, file utilities, a main loop abstraction, and so on."
+				Manufacturer="The GNOME project" InstallerVersion="300" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Directory Id='MODULE_DIR' Name='.'>
+				<Directory Id="FossBinDir" Name="bin">
+					<Component Id="gspawn_win32_helper" Guid="{4F37FE8C-45D2-45e2-9CFC-EDDC90466CA6}">
+						<File Id="gspawn_win32_helper.exe" Source="..\Win32\Release\bin\gspawn-win32-helper.exe" />
+					</Component>
+					<Component Id="gspawn_win32_helper_console" Guid="{5CDC25CE-DA3A-4cac-8B5D-4AFC0708876D}">
+						<File Id="gspawn_win32_helper_console.exe" Source="..\Win32\Release\bin\gspawn-win32-helper-console.exe" />
+					</Component>
+
+					<Component Id="libglib" Guid="{0CC85B41-CCDB-4f8b-842E-5B3D71A1F355}">
+						<File Id="libglib.dll" Source="..\Win32\Release\bin\libglib-2.0.dll" />
+					</Component>
+					<Component Id="libgthread" Guid="{9062F6DC-98A9-4397-BC00-C0B10164C9CF}">
+						<File Id="libgtrhead.dll" Source="..\Win32\Release\bin\libgthread-2.0.dll" />
+					</Component>
+					<Component Id="libgmodule" Guid="{00213FA9-3CBC-4c33-BCCA-CD612DD2AA27}">
+						<File Id="libgmodule.dll" Source="..\Win32\Release\bin\libgmodule-2.0.dll" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>

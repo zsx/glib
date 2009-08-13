@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GLibVersion"
+	>
+	<!-- !!! Set version macros from configure.in !!! -->
+	<UserMacro
+		Name="GLibMajorVersion"
+		Value="2"
+	/>
+	<UserMacro
+		Name="GLibMinorVersion"
+		Value="21"
+	/>
+	<UserMacro
+		Name="GLibMicroVersion"
+		Value="5"
+	/>
+	<UserMacro
+		Name="GLibInterfaceAge"
+		Value="0"
+	/>
+	<UserMacro
+		Name="GLibApiVersion"
+		Value="$(GLibMajorVersion).0"
+	/>
+	<!-- GLibBinaryAge = 100 * GLibMinorVersion + GLibMicroVersion -->
+	<UserMacro
+		Name="GLibBinaryAge"
+		Value="$(GLibMinorVersion)0$(GLibMicroVersion)"
+	/>
+	<UserMacro
+		Name="GLibVersion"
+		Value="$(GLibMajorVersion).$(GLibMinorVersion).$(GLibMicroVersion)"
+	/>
+</VisualStudioPropertySheet>

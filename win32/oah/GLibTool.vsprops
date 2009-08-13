@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="GLibTool"
+	InheritedPropertySheets="GLibVersion.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(IntDir)&quot;;&quot;$(IntDir)\..\generated&quot;;..\glib;..\libintl-proxy;..\..\glib;..\.."
+		PreprocessorDefinitions="HAVE_CONFIG_H;G_DISABLE_DEPRECATED;_CONSOLE"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile="$(OutDir)\bin\$(ProjectName).exe"
+		SubSystem="1"
+	/>
+</VisualStudioPropertySheet>

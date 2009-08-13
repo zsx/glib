@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Module Id="glib2.0dev" Version="@VERSION@.0" Language="1033">
+		<Package Id="{0DC24733-019A-4395-84ED-83AEA74E7C54}"
+				Description="Development package without source code, but includes: headers, import libraries, binaries and pkg-config files"
+				Manufacturer="The GNOME project" InstallerVersion="300" />
+
+		<Dependency RequiredId="glib2.0.32064E59_11D8_4F93_847A_0124194B91AA" RequiredLanguage="0" RequiredVersion="@VERSION@" />
+		<Dependency RequiredId="gobject2.0.4C5C48B8_0971_4C61_A1BC_6E92D4E99215" RequiredLanguage="0" RequiredVersion="@VERSION@" />
+		<Dependency RequiredId="gio2.0.B10A49DD_0549_458D_8456_6C3E6F4A3967" RequiredLanguage="0" RequiredVersion="@VERSION@" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="MODULE_DIR" Name=".">
+				<Directory Id="ModuleBin" Name="bin">
+					<Component Id="tools" Guid="{9C418569-A239-4836-8212-5BFAB3D56F00}">
+						<File Id="glib_mkenums.pl" Source="%(input_path)s\bin\glib-mkenums.pl" />
+						<File Id="glib_genmarshal.exe" Source="%(input_path)s\bin\glib-genmarshal.exe" />
+					</Component>
+				</Directory>
+
+				<Directory Id="ModuleInclude" Name="include">
+					<Directory Id="IncludeTopLevel" Name="glib-2.0">
+						<Component Id="includes" Guid="{853393CA-E142-4200-9AEF-2FEED0949543}">
+							%(include/glib-2.0_files)s
+						</Component>
+
+						<Directory Id="IncludeGLib" Name="glib">
+							<Component Id="glibincludes" Guid="{6685C1BA-7D8B-4443-AFAB-D25266220508}">
+								%(include/glib-2.0/glib_files)s
+							</Component>
+						</Directory>
+
+						<Directory Id="IncludeGObject" Name="gobject">
+							<Component Id="gobjectincludes" Guid="{6C9184E0-C470-425f-AEB1-157A4485242D}">
+								%(include/glib-2.0/gobject_files)s
+							</Component>
+						</Directory>
+
+						<Directory Id="IncludeGIo" Name="gio">
+							<Component Id="gioincludes" Guid="{F2881E7E-C751-47dd-A61F-612F04259DEA}">
+								%(include/glib-2.0/gio_files)s
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+
+				<Directory Id="ModuleLib" Name="lib">
+					<Component Id="libs" Guid="{929BB5BF-93D6-4eb9-90A9-497DCCD8989C}">
+						%(lib_files)s
+					</Component>
+
+					<Directory Id="LibPkgConfig" Name="pkgconfig">
+						<Component Id="pcs" Guid="{5F1ADE42-ED82-494e-9504-3D36B98C1735}">
+							%(pc_files)s
+						</Component>
+					</Directory>
+
+					<Directory Id="LibGLib" Name="glib-2.0">
+						<Directory Id="LibGLibInclude" Name="include">
+							<Component Id="libglibincludes" Guid="{524F4B12-2AAF-494c-A929-D4D4DE07C559}">
+								%(lib/glib-2.0/include_files)s
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+
+				<Directory Id="ModuleRedist" Name="redist">
+					<Component Id="msms" Guid="{389D848C-27A3-47e6-ABA9-C8234C74EB2B}">
+						<File Id="glib.msm" Source="Win32\glib-2.0.msm" />
+						<File Id="gobject.msm" Source="Win32\gobject-2.0.msm" />
+						<File Id="gio.msm" Source="Win32\gio-2.0.msm" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Module>
+</Wix>
