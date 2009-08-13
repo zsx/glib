@@ -1049,6 +1049,31 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\gio\gasyncinitable.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\gio\gasyncresult.h"
 				>
 				<FileConfiguration
@@ -1787,6 +1812,27 @@
 			<File
 				RelativePath="..\..\gio\gfileiostream.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\gfilemonitor.h"
@@ -2067,14 +2113,77 @@
 			<File
 				RelativePath="..\..\gio\ginetaddress.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\ginetsocketaddress.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\ginitable.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\ginputstream.h"
@@ -2355,6 +2464,27 @@
 			<File
 				RelativePath="..\..\gio\giostream.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\giotypes.h"
@@ -2681,10 +2811,52 @@
 			<File
 				RelativePath="..\..\gio\gnetworkaddress.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\gnetworkservice.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\goutputstream.h"
@@ -2735,6 +2907,27 @@
 			<File
 				RelativePath="..\..\gio\gresolver.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\gio\gseekable.h"
@@ -2829,6 +3022,331 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\gio\gsocket.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketaddress.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketaddressenumerator.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketclient.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketconnectable.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketconnection.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketcontrolmessage.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketinputstream.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketlistener.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketoutputstream.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsocketservice.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gsrvtarget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gtcpconnection.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\gio\gthemedicon.h"
 				>
 				<FileConfiguration
@@ -2868,6 +3386,56 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseWdkCrt|x64"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gthreadedresolver.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gio\gthreadedsocketservice.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
 					>
 					<Tool
 						Name="HeaderInstallerTool"
@@ -3011,10 +3579,6 @@
 						Name="HeaderInstallerTool"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\gio\gwin32resolver.h"
-				>
 			</File>
 			<Filter
 				Name="appinfo"
@@ -3203,70 +3767,6 @@
 				</File>
 				<File
 					RelativePath="..\..\gio\win32\winhttp.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="socket"
-				>
-				<File
-					RelativePath="..\..\gio\gsocket.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketaddress.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketaddressenumerator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketclient.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketconnectable.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketconnection.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketcontrolmessage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketinputstream.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketlistener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketoutputstream.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsocketservice.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gsrvtarget.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gtcpconnection.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gthreadedresolver.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gio\gthreadedsocketservice.h"
 					>
 				</File>
 			</Filter>

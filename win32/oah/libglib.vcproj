@@ -1754,6 +1754,27 @@
 			<File
 				RelativePath="..\..\glib\ghostutils.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\glib\gi18n-lib.h"
