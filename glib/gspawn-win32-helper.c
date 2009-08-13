@@ -281,6 +281,7 @@ main (int ignored_argc, char **ignored_argv)
   else if (_wchdir (wargv[ARG_WORKING_DIRECTORY]) < 0)
     write_err_and_exit (child_err_report_fd, CHILD_CHDIR_FAILED);
 
+#ifndef DISABLE_CLOSE_DESCRIPTORS
   /* __argv[ARG_CLOSE_DESCRIPTORS] is "y" if file descriptors from 3
    *  upwards should be closed
    */
@@ -288,6 +289,7 @@ main (int ignored_argc, char **ignored_argv)
     for (i = 3; i < 1000; i++)	/* FIXME real limit? */
       if (i != child_err_report_fd && i != helper_sync_fd)
 	close (i);
+#endif
 
   /* We don't want our child to inherit the error report and
    * helper sync fds.
