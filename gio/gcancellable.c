@@ -52,12 +52,11 @@ enum {
 
 struct _GCancellablePrivate
 {
-  GObject parent_instance;
-
   guint cancelled : 1;
-  guint allocated_pipe : 1;
   guint cancelled_running : 1;
   guint cancelled_running_waiting : 1;
+
+  guint fd_refcount;
   int cancel_pipe[2];
 
 #ifdef G_OS_WIN32
@@ -74,23 +73,39 @@ G_LOCK_DEFINE_STATIC(cancellable);
 static GCond *cancellable_cond = NULL;
   
 static void
-g_cancellable_finalize (GObject *object)
+g_cancellable_close_pipe (GCancellable *cancellable)
 {
-  GCancellable *cancellable = G_CANCELLABLE (object);
   GCancellablePrivate *priv;
-
+  
   priv = cancellable->priv;
 
   if (priv->cancel_pipe[0] != -1)
-    close (priv->cancel_pipe[0]);
+    {
+      close (priv->cancel_pipe[0]);
+      priv->cancel_pipe[0] = -1;
+    }
   
   if (priv->cancel_pipe[1] != -1)
-    close (priv->cancel_pipe[1]);
+    {
+      close (priv->cancel_pipe[1]);
+      priv->cancel_pipe[1] = -1;
+    }
 
 #ifdef G_OS_WIN32
   if (priv->event)
-    CloseHandle (priv->event);
+    {
+      CloseHandle (priv->event);
+      priv->event = NULL;
+    }
 #endif
+}
+
+static void
+g_cancellable_finalize (GObject *object)
+{
+  GCancellable *cancellable = G_CANCELLABLE (object);
+
+  g_cancellable_close_pipe (cancellable);
 
   G_OBJECT_CLASS (g_cancellable_parent_class)->finalize (object);
 }
@@ -211,6 +226,7 @@ set_fd_close_exec (int fd)
 static void
 g_cancellable_open_pipe (GCancellable *cancellable)
 {
+  const char ch = 'x';
   GCancellablePrivate *priv;
 
   priv = cancellable->priv;
@@ -223,9 +239,10 @@ g_cancellable_open_pipe (GCancellable *cancellable)
       set_fd_nonblocking (priv->cancel_pipe[1]);
       set_fd_close_exec (priv->cancel_pipe[0]);
       set_fd_close_exec (priv->cancel_pipe[1]);
+      
+      if (priv->cancelled)
+        write (priv->cancel_pipe[1], &ch, 1);
     }
-  else
-    g_warning ("Failed to create pipe for GCancellable. Out of file descriptors?");
 }
 #endif
 
@@ -358,7 +375,6 @@ g_cancellable_reset (GCancellable *cancellable)
 #ifdef G_OS_WIN32
       if (priv->event)
 	ResetEvent (priv->event);
-      else
 #endif
       if (priv->cancel_pipe[0] != -1)
 	read (priv->cancel_pipe[0], &ch, 1);
@@ -420,6 +436,10 @@ g_cancellable_set_error_if_cancelled (GCancellable  *cancellable,
  * readable status. Reading to unset the readable status is done
  * with g_cancellable_reset().
  * 
+ * After a successful return from this function, you should use 
+ * g_cancellable_release_fd() to free up resources allocated for 
+ * the returned file descriptor.
+ *
  * See also g_cancellable_make_pollfd().
  *
  * Returns: A valid file descriptor. %-1 if the file descriptor 
@@ -429,8 +449,8 @@ int
 g_cancellable_get_fd (GCancellable *cancellable)
 {
   GCancellablePrivate *priv;
-
   int fd;
+
   if (cancellable == NULL)
     return -1;
 
@@ -440,13 +460,11 @@ g_cancellable_get_fd (GCancellable *cancellable)
   return -1;
 #else
   G_LOCK(cancellable);
-  if (!priv->allocated_pipe)
-    {
-      priv->allocated_pipe = TRUE;
-      g_cancellable_open_pipe (cancellable);
-    }
-
+  if (priv->cancel_pipe[0] == -1)
+    g_cancellable_open_pipe (cancellable);
   fd = priv->cancel_pipe[0];
+  if (fd != -1)
+    priv->fd_refcount++;
   G_UNLOCK(cancellable);
 #endif
 
@@ -455,7 +473,7 @@ g_cancellable_get_fd (GCancellable *cancellable)
 
 /**
  * g_cancellable_make_pollfd:
- * @cancellable: a #GCancellable.
+ * @cancellable: a #GCancellable or %NULL
  * @pollfd: a pointer to a #GPollFD
  * 
  * Creates a #GPollFD corresponding to @cancellable; this can be passed
@@ -463,33 +481,100 @@ g_cancellable_get_fd (GCancellable *cancellable)
  * for unix systems without a native poll and for portability to
  * windows.
  *
+ * When this function returns %TRUE, you should use 
+ * g_cancellable_release_fd() to free up resources allocated for the 
+ * @pollfd. After a %FALSE return, do not call g_cancellable_release_fd().
+ *
+ * If this function returns %FALSE, either no @cancellable was given or
+ * resource limits prevent this function from allocating the necessary 
+ * structures for polling. (On Linux, you will likely have reached 
+ * the maximum number of file descriptors.) The suggested way to handle
+ * these cases is to ignore the @cancellable.
+ *
  * You are not supposed to read from the fd yourself, just check for
  * readable status. Reading to unset the readable status is done
  * with g_cancellable_reset().
+ *
+ * @Returns: %TRUE if @pollfd was successfully initialized, %FALSE on 
+ *           failure to prepare the cancellable.
  * 
+ * @Since: 2.22
  **/
-void
+gboolean
 g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
 {
   GCancellablePrivate *priv;
 
-  g_return_if_fail (G_IS_CANCELLABLE (cancellable));
-  g_return_if_fail (pollfd != NULL);
+  g_return_val_if_fail (pollfd != NULL, FALSE);
+  if (cancellable == NULL)
+    return FALSE;
+  g_return_val_if_fail (G_IS_CANCELLABLE (cancellable), FALSE);
 
   priv = cancellable->priv;
 
 #ifdef G_OS_WIN32
-  if (!priv->event)
+  G_LOCK(cancellable);
+  if (priv->event == NULL)
     {
       /* A manual reset anonymous event, starting unset */
       priv->event = CreateEvent (NULL, TRUE, FALSE, NULL);
+      if (priv->event == NULL)
+        {
+          G_UNLOCK(cancellable);
+          return FALSE;
+        }
+      if (priv->cancelled)
+        SetEvent(priv->event);
     }
+  priv->fd_refcount++;
+  G_UNLOCK(cancellable);
+
   pollfd->fd = (gintptr)priv->event;
 #else /* !G_OS_WIN32 */
-  pollfd->fd = g_cancellable_get_fd (cancellable);
+  {
+    int fd = g_cancellable_get_fd (cancellable);
+    if (fd == -1)
+      return FALSE;
+    pollfd->fd = fd;
+  }
 #endif /* G_OS_WIN32 */
   pollfd->events = G_IO_IN;
   pollfd->revents = 0;
+
+  return TRUE;
+}
+
+/**
+ * g_cancellable_release_fd:
+ * @cancellable: a #GCancellable
+ *
+ * Releases a resources previously allocated by g_cancellable_get_fd()
+ * or g_cancellable_make_pollfd().
+ *
+ * For compatibility reasons with older releases, calling this function 
+ * is not strictly required, the resources will be automatically freed
+ * when the @cancellable is finalized. However, the @cancellable will
+ * block scarce file descriptors until it is finalized if this function
+ * is not called. This can cause the application to run out of file 
+ * descriptors when many #GCancellables are used at the same time.
+ * 
+ * @Since: 2.22
+ **/
+void
+g_cancellable_release_fd (GCancellable *cancellable)
+{
+  GCancellablePrivate *priv;
+
+  g_return_if_fail (G_IS_CANCELLABLE (cancellable));
+  g_return_if_fail (cancellable->priv->fd_refcount > 0);
+
+  priv = cancellable->priv;
+
+  G_LOCK (cancellable);
+  priv->fd_refcount--;
+  if (priv->fd_refcount == 0)
+    g_cancellable_close_pipe (cancellable);
+  G_UNLOCK (cancellable);
 }
 
 /**
@@ -514,7 +599,7 @@ g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
 void
 g_cancellable_cancel (GCancellable *cancellable)
 {
-  static const char ch = 'x';
+  const char ch = 'x';
   gboolean cancel;
   GCancellablePrivate *priv;
 
@@ -531,7 +616,7 @@ g_cancellable_cancel (GCancellable *cancellable)
   priv->cancelled_running = TRUE;
 #ifdef G_OS_WIN32
   if (priv->event)
-    SetEvent(priv->event);
+    SetEvent (priv->event);
 #endif
   if (priv->cancel_pipe[1] != -1)
     write (priv->cancel_pipe[1], &ch, 1);

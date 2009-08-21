@@ -1707,6 +1707,16 @@ g_socket_receive_from (GSocket         *socket,
 				   error);
 }
 
+/* Although we ignore SIGPIPE, gdb will still stop if the app receives
+ * one, which can be confusing and annoying. So if possible, we want
+ * to suppress the signal entirely.
+ */
+#ifdef MSG_NOSIGNAL
+#define G_SOCKET_DEFAULT_SEND_FLAGS MSG_NOSIGNAL
+#else
+#define G_SOCKET_DEFAULT_SEND_FLAGS 0
+#endif
+
 /**
  * g_socket_send:
  * @socket: a #GSocket
@@ -1759,7 +1769,7 @@ g_socket_send (GSocket       *socket,
 				    G_IO_OUT, cancellable, error))
 	return -1;
 
-      if ((ret = send (socket->priv->fd, buffer, size, 0)) < 0)
+      if ((ret = send (socket->priv->fd, buffer, size, G_SOCKET_DEFAULT_SEND_FLAGS)) < 0)
 	{
 	  int errsv = get_socket_errno ();
 
@@ -2255,7 +2265,10 @@ winsock_finalize (GSource *source)
   g_object_unref (socket);
 
   if (winsock_source->cancellable)
-    g_object_unref (winsock_source->cancellable);
+    {
+      g_cancellable_release_fd (winsock_source->cancellable);
+      g_object_unref (winsock_source->cancellable);
+    }
 }
 
 static GSourceFuncs winsock_funcs =
@@ -2291,11 +2304,10 @@ winsock_source_new (GSocket      *socket,
   winsock_source->condition = condition;
   add_condition_watch (socket, &winsock_source->condition);
 
-  if (cancellable)
+  if (g_cancellable_make_pollfd (cancellable,
+                                 &winsock_source->cancel_pollfd))
     {
       winsock_source->cancellable = g_object_ref (cancellable);
-      g_cancellable_make_pollfd (cancellable,
-				 &winsock_source->cancel_pollfd);
       g_source_add_poll (source, &winsock_source->cancel_pollfd);
     }
 
@@ -2446,11 +2458,8 @@ g_socket_condition_wait (GSocket       *socket,
     num_events = 0;
     events[num_events++] = socket->priv->event;
 
-    if (cancellable)
-      {
-	g_cancellable_make_pollfd (cancellable, &cancel_fd);
-	events[num_events++] = (WSAEVENT)cancel_fd.fd;
-      }
+    if (g_cancellable_make_pollfd (cancellable, &cancel_fd))
+      events[num_events++] = (WSAEVENT)cancel_fd.fd;
 
     current_condition = update_condition (socket);
     while ((condition & current_condition) == 0)
@@ -2474,6 +2483,8 @@ g_socket_condition_wait (GSocket       *socket,
 	current_condition = update_condition (socket);
       }
     remove_condition_watch (socket, &condition);
+    if (num_events > 1)
+      g_cancellable_release_fd (cancellable);
 
     return (condition & current_condition) != 0;
   }
@@ -2487,15 +2498,15 @@ g_socket_condition_wait (GSocket       *socket,
     poll_fd[0].events = condition;
     num = 1;
 
-    if (cancellable)
-      {
-	g_cancellable_make_pollfd (cancellable, &poll_fd[1]);
-	num++;
-      }
+    if (g_cancellable_make_pollfd (cancellable, &poll_fd[1]))
+      num++;
 
     do
       result = g_poll (poll_fd, num, -1);
     while (result == -1 && get_socket_errno () == EINTR);
+    
+    if (num > 1)
+      g_cancellable_release_fd (cancellable);
 
     return cancellable == NULL ||
       !g_cancellable_set_error_if_cancelled (cancellable, error);
@@ -2680,7 +2691,7 @@ g_socket_send_message (GSocket                *socket,
 				      G_IO_OUT, cancellable, error))
 	  return -1;
 
-	result = sendmsg (socket->priv->fd, &msg, flags);
+	result = sendmsg (socket->priv->fd, &msg, flags | G_SOCKET_DEFAULT_SEND_FLAGS);
 	if (result < 0)
 	  {
 	    int errsv = get_socket_errno ();
