@@ -67,6 +67,86 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="10"
 			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;.\GLibVersion.vsprops"
@@ -106,6 +186,86 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -156,35 +316,133 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="ReleaseWdkCrt|x64"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
 		<File
-			RelativePath="..\config.h.in"
-			>
-		</File>
-		<File
-			RelativePath="..\..\glibconfig.h.win32.in"
+			RelativePath="..\..\config.h.win32.in"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
 				>
 				<Tool
 					Name="DotInGeneratorTool"
-					OutputFileName="glibconfig.h"
+					OutputFileName="config.h"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\gio\gio.symbols"
+			>
 			<FileConfiguration
-				Name="Release|Win32"
+				Name="Debug|Win32"
 				>
 				<Tool
-					Name="DotInGeneratorTool"
-					OutputFileName="glibconfig.h"
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegioalias.pl&quot; &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gioalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegioalias.pl&quot; -def &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gioaliasdef.c&quot;"
+					Outputs="gioalias.h"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\glib\glib.symbols"
+			>
 			<FileConfiguration
-				Name="ReleaseWdkCrt|Win32"
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegalias.pl&quot; &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)galias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegalias.pl&quot; -def &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)galiasdef.c&quot;"
+					Outputs="$(InputDir)glibalias.h"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\glibconfig.h.win32.in"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
 				>
 				<Tool
 					Name="DotInGeneratorTool"
@@ -200,7 +458,23 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="DotInGeneratorTool"
+					OutputFileName="glibconfig.h"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
 				Name="Release|x64"
+				>
+				<Tool
+					Name="DotInGeneratorTool"
+					OutputFileName="glibconfig.h"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="ReleaseWdkCrt|Win32"
 				>
 				<Tool
 					Name="DotInGeneratorTool"
@@ -213,6 +487,19 @@
 				<Tool
 					Name="DotInGeneratorTool"
 					OutputFileName="glibconfig.h"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\gobject\gobject.symbols"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="perl &quot;$(InputDir)makegobjectalias.pl&quot; &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gobjectalias.h&quot;&#x0D;&#x0A;perl &quot;$(InputDir)makegobjectalias.pl&quot; -def &lt; &quot;$(InputPath)&quot; &gt; &quot;$(InputDir)gobjectaliasdef.c&quot;"
+					Outputs="gobjectalias.h"
 				/>
 			</FileConfiguration>
 		</File>

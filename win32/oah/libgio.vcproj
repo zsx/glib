@@ -968,7 +968,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\gio\gioaliasdef.c"
+					RelativePath="..\..\gio\gioaliasdef.c"
 					>
 				</File>
 				<File
@@ -3793,7 +3793,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gio.rc.in"
+				RelativePath="..\..\gio\gio.rc.in"
 				>
 			</File>
 			<File

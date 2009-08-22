@@ -586,6 +586,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\glib\galiasdef.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\glib\garray.c"
 				>
 			</File>
@@ -879,18 +883,6 @@
 							PreprocessorDefinitions="LIBDIR"
 						/>
 					</FileConfiguration>
-				</File>
-			</Filter>
-			<Filter
-				Name="dirent"
-				>
-				<File
-					RelativePath="..\..\build\win32\dirent\dirent.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\build\win32\dirent\wdirent.c"
-					>
 				</File>
 			</Filter>
 			<Filter
@@ -3943,32 +3935,8 @@
 				>
 			</File>
 			<File
-				RelativePath="..\glib.rc.in"
+				RelativePath="..\..\glib\glib.rc.in"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-						Substitute="@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@GLIB_WIN32_STATIC_COMPILATION_DEFINE@/;@GLIB_VERSION@/$(GLibVersion);@VERSION@/$(GLibVersion)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-						Substitute="@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@GLIB_WIN32_STATIC_COMPILATION_DEFINE@/;@GLIB_VERSION@/$(GLibVersion);@VERSION@/$(GLibVersion)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-						Substitute="@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@GLIB_WIN32_STATIC_COMPILATION_DEFINE@/;@GLIB_VERSION@/$(GLibVersion);@VERSION@/$(GLibVersion)"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\glib\glib.symbols"

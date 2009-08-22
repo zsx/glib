@@ -109,7 +109,180 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+				Substitute="@GLIB_VERSION@/$(GLibVersion);@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@VERSION@/$(GLibVersion);@prefix@/\$\(OutDir\);@exec_prefix@/${prefix};@libdir@/${prefix}\/lib;@includedir@/${prefix}\/include;@G_MODULE_SUPPORTED@/1;@G_MODULE_LDFLAGS@/;@G_MODULE_LIBS@/"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+				ModuleName="glib-$(GLibApiVersion)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="GMODULE_COMPILATION;GMODULE_EXPORTS;G_LOG_DOMAIN=\&quot;GModule\&quot;;G_ENABLE_DEBUG"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				ModuleDefinitionFile="$(IntDir)\gmodule.def"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="SymbolsGeneratorTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
+			/>
+			<Tool
+				Name="DotInGeneratorTool"
+				Substitute="@GLIB_VERSION@/$(GLibVersion);@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@VERSION@/$(GLibVersion);@prefix@/\$\(OutDir\);@exec_prefix@/${prefix};@libdir@/${prefix}\/lib;@includedir@/${prefix}\/include;@G_MODULE_SUPPORTED@/1;@G_MODULE_LDFLAGS@/;@G_MODULE_LIBS@/"
+			/>
+			<Tool
+				Name="HeaderInstallerTool"
+				ModuleName="glib-$(GLibApiVersion)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="GMODULE_COMPILATION;GMODULE_EXPORTS;G_LOG_DOMAIN=\&quot;GModule\&quot;"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				ModuleDefinitionFile="$(IntDir)\gmodule.def"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
 			CharacterSet="2"
@@ -283,161 +456,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="HeaderInstallerTool"
-				ModuleName="glib-$(GLibApiVersion)"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="DotInGeneratorTool"
-				Substitute="@GLIB_VERSION@/$(GLibVersion);@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@VERSION@/$(GLibVersion);@prefix@/\$\(OutDir\);@exec_prefix@/${prefix};@libdir@/${prefix}\/lib;@includedir@/${prefix}\/include;@G_MODULE_SUPPORTED@/1;@G_MODULE_LDFLAGS@/;@G_MODULE_LIBS@/"
-			/>
-			<Tool
-				Name="GObjectGenMarshalTool"
-			/>
-			<Tool
-				Name="GObjectMkEnumsTool"
-			/>
-			<Tool
-				Name="GenSDKVSPropsTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="GMODULE_COMPILATION;GMODULE_EXPORTS;G_LOG_DOMAIN=\&quot;GModule\&quot;;G_ENABLE_DEBUG"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				ModuleDefinitionFile="$(IntDir)\gmodule.def"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="HeaderInstallerTool"
-				ModuleName="glib-$(GLibApiVersion)"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="DotInGeneratorTool"
-				Substitute="@GLIB_VERSION@/$(GLibVersion);@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@VERSION@/$(GLibVersion);@prefix@/\$\(OutDir\);@exec_prefix@/${prefix};@libdir@/${prefix}\/lib;@includedir@/${prefix}\/include;@G_MODULE_SUPPORTED@/1;@G_MODULE_LDFLAGS@/;@G_MODULE_LIBS@/"
-			/>
-			<Tool
-				Name="GObjectGenMarshalTool"
-			/>
-			<Tool
-				Name="GObjectMkEnumsTool"
-			/>
-			<Tool
-				Name="GenSDKVSPropsTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="GMODULE_COMPILATION;GMODULE_EXPORTS;G_LOG_DOMAIN=\&quot;GModule\&quot;"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				ModuleDefinitionFile="$(IntDir)\gmodule.def"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="ReleaseWdkCrt|x64"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(OAH_INSTALLED_PATH)\vsprops\oah-$(PlatformName)-$(ConfigurationName).vsprops;$(OAH_INSTALLED_PATH)\vsprops\oah-PC.vsprops;.\GLibLibrary.vsprops"
@@ -448,24 +466,33 @@
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
-				Name="HeaderInstallerTool"
-				ModuleName="glib-$(GLibApiVersion)"
+				Name="SymbolsGeneratorTool"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PkgConfigOAHDepsTool"
+			/>
+			<Tool
+				Name="PkgConfigTool"
+			/>
+			<Tool
+				Name="SEDTool"
+			/>
+			<Tool
+				Name="GObjectGenMarshalTool"
+			/>
+			<Tool
+				Name="GObjectMkEnumsTemplateTool"
 			/>
 			<Tool
 				Name="DotInGeneratorTool"
 				Substitute="@GLIB_VERSION@/$(GLibVersion);@GLIB_MAJOR_VERSION@/$(GLibMajorVersion);@GLIB_MINOR_VERSION@/$(GLibMinorVersion);@GLIB_MICRO_VERSION@/$(GLibMicroVersion);@GLIB_INTERFACE_AGE@/$(GLibInterfaceAge);@GLIB_BINARY_AGE@/$(GLibBinaryAge);@VERSION@/$(GLibVersion);@prefix@/\$\(OutDir\);@exec_prefix@/${prefix};@libdir@/${prefix}\/lib;@includedir@/${prefix}\/include;@G_MODULE_SUPPORTED@/1;@G_MODULE_LDFLAGS@/;@G_MODULE_LIBS@/"
 			/>
 			<Tool
-				Name="GObjectGenMarshalTool"
-			/>
-			<Tool
-				Name="GObjectMkEnumsTool"
-			/>
-			<Tool
-				Name="GenSDKVSPropsTool"
+				Name="HeaderInstallerTool"
+				ModuleName="glib-$(GLibApiVersion)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -550,20 +577,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="HeaderInstallerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|Win32"
-					>
-					<Tool
-						Name="HeaderInstallerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|x64"
 					>
 					<Tool
@@ -571,7 +584,21 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|x64"
+					>
+					<Tool
+						Name="HeaderInstallerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWdkCrt|Win32"
 					>
 					<Tool
 						Name="HeaderInstallerTool"
@@ -620,7 +647,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gmodule.rc.in"
+				RelativePath="..\..\gmodule\gmodule.rc.in"
 				>
 			</File>
 			<File
@@ -630,48 +657,6 @@
 			<File
 				RelativePath="..\..\gmodule\gmoduleconf.h.win32"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|Win32"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWdkCrt|x64"
-					>
-					<Tool
-						Name="DotInGeneratorTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
