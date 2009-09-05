@@ -1,7 +1,7 @@
 # vim: ft=python expandtab
 Import('env_glib prefix')
 
-env_glib_gmodule = env_glib.Clone(PDB = 'libglib-2.0.pdb')
+env_glib_gmodule = env_glib.Clone(PDB = 'libgmodule-2.0.pdb')
 
 env_glib_gmodule['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', r'\"GModule\"'),

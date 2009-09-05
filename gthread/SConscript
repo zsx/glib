@@ -1,7 +1,7 @@
 # vim: ft=python expandtab
 Import('env_glib prefix')
 
-env_glib_gthread = env_glib.Clone(PDB = 'libglib-2.0.pdb')
+env_glib_gthread = env_glib.Clone(PDB = 'libgthread-2.0.pdb')
 
 env_glib_gthread['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', r'\"GThread\"'),
