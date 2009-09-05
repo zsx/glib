@@ -10,7 +10,7 @@ env_glib_glib_win_iconv = env_glib_glib.Clone(PDB = 'libiconv.pdb')
 env_glib_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_glib_win_iconv['LIB_SUFFIX'],
                                         'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
 
-Alias('install', env_glib_glib_win_iconv.Install(prefix + '/bin', 'iconv'+env_glib_glib_win_iconv['LIB_SUFFIX'] + env_glib_glib_win_iconv['SHLIBSUFFIX']))
+Alias('install', env_glib_glib_win_iconv.Install(prefix + '/bin', 'libiconv'+env_glib_glib_win_iconv['LIB_SUFFIX'] + env_glib_glib_win_iconv['SHLIBSUFFIX']))
 
 #glib
 env_glib_glib['CPPDEFINES']=['HAVE_CONFIG_H',
@@ -157,10 +157,13 @@ EXTRA_libglib_SOURCES = Split("\
 	gspawn-win32.c	\
 	gwin32.c")
 
-SConscript(['libcharset/SConscript',
+subdirs = ['libcharset/SConscript',
             'gnulib/SConscript',
-            'pcre/SConscript'],
-            exports='env_glib_glib prefix')
+            'pcre/SConscript']
+if ARGUMENTS.get('build_test', 0):
+    subdirs += ['tests/SConscript']
+SConscript(subdirs, exports='env_glib_glib prefix')
+
 env_glib_glib.Append(CPPPATH=['#glib/glib', '#glib/win32/libintl-proxy'])
 env_glib_glib.Append(CPPDEFINES=['PCRE_STATIC'])
 env_glib_glib.Append(CFLAGS=env_glib_glib['DEBUG_CFLAGS'])
