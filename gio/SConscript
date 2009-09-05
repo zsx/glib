@@ -1,7 +1,7 @@
 # vim: ft=python expandtab
 Import('env_glib prefix')
 
-env_glib_gio = env_glib.Clone(PDB = 'libglib-2.0.pdb')
+env_glib_gio = env_glib.Clone(PDB = 'libgio-2.0.pdb')
 
 env_glib_gio['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '\\\"GLib-GIO\\\"'),
@@ -187,7 +187,10 @@ env_glib_gio.Command('gioenumtypes.c', 'gioenumtypes.c.template',
         "%s glib\\gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_glib_gio['PERL'], " ".join(map(lambda x: 'glib/gio/' + x, gio_HEADERS))))
 env_glib_gio.Depends('gioenumtypes.c', '#glib/gobject/glib-mkenums')
 
-SConscript('win32/SConscript', exports = "env_glib_gio prefix")
+subdirs = ['win32/SConscript']
+if ARGUMENTS.get('build_test', 0):
+    subdirs += ['tests/SConscript']
+SConscript(subdirs, exports = "env_glib_gio prefix")
 
 env_glib_gio.DotIn('gio.rc', 'gio.rc.in')
 env_glib_gio.RES('gio.rc')

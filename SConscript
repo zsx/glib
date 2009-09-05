@@ -55,13 +55,16 @@ env_glib.DotIn('glib-gettextize', 'glib-gettextize.in')
 iheader = env_glib.Install(prefix + '/lib/include', 'glibconfig.h')
 ibin = env_glib.Install(prefix + '/bin', 'glib-gettextize')
 
-SConscript(['glib/SConscript',
-'gmodule/SConscript',
-'gthread/SConscript',
-'gobject/SConscript',
-'gio/SConscript',
-'win32/libintl-proxy/SConscript',
-'tests/SConscript'], exports=['env_glib', 'prefix'])
+subdirs = ['glib/SConscript',
+           'gmodule/SConscript',
+           'gthread/SConscript',
+           'gobject/SConscript',
+           'gio/SConscript',
+           'win32/libintl-proxy/SConscript']
+if ARGUMENTS.get('build_test', 0):
+    subdirs += ['test/SConscript']
+
+SConscript(subdirs, exports=['env_glib', 'prefix'])
 
 env_glib.Depends('glib/SConscript', 'config.h')
 

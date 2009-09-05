@@ -117,6 +117,12 @@ env_glib_gobject.Depends(gobject_dll, gobject_HEADERS)
 env_glib_gobject.Depends(gobject_dll, genmarshal)
 
 env_glib_gobject.AddPostAction(gobject_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+subdirs = []
+if ARGUMENTS.get('build_test', 0):
+    subdirs += ['tests/SConscript']
+SConscript(subdirs, exports='env_glib_gobject prefix')
+
 Alias('insall', env_glib_gobject.Install(prefix + '/bin', 'glib-genmarshal.exe'))
 
 Alias('install', env_glib_gobject.Install(prefix + '/include/glib-2.0/gobject', gobject_HEADERS))
