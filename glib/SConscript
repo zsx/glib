@@ -1,0 +1,198 @@
+# vim: ft=python expandtab
+
+Import('env_glib prefix')
+
+env_glib_glib = env_glib.Clone()
+env_glib_glib['PDB'] = 'libglib-2.0.pdb'
+
+# win_iconv
+env_glib_glib_win_iconv = env_glib_glib.Clone(PDB = 'libiconv.pdb')
+env_glib_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_glib_win_iconv['LIB_SUFFIX'],
+                                        'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
+
+Alias('install', env_glib_glib_win_iconv.Install(prefix + '/bin', 'iconv'+env_glib_glib_win_iconv['LIB_SUFFIX'] + env_glib_glib_win_iconv['SHLIBSUFFIX']))
+
+#glib
+env_glib_glib['CPPDEFINES']=['HAVE_CONFIG_H',
+                            ('G_LOG_DOMAN', '\\\"GLib\\\"'),
+                            'G_DISABLE_DEPRECATED',
+                            'GLIB_COMPILATION'] + env_glib_glib['DEBUG_CPPDEFINES']
+
+env_glib_glib.Append(CPPPATH=['#glib', '#glib/glib', '#glib/win32/libintl-proxy'])
+
+env_glib_glib['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
+env_glib_glib.DotSymbols2Def('glib.def', 'glib.symbols')
+
+env_glib_glib.Command('galias.h', 'glib.symbols', env_glib_glib['PERL'] + ' glib/glib/makegalias.pl <$SOURCE >$TARGET')
+env_glib_glib.Command('galiasdef.c', 'glib.symbols', env_glib_glib['PERL'] + ' glib/glib/makegalias.pl -def <$SOURCE >$TARGET')
+
+gregex_h = ["gregex.h"]
+gregex_c = ["gregex.c"]
+
+glibinclude_HEADERS =  Split("\
+	glib-object.h	\
+	glib.h")
+glibsubinclude_HEADERS =  Split(" \
+	galloca.h	\
+	garray.h	\
+	gasyncqueue.h	\
+	gatomic.h	\
+	gbacktrace.h	\
+	gbase64.h	\
+	gbookmarkfile.h \
+	gcache.h	\
+	gchecksum.h	\
+	gcompletion.h	\
+	gconvert.h	\
+	gdataset.h	\
+	gdate.h		\
+	gdir.h		\
+	gerror.h	\
+	gfileutils.h	\
+	ghash.h		\
+	ghook.h		\
+	ghostutils.h	\
+	gi18n.h		\
+	gi18n-lib.h	\
+	giochannel.h	\
+	gkeyfile.h 	\
+	glist.h		\
+	gmacros.h	\
+	gmain.h		\
+	gmappedfile.h	\
+	gmarkup.h	\
+	gmem.h		\
+	gmessages.h	\
+	gnode.h		\
+	goption.h	\
+	gpattern.h	\
+	gpoll.h		\
+	gprimes.h	\
+	gqsort.h	\
+	gquark.h	\
+	gqueue.h	\
+	grand.h		\
+	grel.h		\
+	gscanner.h	\
+	gsequence.h	\
+	gshell.h	\
+	gslice.h	\
+	gslist.h	\
+	gspawn.h	\
+	gstdio.h	\
+	gstrfuncs.h	\
+	gtestutils.h	\
+	gstring.h	\
+	gthread.h	\
+	gthreadpool.h	\
+	gtimer.h	\
+	gtree.h		\
+	gtypes.h	\
+	gunicode.h	\
+	gurifuncs.h 		\
+	gutils.h	\
+	gwin32.h	\
+	gprintf.h") + gregex_h
+
+libglib_SOURCES = Split("	\
+	garray.c		\
+	gasyncqueue.c		\
+	gatomic.c		\
+	gbacktrace.c		\
+	gbase64.c		\
+	gbookmarkfile.c 	\
+	gcache.c		\
+	gchecksum.c		\
+	gcompletion.c		\
+	gconvert.c		\
+	gdataset.c		\
+	gdate.c         	\
+	gdir.c			\
+	gerror.c		\
+	gfileutils.c		\
+	ghash.c			\
+	ghook.c			\
+	ghostutils.c		\
+	giochannel.c    	\
+	gkeyfile.c        	\
+	glist.c			\
+	gmain.c         	\
+	gmappedfile.c		\
+	gmarkup.c		\
+	gmem.c			\
+	gmessages.c		\
+	gnode.c			\
+	goption.c		\
+	gpattern.c		\
+	gpoll.c			\
+	gprimes.c		\
+	gqsort.c		\
+	gqueue.c		\
+	grel.c			\
+	grand.c			\
+	gscanner.c		\
+	gsequence.c		\
+	gshell.c		\
+	gslice.c		\
+	gslist.c		\
+	gstdio.c		\
+	gstrfuncs.c		\
+	gstring.c		\
+	gtestutils.c		\
+	gthread.c       	\
+	gthreadpool.c   	\
+	gtimer.c		\
+	gtree.c			\
+	guniprop.c		\
+	gutf8.c			\
+	gunibreak.c		\
+	gunicollate.c		\
+	gunidecomp.c		\
+	gurifuncs.c 		\
+	gutils.c		\
+	gprintf.c") + gregex_c
+
+EXTRA_libglib_SOURCES = Split("\
+	giowin32.c	\
+	gspawn-win32.c	\
+	gwin32.c")
+
+SConscript(['libcharset/SConscript',
+            'gnulib/SConscript',
+            'pcre/SConscript'],
+            exports='env_glib_glib prefix')
+env_glib_glib.Append(CPPPATH=['#glib/glib', '#glib/win32/libintl-proxy'])
+env_glib_glib.Append(CPPDEFINES=['PCRE_STATIC'])
+env_glib_glib.Append(CFLAGS=env_glib_glib['DEBUG_CFLAGS'])
+
+env_glib_glib.DotIn('glib.rc', 'glib.rc.in')
+env_glib_glib.RES('glib.rc')
+glib_dll = env_glib_glib.SharedLibrary(['libglib-2.0' + env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX'], 'libglib-2.0.lib'],
+        libglib_SOURCES + EXTRA_libglib_SOURCES 
+        + ['glib.def', 
+           'glib.res',
+           'libcharset/libcharset.lib', 
+           'gnulib/libgnulib.lib', 
+           'pcre/libpcre.lib'], 
+        LIBS=['libintl-proxy',
+              'ws2_32', 
+              'user32', 
+              'advapi32', 
+              'shell32', 
+              'wsock32',
+              'ole32'], 
+        LIBPATH='#glib/win32/libintl-proxy')
+
+env_glib_glib.Depends('libglib-2.0' + env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX'], 
+        '#glib/win32/libintl-proxy/libintl-proxy.lib')
+
+env_glib_glib.AddPostAction(glib_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+iheader = []
+iheader.append(env_glib_glib.Install(prefix + '/include/glib-2.0', glibinclude_HEADERS))
+iheader.append(env_glib_glib.Install(prefix + '/include/glib-2.0/glib', glibsubinclude_HEADERS))
+Alias('install', iheader)
+
+Alias('install', env_glib_glib.Install(prefix + '/bin', 'libglib-2.0'+env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX']))
+Alias('install', env_glib_glib.Install(prefix + '/lib', 'libglib-2.0.lib'))
+
+Alias('install', env_glib_glib.Install(prefix + '/pdb', 'libglib-2.0.pdb'))

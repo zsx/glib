@@ -1,0 +1,12 @@
+# vim: ft=python expandtab
+
+Import('env_glib_gio prefix')
+
+#libgiowin32 
+libgiowin32_SOURCES = Split("\
+	gwin32directorymonitor.c		\
+	gwinhttpvfs.c				\
+	gwinhttpfile.c				\
+	gwinhttpfileinputstream.c		\
+	gwinhttpfileoutputstream.c")
+env_glib_gio.StaticLibrary('libgiowin32', libgiowin32_SOURCES)
