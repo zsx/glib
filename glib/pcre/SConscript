@@ -1,0 +1,45 @@
+# vim: ft=python expandtab
+
+Import('env_glib_glib prefix')
+
+#libpcre 
+libpcre_SOURCES = Split("\
+	pcre_compile.c \
+	pcre_chartables.c \
+	pcre_config.c \
+	pcre_dfa_exec.c \
+	pcre_exec.c \
+	pcre_fullinfo.c \
+	pcre_get.c \
+	pcre_globals.c \
+	pcre_info.c \
+	pcre_maketables.c \
+	pcre_newline.c \
+	pcre_ord2utf8.c \
+	pcre_refcount.c \
+	pcre_study.c \
+	pcre_tables.c \
+	pcre_try_flipped.c \
+	pcre_ucp_searchfuncs.c \
+	pcre_valid_utf8.c \
+	pcre_version.c \
+	pcre_xclass.c")
+
+env_glib_glib_pcre = env_glib_glib.Clone()
+env_glib_glib_pcre.Append(CPPDEFINES=[
+	('G_LOG_DOMAIN','"\\"GLib-GRegex\\""'),
+	('SUPPORT_UCP'),
+	('SUPPORT_UTF8'),
+	('NEWLINE', '-1'),
+	('MATCH_LIMIT', '10000000'),
+	('MATCH_LIMIT_RECURSION', '8192'),
+	('MAX_NAME_SIZE', '32'),
+	('MAX_NAME_COUNT', '10000'),
+	('MAX_DUPLENGTH', '30000'),
+	('LINK_SIZE', '2'),
+	('POSIX_MALLOC_THRESHOLD', '10'),
+	('PCRE_STATIC')])
+env_glib_glib_pcre.Append(CPPPATH=['#glib/glib'])
+libpcre = env_glib_glib_pcre.StaticLibrary('libpcre', libpcre_SOURCES)
+
+#Return(libcharset)

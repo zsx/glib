@@ -1,0 +1,14 @@
+# vim: ft=python expandtab
+
+Import('env_glib_glib prefix')
+
+# 
+libgnulib_SOURCES = Split("\
+	asnprintf.c \
+	printf-args.c \
+	printf-parse.c \
+	vasnprintf.c \
+	printf.c")
+libgnulib = env_glib_glib.StaticLibrary('libgnulib', libgnulib_SOURCES)
+
+#Return(libcharset)

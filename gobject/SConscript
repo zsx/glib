@@ -1,0 +1,123 @@
+# vim: ft=python expandtab
+Import('env_glib prefix')
+
+env_glib_gobject = env_glib.Clone()
+env_glib_gobject['PDB'] = 'libgobject.pdb'
+
+env_glib_gobject['CPPDEFINES']=['HAVE_CONFIG_H',
+                                ('G_LOG_DOMAN', '\\\"GLib-GObject\\\"'),
+                                'G_DISABLE_DEPRECATED',
+                                'GOBJECT_COMPILATION',
+                                'G_DISABLE_CONST_RETURNS'] + env_glib_gobject['DEBUG_CPPDEFINES']
+env_glib_gobject.Append(CPPPATH=['#glib', '#glib/glib'])
+env_glib_gobject.Append(CFLAGS=env_glib_gobject['DEBUG_CFLAGS'])
+
+#glib-mkenums
+glib_mkenums = env_glib_gobject.DotIn('glib-mkenums', 'glib-mkenums.in')
+
+Alias('install', env_glib_gobject.Install(prefix + '/bin', 'glib-mkenums'))
+
+#glib-genmarshal
+env_glib_gobject_genmarshal = env_glib_gobject.Clone(PDB = 'glib-genmarshal.pdb')
+
+def dot_strings(target, source, env):
+    t = file(str(target[0]), 'w')
+    s = file(str(source[0]), 'r')
+    for line in s.readlines():
+        '''
+	grep '^[A-Z]' $(srcdir)/gmarshal.list \
+	| sed -e 's/^/"g_cclosure_marshal_/' -e 's/:/__/' -e 's/,/_/g' -e 's/$$/",/' > xgen-gms \
+        '''
+        if line[0].isupper():
+            line = '"g_cclosure_marshal_' + line
+            line = line.replace(':', '__')
+            line = line.replace(',', '_')
+            line = line.replace('\n', '",\n')
+            t.write(line)
+    s.close()
+    t.close()
+
+dot_strings_processor = env_glib_gobject_genmarshal.Builder(action= dot_strings, src_suffix = '.list')
+env_glib_gobject_genmarshal.Append(BUILDERS={'DotStrings': dot_strings_processor})
+
+env_glib_gobject_genmarshal.DotStrings('gmarshal.strings', 'gmarshal.list')
+genmarshal = env_glib_gobject_genmarshal.Program('glib-genmarshal.c', LIBS='libglib-2.0', LIBPATH=prefix + '/lib')
+env_glib_gobject_genmarshal.Depends(genmarshal, 'gmarshal.strings')
+env_glib_gobject_genmarshal.AddPostAction(genmarshal, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+#gobject
+env_glib_gobject['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
+env_glib_gobject.DotSymbols2Def('gobject.def', 'gobject.symbols')
+
+env_glib_gobject.Command('gobjectalias.h', 'gobject.symbols', env_glib_gobject['PERL'] + ' glib/gobject/makegobjectalias.pl <$SOURCE >$TARGET')
+env_glib_gobject.Command('gobjectaliasdef.c', 'gobject.symbols', env_glib_gobject['PERL'] + ' glib/gobject/makegobjectalias.pl -def <$SOURCE >$TARGET')
+
+gobject_HEADERS = Split("\
+	gboxed.h		\
+	gclosure.h		\
+	genums.h		\
+	gobject.h		\
+	gparam.h		\
+	gparamspecs.h		\
+	gsignal.h		\
+	gsourceclosure.h	\
+	gtype.h			\
+	gtypemodule.h		\
+	gtypeplugin.h		\
+	gvalue.h		\
+	gvaluearray.h		\
+	gvaluecollector.h	\
+	gvaluetypes.h		\
+	gmarshal.h")
+
+gobject_SOURCES = Split("\
+	gboxed.c		\
+	gclosure.c		\
+	genums.c		\
+	gobject.c		\
+	gparam.c		\
+	gparamspecs.c		\
+	gsignal.c		\
+	gsourceclosure.c	\
+	gtype.c			\
+	gtypemodule.c		\
+	gtypeplugin.c		\
+	gvalue.c		\
+	gvaluearray.c		\
+	gvaluetransform.c	\
+	gvaluetypes.c")
+BUILT_gobject_SOURCES = Split('gobjectaliasdef.c')
+
+env_glib_gobject.AppendENVPath('PATH', ['#glib/glib', '#glib/win32/libintl-proxy']) 
+env_glib_gobject.Command('gmarshal.c', 'gmarshal.list', 
+        '"glib\\gobject\\glib-genmarshal" --nostdinc --prefix=g_cclosure_marshal $SOURCE --body >> $TARGET')
+env_glib_gobject.Depends('gmarshal.c', genmarshal)
+
+env_glib_gobject.Command('gmarshal.h', 'gmarshal.list', '''
+	echo #ifndef __G_MARSHAL_H__ > $TARGET
+	echo #define __G_MARSHAL_H__ >> $TARGET
+        "glib\\gobject\\glib-genmarshal.exe" --nostdinc --prefix=g_cclosure_marshal $SOURCE --header >> $TARGET
+	echo #endif /* __G_MARSHAL_H__ */ >> $TARGET''')
+env_glib_gobject.Depends('gmarshal.h', genmarshal)
+
+env_glib_gobject.DotIn('gobject.rc', 'gobject.rc.in')
+env_glib_gobject.RES('gobject.rc')
+gobject_dll=env_glib_gobject.SharedLibrary(['libgobject-2.0' + env_glib_gobject['LIB_SUFFIX'] + env_glib_gobject['SHLIBSUFFIX'],
+                                            'libgobject-2.0.lib'],
+                                           gobject_SOURCES + BUILT_gobject_SOURCES + ['gobject.def', 'gobject.res'], 
+                                           LIBS=['libintl-proxy',
+                                                 'libglib-2.0',
+                                                 'user32', 
+                                                 'advapi32', 
+                                                 'shell32', 
+                                                 'ole32'],
+                                           LIBPATH=[prefix + '/lib', '#glib/glib', '#glib/win32/libintl-proxy'])
+env_glib_gobject.Depends('gsignal.obj', 'gmarshal.c') #gsignal.c include this file, itself is not listed on source files though
+env_glib_gobject.Depends(gobject_dll, gobject_HEADERS)
+env_glib_gobject.Depends(gobject_dll, genmarshal)
+
+env_glib_gobject.AddPostAction(gobject_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+Alias('insall', env_glib_gobject.Install(prefix + '/bin', 'glib-genmarshal.exe'))
+
+Alias('install', env_glib_gobject.Install(prefix + '/include/glib-2.0/gobject', gobject_HEADERS))
+Alias('install', env_glib_gobject.Install(prefix + '/bin', 'libgobject-2.0' + env_glib_gobject['LIB_SUFFIX'] + '.dll'))

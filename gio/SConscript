@@ -1,0 +1,218 @@
+# vim: ft=python expandtab
+Import('env_glib prefix')
+
+env_glib_gio = env_glib.Clone(PDB = 'libglib-2.0.pdb')
+
+env_glib_gio['CPPDEFINES']=['HAVE_CONFIG_H',
+                                ('G_LOG_DOMAN', '\\\"GLib-GIO\\\"'),
+                                'G_DISABLE_DEPRECATED',
+                                'GIO_COMPILATION',
+                                'GIO_MODULE_DIR', 'gio/modules'] + env_glib_gio['DEBUG_CPPDEFINES']
+env_glib_gio.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule', '#glib/gio', '#glib/win32/libintl-proxy'])
+
+env_glib_gio['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
+env_glib_gio.DotSymbols2Def('gio.def', 'gio.symbols')
+
+env_glib_gio.Command('gioalias.h', 'gio.symbols', env_glib_gio['PERL'] + ' glib/gio/makegioalias.pl <$SOURCE >$TARGET')
+env_glib_gio.Command('gioaliasdef.c', 'gio.symbols', env_glib_gio['PERL'] + ' glib/gio/makegioalias.pl -def <$SOURCE >$TARGET')
+
+gio_HEADERS =	Split("		\
+	gappinfo.h 		\
+	gasyncinitable.h	\
+	gasyncresult.h 		\
+	gbufferedinputstream.h 	\
+	gbufferedoutputstream.h \
+	gcancellable.h 		\
+	gcontenttype.h 		\
+	gdatainputstream.h 	\
+	gdataoutputstream.h 	\
+	gdrive.h 		\
+	gemblem.h 		\
+	gemblemedicon.h		\
+	gfile.h 		\
+	gfileattribute.h 	\
+	gfileenumerator.h 	\
+	gfileicon.h 		\
+	gfileinfo.h 		\
+	gfileinputstream.h 	\
+	gfilemonitor.h 		\
+	gfilenamecompleter.h 	\
+	gfileoutputstream.h 	\
+	gfileiostream.h		\
+	gfilterinputstream.h 	\
+	gfilteroutputstream.h 	\
+	gicon.h 		\
+	ginetaddress.h		\
+	ginetsocketaddress.h	\
+	ginputstream.h 		\
+	ginitable.h		\
+	gio.h			\
+	giotypes.h		\
+	gioenums.h		\
+	gioerror.h 		\
+	giomodule.h 		\
+	gioscheduler.h 		\
+	giostream.h		\
+	gloadableicon.h 	\
+	gmount.h 		\
+	gmemoryinputstream.h 	\
+	gmemoryoutputstream.h 	\
+	gmountoperation.h 	\
+	gnativevolumemonitor.h 	\
+	gnetworkaddress.h	\
+	gnetworkservice.h	\
+	goutputstream.h 	\
+	gresolver.h		\
+	gseekable.h 		\
+	gsimpleasyncresult.h 	\
+	gsocket.h		\
+	gsocketaddress.h	\
+	gsocketaddressenumerator.h \
+	gsocketclient.h		\
+	gsocketconnectable.h	\
+	gsocketconnection.h	\
+	gsocketcontrolmessage.h	\
+	gsocketlistener.h	\
+	gsocketservice.h	\
+	gsrvtarget.h		\
+	gtcpconnection.h	\
+	gthreadedsocketservice.h\
+	gthemedicon.h 		\
+	gvfs.h 			\
+	gvolume.h 		\
+	gvolumemonitor.h")
+
+local_sources = Split("\
+	glocaldirectorymonitor.c 	\
+	glocalfile.c 			\
+	glocalfileenumerator.c 		\
+	glocalfileinfo.c 		\
+	glocalfileinputstream.c 	\
+	glocalfilemonitor.c 		\
+	glocalfileoutputstream.c 	\
+	glocalfileiostream.c		\
+	glocalvfs.c")
+
+win32_sources = Split("\
+	gwin32mount.c \
+	gwin32resolver.c \
+	gwin32volumemonitor.c")
+
+marshal_sources = Split("gio-marshal.c")
+appinfo_sources = Split("gwin32appinfo.c")
+
+gio_SOURCES = Split("\
+	gappinfo.c 		\
+	gasynchelper.c 		\
+	gasyncinitable.c	\
+	gasyncresult.c 		\
+	gbufferedinputstream.c 	\
+	gbufferedoutputstream.c \
+	gcancellable.c 		\
+	gcontenttype.c 		\
+	gdatainputstream.c 	\
+	gdataoutputstream.c 	\
+	gdrive.c 		\
+	gdummyfile.c 		\
+	gemblem.c 		\
+	gemblemedicon.c		\
+	gfile.c 		\
+	gfileattribute.c 	\
+	gfileenumerator.c 	\
+	gfileicon.c 		\
+	gfileinfo.c 		\
+	gfileinputstream.c 	\
+	gfilemonitor.c 		\
+	gfilenamecompleter.c 	\
+	gfileoutputstream.c 	\
+	gfileiostream.c		\
+	gfilterinputstream.c 	\
+	gfilteroutputstream.c 	\
+	gicon.c 		\
+	ginetaddress.c		\
+	ginetsocketaddress.c	\
+	ginitable.c		\
+	ginputstream.c 		\
+	gioerror.c 		\
+	giomodule.c 		\
+	gioscheduler.c 		\
+	giostream.c		\
+	gloadableicon.c 	\
+	gmount.c 		\
+	gmemoryinputstream.c 	\
+	gmemoryoutputstream.c 	\
+	gmountoperation.c 	\
+	gnativevolumemonitor.c 	\
+	gnetworkaddress.c	\
+	gnetworkservice.c	\
+	goutputstream.c 	\
+	gpollfilemonitor.c 	\
+	gresolver.c		\
+	gseekable.c 		\
+	gsimpleasyncresult.c 	\
+	gsocket.c		\
+	gsocketaddress.c	\
+	gsocketaddressenumerator.c \
+	gsocketclient.c		\
+	gsocketconnectable.c	\
+	gsocketconnection.c	\
+	gsocketcontrolmessage.c	\
+	gsocketinputstream.c	\
+	gsocketlistener.c	\
+	gsocketoutputstream.c	\
+	gsocketservice.c	\
+	gsrvtarget.c		\
+	gtcpconnection.c	\
+	gthreadedsocketservice.c\
+	gthemedicon.c 		\
+	gthreadedresolver.c	\
+	gunionvolumemonitor.c 	\
+	gvfs.c 			\
+	gvolume.c 		\
+	gvolumemonitor.c 	\
+	gioenumtypes.c		\
+	gioaliasdef.c") + local_sources + win32_sources + marshal_sources + appinfo_sources
+
+env_glib_gio.Command('gio-marshal.c', 'gio-marshal.list', '''
+        echo #include "gio-marshal.h" > $TARGET
+        "glib\\gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --body >> $TARGET''')
+env_glib_gio.Command('gio-marshal.h', 'gio-marshal.list', '''
+        "glib\\gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --header --internal >> $TARGET >> $TARGET''')
+
+env_glib_gio.Command('gioenumtypes.h', 'gioenumtypes.h.template',
+        "%s glib\\gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_glib_gio['PERL'], " ".join(map(lambda x: 'glib/gio/' + x, gio_HEADERS))))
+env_glib_gio.Depends('gioenumtypes.h', '#glib/gobject/glib-mkenums')
+
+env_glib_gio.Command('gioenumtypes.c', 'gioenumtypes.c.template',
+        "%s glib\\gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_glib_gio['PERL'], " ".join(map(lambda x: 'glib/gio/' + x, gio_HEADERS))))
+env_glib_gio.Depends('gioenumtypes.c', '#glib/gobject/glib-mkenums')
+
+SConscript('win32/SConscript', exports = "env_glib_gio prefix")
+
+env_glib_gio.DotIn('gio.rc', 'gio.rc.in')
+env_glib_gio.RES('gio.rc')
+gio_dll=env_glib_gio.SharedLibrary(['libgio-2.0' + env_glib_gio['LIB_SUFFIX'] + env_glib_gio['SHLIBSUFFIX'],
+                                    'libgio-2.0.lib'],
+                                   gio_SOURCES + ['gio.def', 'gio.res', 'win32/libgiowin32.lib'], 
+                                   LIBS=['libglib-2.0',
+                                         'libgobject-2.0',
+                                         'libgmodule-2.0',
+                                         'shlwapi',
+                                         'ws2_32',
+                                         'dnsapi',
+                                         'kernel32',
+                                         'user32',
+                                         'advapi32',
+                                         'shell32'],
+                                   LIBPATH=[prefix + '/lib', '#glib/glib', '#glib/gobject', '#glib/gmodule', 'win32/libgiowin32'])
+env_glib_gio.Depends(gio_dll, gio_HEADERS)
+env_glib_gio.Depends(gio_dll, ['#glib/glib/libglib-2.0.lib',
+                              '#glib/gobject/libgobject-2.0.lib',
+                              '#glib/gmodule/libgmodule-2.0.lib',
+                              ])
+env_glib_gio.AddPostAction(gio_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+Alias('install', env_glib_gio.Install(prefix + '/include/glib-2.0/gio', gio_HEADERS))
+Alias('install', env_glib_gio.Install(prefix + '/bin', 'libgio-2.0' + env_glib_gio['LIB_SUFFIX'] + '.dll'))
+Alias('install', env_glib_gio.Install(prefix + '/lib', 'libgio-2.0.lib'))
+Alias('install', env_glib_gio.Install(prefix + '/pdb', 'libgio-2.0.pdb'))

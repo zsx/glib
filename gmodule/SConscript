@@ -1,0 +1,37 @@
+# vim: ft=python expandtab
+Import('env_glib prefix')
+
+env_glib_gmodule = env_glib.Clone(PDB = 'libglib-2.0.pdb')
+
+env_glib_gmodule['CPPDEFINES']=['HAVE_CONFIG_H',
+                                ('G_LOG_DOMAN', r'\"GModule\"'),
+                                'G_DISABLE_DEPRECATED'] + env_glib_gmodule['DEBUG_CPPDEFINES']
+env_glib_gmodule.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
+
+env_glib_gmodule['DOT_SYMBOLS_FLAGS'] = ''
+env_glib_gmodule.DotSymbols2Def('gmodule.def', 'gmodule.symbols')
+
+gmodule_HEADERS = Split("		\
+	gmodule.h")
+
+gmodule_SOURCES = Split("\
+	gmodule.c")
+
+env_glib_gmodule.DotIn('gmoduleconf.h', 'gmoduleconf.h.win32')
+
+env_glib_gmodule.DotIn('gmodule.rc', 'gmodule.rc.in')
+env_glib_gmodule.RES('gmodule.rc')
+
+gmodule_dll=env_glib_gmodule.SharedLibrary(['libgmodule-2.0' + env_glib_gmodule['LIB_SUFFIX'] + env_glib_gmodule['SHLIBSUFFIX'],
+                                    'libgmodule-2.0.lib'],
+                                   gmodule_SOURCES + ['gmodule.def', 'gmodule.res'], 
+                                   LIBS=['libglib-2.0'],
+                                   LIBPATH=[prefix + '/lib', '#glib/glib'])
+
+env_glib_gmodule.Depends(gmodule_dll, gmodule_HEADERS)
+env_glib_gmodule.AddPostAction(gmodule_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+Alias('install', env_glib_gmodule.Install(prefix + '/include/glib-2.0/gmodule', gmodule_HEADERS))
+Alias('install', env_glib_gmodule.Install(prefix + '/bin', 'libgmodule-2.0' + env_glib_gmodule['LIB_SUFFIX'] + '.dll'))
+Alias('install', env_glib_gmodule.Install(prefix + '/lib', 'libgmodule-2.0.lib'))
+Alias('install', env_glib_gmodule.Install(prefix + '/pdb', 'libgmodule-2.0.pdb'))

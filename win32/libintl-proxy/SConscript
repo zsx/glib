@@ -1,0 +1,11 @@
+# vim: ft=python expandtab
+
+Import('env_glib prefix')
+
+# 
+env_glib_libintl_proxy = env_glib.Clone(PDB = 'libintl-proxy.pdb')
+libintl_SOURCES = Split("libintl.c libintl.def")
+libintl = env_glib_libintl_proxy.SharedLibrary(['libintl-proxy' + env_glib_libintl_proxy['LIB_SUFFIX'],
+                                                'libintl-proxy.lib'], libintl_SOURCES)
+
+#Return(libcharset)
