@@ -27,3 +27,6 @@ for i in tests:
         e.Program(i, i + '.obj')
     else:
         e.Program(i, i + '.c')
+for x in tests:
+    if x not in ['']:
+        env_glib_test_refcount.AlwaysBuild(env_glib_test_refcount.Alias('test', [], os.path.join('glib', 'tests', 'refcount', x + '.exe')))

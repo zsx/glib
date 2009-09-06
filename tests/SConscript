@@ -1,8 +1,12 @@
 # vim: ft=python expandtab
+import os
+import subprocess
 
 Import('env_glib prefix')
 
 env_glib_test = env_glib.Clone()
+env_glib_test.Append(CLFAGS = env_glib_test['DEBUG_CFLAGS'])
+env_glib_test.Append(CPPDEFINES = ['ENABLE_REGEX'] + env_glib_test['DEBUG_CPPDEFINES'])
 env_glib_test.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
 env_glib_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgmodule-2.0', 'user32'])
 env_glib_test.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gmodule'])
@@ -60,6 +64,20 @@ for i in tests:
         e.Program(i, [i + '.c', 'memchunks.c'])
     else:
         e.Program(i, i + '.c')
+
+env_glib_test['ENV']['PATH'] += ';' + ';'.join([os.path.join('glib', 'glib'), 
+                                          os.path.join('glib', 'gmodule'), 
+                                          os.path.join('glib', 'gthread'), 
+                                          os.path.join('glib', 'gobject'),
+                                          os.path.join('glib', 'win32', 'libintl-proxy')]) 
+env_glib_test['ENV']['srcdir'] = os.path.dirname('glib/tests/') #for iochannel-test
+
+for x in tests:
+    if x not in ['checksum-test', 'file-test', 'mapping-test', 'module-test', 'child-test', 'spawn-test']:
+        env_glib_test.AlwaysBuild(env_glib_test.Alias('test', [], os.path.join('glib', 'tests', x + '.exe')))
+
+env_glib_test.SharedLibrary('libmoduletestplugin_a.c')
+env_glib_test.SharedLibrary('libmoduletestplugin_b.c')
 
 SConscript(['gobject/SConscript',
             'refcount/SConscript'], 
