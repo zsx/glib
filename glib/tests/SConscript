@@ -5,38 +5,20 @@ Import('env_glib_glib prefix')
 env_glib_glib_test = env_glib_glib.Clone()
 env_glib_glib_test.Append(LIBS='libglib-2.0')
 env_glib_glib_test.Append(LIBPATH=['#glib/glib'])
+env_glib_glib_test.Append(CFLAGS=env_glib_glib['DEBUG_CFLAGS'])
+env_glib_glib_test['CPPDEFINES'] = env_glib_glib['DEBUG_CPPDEFINES']
 
-env_glib_glib_test_testing = env_glib_glib_test.Clone(PDB = 'testing.pdb')
-env_glib_glib_test_testing.Program('testing', 'testing.c')
-
-env_glib_glib_test_option_context = env_glib_glib_test.Clone(PDB = 'option-context.pdb')
-env_glib_glib_test_option_context.Program('option-context', 'option-context.c')
-
-env_glib_glib_test_keyfile = env_glib_glib_test.Clone(PDB = 'keyfile.pdb')
-env_glib_glib_test_keyfile.Program('keyfile', 'keyfile.c')
-
-env_glib_glib_test_fileutils = env_glib_glib_test.Clone(PDB = 'fileutils.pdb')
-env_glib_glib_test_fileutils.Program('fileutils', 'fileutils.c')
-
-env_glib_glib_test_printf = env_glib_glib_test.Clone(PDB = 'printf.pdb')
-env_glib_glib_test_printf.Program('printf', 'printf.c')
-
-env_glib_glib_test_rand = env_glib_glib_test.Clone(PDB = 'rand.pdb')
-env_glib_glib_test_rand.Program('rand', 'rand.c')
-
-#glib\glib\tests\strfuncs.c(955) : fatal error C1064: compiler limit : token over
-#flowed internal buffer
-#env_glib_glib_test_strfuncs = env_glib_glib_test.Clone(PDB = 'strfuncs.pdb')
-#env_glib_glib_test_strfuncs.Program('strfuncs', 'strfuncs.c')
-
-env_glib_glib_test_string = env_glib_glib_test.Clone(PDB = 'string.pdb')
-env_glib_glib_test_string.Program('string', 'string.c')
-
-env_glib_glib_test_markup_subparser = env_glib_glib_test.Clone(PDB = 'markup-subparser.pdb')
-env_glib_glib_test_markup_subparser.Program('markup-subparser', 'markup-subparser.c')
-
-env_glib_glib_test_array_test = env_glib_glib_test.Clone(PDB = 'array-test.pdb')
-env_glib_glib_test_array_test.Program('array-test', 'array-test.c')
-
-env_glib_glib_test_hostutils = env_glib_glib_test.Clone(PDB = 'hostutils.pdb')
-env_glib_glib_test_hostutils.Program('hostutils', 'hostutils.c')
+tests = ["testing",
+         "option-context",
+         "keyfile",
+         "fileutils",
+         "printf",
+         "rand",
+         #"strfuncs", #glib\glib\tests\strfuncs.c(955) : fatal error C1064: compiler limit : token over flowed internal buffer
+         "string",
+         "markup-subparser",
+         "array-test",
+         "hostutils"]
+for i in tests:
+    e = env_glib_glib_test.Clone(PDB = i + '.pdb')
+    e.Program(i, i + '.c')
