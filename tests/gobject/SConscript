@@ -38,3 +38,7 @@ env_glib_test_gobject.StaticLibrary('libtestgobject', libtestgobject_sources)
 for i in tests:
     e = env_glib_test_gobject.Clone(PDB = i + '.pdb')
     e.Program(i, [i + '.c', 'libtestgobject.lib'])
+
+for x in tests:
+    if x not in ['']:
+        env_glib_test_gobject.AlwaysBuild(env_glib_test_gobject.Alias('test', [], os.path.join('glib', 'tests', 'gobject', x + '.exe')))
