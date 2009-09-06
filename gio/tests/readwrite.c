@@ -1,7 +1,9 @@
 #include <glib/glib.h>
 #include <glib/gstdio.h>
 #include <gio/gio.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <string.h>
 
 static const char *original_data = "This is some test data that we can put in a file...";
