@@ -62,7 +62,7 @@ subdirs = ['glib/SConscript',
            'gio/SConscript',
            'win32/libintl-proxy/SConscript']
 if ARGUMENTS.get('build_test', 0):
-    subdirs += ['test/SConscript']
+    subdirs += ['tests/SConscript']
 
 SConscript(subdirs, exports=['env_glib', 'prefix'])
 

@@ -1,0 +1,30 @@
+# vim: ft=python expandtab
+import os
+Import('env_glib_gio prefix')
+
+env_glib_gio_test = env_glib_gio.Clone()
+env_glib_gio_test.Append(CFLAGS=env_glib_gio['DEBUG_CFLAGS'])
+env_glib_gio_test['CPPDEFINES'] = [('SRCDIR', r'\"\"')] + env_glib_gio['DEBUG_CPPDEFINES'] #FIXME: os.path.dirname(__file__) complains __file__ is not defiend
+env_glib_gio_test.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
+env_glib_gio_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0', 'libgio-2.0', 'user32'])
+env_glib_gio_test.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gobject', '#glib/gio'])
+
+tests = ["memory-input-stream",
+         "memory-output-stream",
+         "readwrite",
+         "g-file",
+         "g-file-info",
+         "data-input-stream",
+         "data-output-stream",
+         "g-icon",
+         "buffered-input-stream",
+         "sleepy-stream",
+         "filter-streams",
+         "simple-async-result",
+         "srvtarget",
+         "contexts"]
+
+sample_progs = Split("resolver socket-server socket-client echo-server httpd send-data")
+for i in tests + sample_progs:
+    e = env_glib_gio_test.Clone(PDB = i + '.pdb')
+    e.Program(i, i + '.c')
