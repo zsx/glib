@@ -15,8 +15,13 @@
  * otherwise) arising in any way out of the use of this software, even
  * if advised of the possibility of such damage.
  */
+#include "config.h"
+
 #include <glib-object.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #define TEST_POINTER1   ((gpointer) 47)
 #define TEST_POINTER2   ((gpointer) 49)
