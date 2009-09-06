@@ -19,6 +19,7 @@ env_glib['DOT_IN_SUBS'] = {'@PACKAGE_VERSION@': GLIB_VERSION,
                            '@GLIB_VERSION@': GLIB_VERSION,
                            '@GLIB_INTERFACE_AGE@': str(GLIB_INTERFACE_AGE),
                            '@GLIB_BINARY_AGE@': str(GLIB_BINARY_AGE),
+                           '@GETTEXT_PACKAGE@': "glib20",
                            '-@LT_CURRENT_MINUS_AGE@': '',
 			   '@prefix@': prefix,
 			   '@exec_prefix@': '${prefix}/bin',
@@ -54,6 +55,8 @@ env_glib.DotIn('glib-gettextize', 'glib-gettextize.in')
 
 iheader = env_glib.Install(prefix + '/lib/include', 'glibconfig.h')
 ibin = env_glib.Install(prefix + '/bin', 'glib-gettextize')
+
+env_glib.AppendENVPath('PATH', 'glib/glib;glib/win32/libintl-proxy')
 
 subdirs = ['glib/SConscript',
            'gmodule/SConscript',
