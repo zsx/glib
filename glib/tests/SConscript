@@ -1,5 +1,5 @@
 # vim: ft=python expandtab
-
+import os
 Import('env_glib_glib prefix')
 
 env_glib_glib_test = env_glib_glib.Clone()
@@ -22,3 +22,7 @@ tests = ["testing",
 for i in tests:
     e = env_glib_glib_test.Clone(PDB = i + '.pdb')
     e.Program(i, i + '.c')
+
+for x in tests:
+    if x not in ['']:
+        env_glib_glib_test.AlwaysBuild(env_glib_glib_test.Alias('test', [], os.path.join('glib', 'glib', 'tests', x + '.exe')))
