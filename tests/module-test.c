@@ -83,7 +83,7 @@ main (int   arg,
   if (!g_module_supported ())
     g_error ("dynamic modules not supported");
 
-  dir = g_get_current_dir ();
+  dir = getenv ("srcdir");
 
   plugin_a = g_strconcat (dir, G_DIR_SEPARATOR_S "libmoduletestplugin_a", 
 			  NULL);
