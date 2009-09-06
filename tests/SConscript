@@ -1,1 +1,62 @@
 # vim: ft=python expandtab
+
+Import('env_glib prefix')
+
+env_glib_test = env_glib.Clone()
+env_glib_test.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
+env_glib_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgmodule-2.0', 'user32'])
+env_glib_test.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gmodule'])
+
+tests = ["atomic-test",
+         "base64-test",
+         "bit-test",
+         #"cxx-test.C",
+         "checksum-test",
+         "child-test",
+         "completion-test",
+         "convert-test",
+         "date-test",
+         "dirname-test",
+         "file-test",
+         "env-test",
+         "gio-test",
+         "hash-test",
+         "iochannel-test",
+         "list-test",
+         "mainloop-test",
+         "mapping-test",
+         #c99 "markup-collect",
+         "markup-escape-test",
+         "module-test",
+         "node-test",
+         #c99 "onceinit",
+         "patterntest",
+         "queue-test",
+         "asyncqueue-test",
+         "qsort-test",
+         "relation-test",
+         "sequence-test",
+         "shell-test",
+         "slist-test",
+         "slice-test",
+         "slice-color",
+         #unistd "slice-concurrent",
+         "slice-threadinit",
+         "spawn-test",
+         "spawn-test-win32-gui",
+         "thread-test",
+         "threadpool-test",
+         "tree-test",
+         "type-test",
+         "unicode-caseconv",
+         "unicode-encoding",
+         "utf8-validate",
+         "utf8-pointer",
+         "uri-test",
+         "regex-test"]
+for i in tests:
+    e = env_glib_test.Clone(PDB = i + '.pdb')
+    if i == 'slice-test':
+        e.Program(i, [i + '.c', 'memchunks.c'])
+    else:
+        e.Program(i, i + '.c')
