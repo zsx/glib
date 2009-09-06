@@ -1,0 +1,29 @@
+# vim: ft=python expandtab
+import os
+Import('env_glib_test prefix')
+
+env_glib_test_refcount = env_glib_test.Clone()
+env_glib_test_refcount.Append(CFLAGS=env_glib_test['DEBUG_CFLAGS'])
+env_glib_test_refcount['CPPDEFINES'] = env_glib_test['DEBUG_CPPDEFINES']
+env_glib_test_refcount.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
+env_glib_test_refcount.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0', 'libgmodule-2.0'])
+env_glib_test_refcount.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gobject', '#glib/gmodule'])
+
+tests = Split("\
+	closures				\
+	objects					\
+	objects2				\
+	properties				\
+	properties2				\
+	signal1					\
+	signal2					\
+	signal3")
+
+for i in tests:
+    e = env_glib_test_refcount.Clone(PDB = i + '.pdb')
+    if i.startswith('signal'):
+        e.Append(CPPDEFINES=[('TESTNUM', i[-1])])
+        e.Object(i + '.obj', 'signals.c')
+        e.Program(i, i + '.obj')
+    else:
+        e.Program(i, i + '.c')

@@ -1,0 +1,40 @@
+# vim: ft=python expandtab
+import os
+Import('env_glib_test prefix')
+
+env_glib_test_gobject = env_glib_test.Clone()
+env_glib_test_gobject.Append(CFLAGS=env_glib_test['DEBUG_CFLAGS'])
+env_glib_test_gobject['CPPDEFINES'] = env_glib_test['DEBUG_CPPDEFINES']
+env_glib_test_gobject.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
+env_glib_test_gobject.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0', 'libgmodule-2.0'])
+env_glib_test_gobject.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gobject', '#glib/gmodule'])
+
+libtestgobject_sources = ["testmarshal.c",
+                          "testmodule.c"]
+
+tests = Split("deftype					\
+               gvalue-test				\
+               paramspec-test				\
+               accumulator				\
+               defaultiface				\
+               dynamictype				\
+               ifacecheck				\
+               ifaceinit				\
+               ifaceinherit				\
+               ifaceproperties				\
+               override				\
+               singleton				\
+               references")
+env_glib_test_gobject.Command('testmarshal.c', 'testmarshal.list', '''
+        "glib\\gobject\\glib-genmarshal" --prefix=test_marshal $SOURCE --body >> $TARGET''')
+env_glib_test_gobject.Depends('testmarshal.c', '#glib/gobject/glib-genmarshal.exe')
+
+env_glib_test_gobject.Command('testmarshal.h', 'testmarshal.list', '''
+        "glib\\gobject\\glib-genmarshal" --prefix=test_marshal $SOURCE --header >> $TARGET >> $TARGET''')
+env_glib_test_gobject.Depends('testmarshal.h', '#glib/gobject/glib-genmarshal.exe')
+
+env_glib_test_gobject.StaticLibrary('libtestgobject', libtestgobject_sources)
+
+for i in tests:
+    e = env_glib_test_gobject.Clone(PDB = i + '.pdb')
+    e.Program(i, [i + '.c', 'libtestgobject.lib'])
