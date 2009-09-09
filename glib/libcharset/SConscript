@@ -1,10 +1,10 @@
 # vim: ft=python expandtab
 
-Import('env_glib_glib prefix')
+Import('env_glib')
 
 # win_iconv
-env_glib_glib_libcharset = env_glib_glib.Clone()
-env_glib_glib_libcharset.Append(CPPDEFINES=[('LIBDIR', prefix + '/lib')])
-libcharset = env_glib_glib_libcharset.StaticLibrary('libcharset', 'localcharset.c')
+env_glib_libcharset = env_glib.Clone()
+env_glib_libcharset.Append(CPPDEFINES=[('LIBDIR', '$PREFIX/lib')])
+libcharset = env_glib_libcharset.StaticLibrary('libcharset', 'localcharset.c')
 
 #Return(libcharset)

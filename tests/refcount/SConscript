@@ -1,13 +1,13 @@
 # vim: ft=python expandtab
 import os
-Import('env_glib_test prefix')
+Import('env_test')
 
-env_glib_test_refcount = env_glib_test.Clone()
-env_glib_test_refcount.Append(CFLAGS=env_glib_test['DEBUG_CFLAGS'])
-env_glib_test_refcount['CPPDEFINES'] = env_glib_test['DEBUG_CPPDEFINES']
-env_glib_test_refcount.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
-env_glib_test_refcount.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0', 'libgmodule-2.0'])
-env_glib_test_refcount.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gobject', '#glib/gmodule'])
+env_test_refcount = env_test.Clone()
+env_test_refcount.Append(CFLAGS=env_test['DEBUG_CFLAGS'])
+env_test_refcount['CPPDEFINES'] = env_test['DEBUG_CPPDEFINES']
+env_test_refcount.Append(CPPPATH=['#', '#glib', '#gmodule'])
+env_test_refcount.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0', 'libgmodule-2.0'])
+env_test_refcount.Append(LIBPATH=['#glib', '#gthread', '#gobject', '#gmodule'])
 
 tests = Split("\
 	closures				\
@@ -20,7 +20,7 @@ tests = Split("\
 	signal3")
 
 for i in tests:
-    e = env_glib_test_refcount.Clone(PDB = i + '.pdb')
+    e = env_test_refcount.Clone(PDB = i + '.pdb')
     if i.startswith('signal'):
         e.Append(CPPDEFINES=[('TESTNUM', i[-1])])
         e.Object(i + '.obj', 'signals.c')
@@ -29,4 +29,4 @@ for i in tests:
         e.Program(i, i + '.c')
 for x in tests:
     if x not in ['']:
-        env_glib_test_refcount.AlwaysBuild(env_glib_test_refcount.Alias('test', [], os.path.join('glib', 'tests', 'refcount', x + '.exe')))
+        env_test_refcount.AlwaysBuild(env_test_refcount.Alias('test', [], os.path.join('tests', 'refcount', x + '.exe')))

@@ -1,12 +1,12 @@
 # vim: ft=python expandtab
 import os
-Import('env_glib_glib prefix')
+Import('env_glib')
 
-env_glib_glib_test = env_glib_glib.Clone()
-env_glib_glib_test.Append(LIBS='libglib-2.0')
-env_glib_glib_test.Append(LIBPATH=['#glib/glib'])
-env_glib_glib_test.Append(CFLAGS=env_glib_glib['DEBUG_CFLAGS'])
-env_glib_glib_test['CPPDEFINES'] = env_glib_glib['DEBUG_CPPDEFINES']
+env_glib_test = env_glib.Clone()
+env_glib_test.Append(LIBS='libglib-2.0')
+env_glib_test.Append(LIBPATH=['#glib'])
+env_glib_test.Append(CFLAGS=env_glib['DEBUG_CFLAGS'])
+env_glib_test['CPPDEFINES'] = env_glib['DEBUG_CPPDEFINES']
 
 tests = ["testing",
          "option-context",
@@ -20,9 +20,9 @@ tests = ["testing",
          "array-test",
          "hostutils"]
 for i in tests:
-    e = env_glib_glib_test.Clone(PDB = i + '.pdb')
+    e = env_glib_test.Clone(PDB = i + '.pdb')
     e.Program(i, i + '.c')
 
 for x in tests:
     if x not in ['']:
-        env_glib_glib_test.AlwaysBuild(env_glib_glib_test.Alias('test', [], os.path.join('glib', 'glib', 'tests', x + '.exe')))
+        env_glib_test.AlwaysBuild(env_glib_test.Alias('test', [], os.path.join('glib', 'glib', 'tests', x + '.exe')))

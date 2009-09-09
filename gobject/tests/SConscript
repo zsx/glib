@@ -1,15 +1,15 @@
 # vim: ft=python expandtab
 import os
-Import('env_glib_gobject prefix')
+Import('env_gobject')
 
-env_glib_gobject_test = env_glib_gobject.Clone()
-env_glib_gobject_test.Append(CFLAGS=env_glib_gobject['DEBUG_CFLAGS'])
-env_glib_gobject_test['CPPDEFINES'] = env_glib_gobject['DEBUG_CPPDEFINES'] 
-env_glib_gobject_test.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule'])
-env_glib_gobject_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0',])
-env_glib_gobject_test.Append(LIBPATH=['#glib/glib', '#glib/gthread', '#glib/gobject'])
+env_gobject_test = env_gobject.Clone()
+env_gobject_test.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
+env_gobject_test['CPPDEFINES'] = env_gobject['DEBUG_CPPDEFINES'] 
+env_gobject_test.Append(CPPPATH=['#', '#glib', '#gmodule'])
+env_gobject_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgobject-2.0',])
+env_gobject_test.Append(LIBPATH=['#glib', '#gthread', '#gobject'])
 
 tests = ["threadtests"]
 for i in tests:
-    e = env_glib_gobject_test.Clone(PDB = i + '.pdb')
+    e = env_gobject_test.Clone(PDB = i + '.pdb')
     e.Program(i, i + '.c')
