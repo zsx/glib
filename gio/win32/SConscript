@@ -1,6 +1,6 @@
 # vim: ft=python expandtab
 
-Import('env_glib_gio prefix')
+Import('env_gio')
 
 #libgiowin32 
 libgiowin32_SOURCES = Split("\
@@ -9,4 +9,4 @@ libgiowin32_SOURCES = Split("\
 	gwinhttpfile.c				\
 	gwinhttpfileinputstream.c		\
 	gwinhttpfileoutputstream.c")
-env_glib_gio.StaticLibrary('libgiowin32', libgiowin32_SOURCES)
+env_gio.StaticLibrary('libgiowin32', libgiowin32_SOURCES)

@@ -1,30 +1,29 @@
 # vim: ft=python expandtab
+Import('env')
 
-Import('env_glib prefix')
-
-env_glib_glib = env_glib.Clone()
-env_glib_glib['PDB'] = 'libglib-2.0.pdb'
+env_glib = env.Clone()
+env_glib['PDB'] = 'libglib-2.0.pdb'
 
 # win_iconv
-env_glib_glib_win_iconv = env_glib_glib.Clone(PDB = 'libiconv.pdb')
-env_glib_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_glib_win_iconv['LIB_SUFFIX'],
+env_glib_win_iconv = env_glib.Clone(PDB = 'libiconv.pdb')
+env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
                                         'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
 
-Alias('install', env_glib_glib_win_iconv.Install(prefix + '/bin', 'libiconv'+env_glib_glib_win_iconv['LIB_SUFFIX'] + env_glib_glib_win_iconv['SHLIBSUFFIX']))
+Alias('install', env_glib_win_iconv.Install('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX']))
 
 #glib
-env_glib_glib['CPPDEFINES']=['HAVE_CONFIG_H',
+env_glib['CPPDEFINES']=['HAVE_CONFIG_H',
                             ('G_LOG_DOMAN', '\\\"GLib\\\"'),
                             'G_DISABLE_DEPRECATED',
-                            'GLIB_COMPILATION'] + env_glib_glib['DEBUG_CPPDEFINES']
+                            'GLIB_COMPILATION'] + env_glib['DEBUG_CPPDEFINES']
 
-env_glib_glib.Append(CPPPATH=['#glib', '#glib/glib', '#glib/win32/libintl-proxy'])
+env_glib.Append(CPPPATH=['#', '#glib', '#win32/libintl-proxy'])
 
-env_glib_glib['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
-env_glib_glib.DotSymbols2Def('glib.def', 'glib.symbols')
+env_glib['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
+env_glib.DotSymbols2Def('glib.def', 'glib.symbols')
 
-env_glib_glib.Command('galias.h', 'glib.symbols', env_glib_glib['PERL'] + ' glib/glib/makegalias.pl <$SOURCE >$TARGET')
-env_glib_glib.Command('galiasdef.c', 'glib.symbols', env_glib_glib['PERL'] + ' glib/glib/makegalias.pl -def <$SOURCE >$TARGET')
+env_glib.Command('galias.h', 'glib.symbols', env_glib['PERL'] + ' glib/makegalias.pl <$SOURCE >$TARGET')
+env_glib.Command('galiasdef.c', 'glib.symbols', env_glib['PERL'] + ' glib/makegalias.pl -def <$SOURCE >$TARGET')
 
 gregex_h = ["gregex.h"]
 gregex_c = ["gregex.c"]
@@ -162,15 +161,15 @@ subdirs = ['libcharset/SConscript',
             'pcre/SConscript']
 if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
-SConscript(subdirs, exports='env_glib_glib prefix')
+SConscript(subdirs, exports='env_glib')
 
-env_glib_glib.Append(CPPPATH=['#glib/glib', '#glib/win32/libintl-proxy'])
-env_glib_glib.Append(CPPDEFINES=['PCRE_STATIC'])
-env_glib_glib.Append(CFLAGS=env_glib_glib['DEBUG_CFLAGS'])
+env_glib.Append(CPPPATH=['#glib', '#win32/libintl-proxy'])
+env_glib.Append(CPPDEFINES=['PCRE_STATIC'])
+env_glib.Append(CFLAGS=env_glib['DEBUG_CFLAGS'])
 
-env_glib_glib.DotIn('glib.rc', 'glib.rc.in')
-env_glib_glib.RES('glib.rc')
-glib_dll = env_glib_glib.SharedLibrary(['libglib-2.0' + env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX'], 'libglib-2.0.lib'],
+env_glib.DotIn('glib.rc', 'glib.rc.in')
+env_glib.RES('glib.rc')
+glib_dll = env_glib.SharedLibrary(['libglib-2.0' + env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'], 'libglib-2.0.lib'],
         libglib_SOURCES + EXTRA_libglib_SOURCES 
         + ['glib.def', 
            'glib.res',
@@ -184,18 +183,18 @@ glib_dll = env_glib_glib.SharedLibrary(['libglib-2.0' + env_glib_glib['LIB_SUFFI
               'shell32', 
               'wsock32',
               'ole32'], 
-        LIBPATH='#glib/win32/libintl-proxy')
+        LIBPATH='#win32/libintl-proxy')
 
-env_glib_glib.Depends('libglib-2.0' + env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX'], 
-        '#glib/win32/libintl-proxy/libintl-proxy.lib')
+env_glib.Depends('libglib-2.0' + env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'], 
+        '#win32/libintl-proxy/libintl-proxy.lib')
 
-env_glib_glib.AddPostAction(glib_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+env_glib.AddPostAction(glib_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 iheader = []
-iheader.append(env_glib_glib.Install(prefix + '/include/glib-2.0', glibinclude_HEADERS))
-iheader.append(env_glib_glib.Install(prefix + '/include/glib-2.0/glib', glibsubinclude_HEADERS))
+iheader.append(env_glib.Install('$PREFIX/include/glib-2.0', glibinclude_HEADERS))
+iheader.append(env_glib.Install('$PREFIX/include/glib-2.0/glib', glibsubinclude_HEADERS))
 Alias('install', iheader)
 
-Alias('install', env_glib_glib.Install(prefix + '/bin', 'libglib-2.0'+env_glib_glib['LIB_SUFFIX'] + env_glib_glib['SHLIBSUFFIX']))
-Alias('install', env_glib_glib.Install(prefix + '/lib', 'libglib-2.0.lib'))
+Alias('install', env_glib.Install('$PREFIX/bin', 'libglib-2.0'+env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX']))
+Alias('install', env_glib.Install('$PREFIX/lib', 'libglib-2.0.lib'))
 
-Alias('install', env_glib_glib.Install(prefix + '/pdb', 'libglib-2.0.pdb'))
+Alias('install', env_glib.Install('$PREFIX/pdb', 'libglib-2.0.pdb'))

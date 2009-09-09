@@ -1,20 +1,20 @@
 # vim: ft=python expandtab
-Import('env_glib prefix')
+Import('env')
 
-env_glib_gio = env_glib.Clone(PDB = 'libgio-2.0.pdb')
+env_gio = env.Clone(PDB = 'libgio-2.0.pdb')
 
-env_glib_gio['CPPDEFINES']=['HAVE_CONFIG_H',
+env_gio['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '\\\"GLib-GIO\\\"'),
                                 'G_DISABLE_DEPRECATED',
                                 'GIO_COMPILATION',
-                                'GIO_MODULE_DIR', 'gio/modules'] + env_glib_gio['DEBUG_CPPDEFINES']
-env_glib_gio.Append(CPPPATH=['#glib', '#glib/glib', '#glib/gmodule', '#glib/gio', '#glib/win32/libintl-proxy'])
+                                'GIO_MODULE_DIR', 'gio/modules'] + env_gio['DEBUG_CPPDEFINES']
+env_gio.Append(CPPPATH=['#', '#glib', '#gmodule', '#gio', '#win32/libintl-proxy'])
 
-env_glib_gio['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
-env_glib_gio.DotSymbols2Def('gio.def', 'gio.symbols')
+env_gio['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
+env_gio.DotSymbols2Def('gio.def', 'gio.symbols')
 
-env_glib_gio.Command('gioalias.h', 'gio.symbols', env_glib_gio['PERL'] + ' glib/gio/makegioalias.pl <$SOURCE >$TARGET')
-env_glib_gio.Command('gioaliasdef.c', 'gio.symbols', env_glib_gio['PERL'] + ' glib/gio/makegioalias.pl -def <$SOURCE >$TARGET')
+env_gio.Command('gioalias.h', 'gio.symbols', env_gio['PERL'] + ' gio/makegioalias.pl <$SOURCE >$TARGET')
+env_gio.Command('gioaliasdef.c', 'gio.symbols', env_gio['PERL'] + ' gio/makegioalias.pl -def <$SOURCE >$TARGET')
 
 gio_HEADERS =	Split("		\
 	gappinfo.h 		\
@@ -173,28 +173,31 @@ gio_SOURCES = Split("\
 	gioenumtypes.c		\
 	gioaliasdef.c") + local_sources + win32_sources + marshal_sources + appinfo_sources
 
-env_glib_gio.Command('gio-marshal.c', 'gio-marshal.list', '''
+env_gio.Command('gio-marshal.c', 'gio-marshal.list', '''
         echo #include "gio-marshal.h" > $TARGET
-        "glib\\gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --body >> $TARGET''')
-env_glib_gio.Command('gio-marshal.h', 'gio-marshal.list', '''
-        "glib\\gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --header --internal >> $TARGET >> $TARGET''')
+        "gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --body >> $TARGET''')
+env_gio.Depends('gio-marshal.c', '#gobject/glib-genmarshal.exe')
 
-env_glib_gio.Command('gioenumtypes.h', 'gioenumtypes.h.template',
-        "%s glib\\gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_glib_gio['PERL'], " ".join(map(lambda x: 'glib/gio/' + x, gio_HEADERS))))
-env_glib_gio.Depends('gioenumtypes.h', '#glib/gobject/glib-mkenums')
+env_gio.Command('gio-marshal.h', 'gio-marshal.list', '''
+        "gobject\\glib-genmarshal" --prefix=_gio_marshal $SOURCE --header --internal >> $TARGET >> $TARGET''')
+env_gio.Depends('gio-marshal.h', '#gobject/glib-genmarshal.exe')
 
-env_glib_gio.Command('gioenumtypes.c', 'gioenumtypes.c.template',
-        "%s glib\\gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_glib_gio['PERL'], " ".join(map(lambda x: 'glib/gio/' + x, gio_HEADERS))))
-env_glib_gio.Depends('gioenumtypes.c', '#glib/gobject/glib-mkenums')
+env_gio.Command('gioenumtypes.h', 'gioenumtypes.h.template',
+        "%s gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_gio['PERL'], " ".join(map(lambda x: 'gio/' + x, gio_HEADERS))))
+env_gio.Depends('gioenumtypes.h', '#gobject/glib-mkenums')
+
+env_gio.Command('gioenumtypes.c', 'gioenumtypes.c.template',
+        "%s gobject\\glib-mkenums --template $SOURCE %s > $TARGET" % (env_gio['PERL'], " ".join(map(lambda x: 'gio/' + x, gio_HEADERS))))
+env_gio.Depends('gioenumtypes.c', '#gobject/glib-mkenums')
 
 subdirs = ['win32/SConscript']
 if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
-SConscript(subdirs, exports = "env_glib_gio prefix")
+SConscript(subdirs, exports = "env_gio")
 
-env_glib_gio.DotIn('gio.rc', 'gio.rc.in')
-env_glib_gio.RES('gio.rc')
-gio_dll=env_glib_gio.SharedLibrary(['libgio-2.0' + env_glib_gio['LIB_SUFFIX'] + env_glib_gio['SHLIBSUFFIX'],
+env_gio.DotIn('gio.rc', 'gio.rc.in')
+env_gio.RES('gio.rc')
+gio_dll=env_gio.SharedLibrary(['libgio-2.0' + env_gio['LIB_SUFFIX'] + env_gio['SHLIBSUFFIX'],
                                     'libgio-2.0.lib'],
                                    gio_SOURCES + ['gio.def', 'gio.res', 'win32/libgiowin32.lib'], 
                                    LIBS=['libglib-2.0',
@@ -207,15 +210,15 @@ gio_dll=env_glib_gio.SharedLibrary(['libgio-2.0' + env_glib_gio['LIB_SUFFIX'] + 
                                          'user32',
                                          'advapi32',
                                          'shell32'],
-                                   LIBPATH=[prefix + '/lib', '#glib/glib', '#glib/gobject', '#glib/gmodule', 'win32/libgiowin32'])
-env_glib_gio.Depends(gio_dll, gio_HEADERS)
-env_glib_gio.Depends(gio_dll, ['#glib/glib/libglib-2.0.lib',
-                              '#glib/gobject/libgobject-2.0.lib',
-                              '#glib/gmodule/libgmodule-2.0.lib',
+                                   LIBPATH=['$PREFIX/lib', '#glib', '#gobject', '#gmodule', 'win32/libgiowin32'])
+env_gio.Depends(gio_dll, gio_HEADERS)
+env_gio.Depends(gio_dll, ['#glib/libglib-2.0.lib',
+                              '#gobject/libgobject-2.0.lib',
+                              '#gmodule/libgmodule-2.0.lib',
                               ])
-env_glib_gio.AddPostAction(gio_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+env_gio.AddPostAction(gio_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-Alias('install', env_glib_gio.Install(prefix + '/include/glib-2.0/gio', gio_HEADERS))
-Alias('install', env_glib_gio.Install(prefix + '/bin', 'libgio-2.0' + env_glib_gio['LIB_SUFFIX'] + '.dll'))
-Alias('install', env_glib_gio.Install(prefix + '/lib', 'libgio-2.0.lib'))
-Alias('install', env_glib_gio.Install(prefix + '/pdb', 'libgio-2.0.pdb'))
+Alias('install', env_gio.Install('$PREFIX/include/glib-2.0/gio', gio_HEADERS))
+Alias('install', env_gio.Install('$PREFIX/bin', 'libgio-2.0' + env_gio['LIB_SUFFIX'] + '.dll'))
+Alias('install', env_gio.Install('$PREFIX/lib', 'libgio-2.0.lib'))
+Alias('install', env_gio.Install('$PREFIX/pdb', 'libgio-2.0.pdb'))

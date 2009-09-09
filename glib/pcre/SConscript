@@ -1,6 +1,6 @@
 # vim: ft=python expandtab
 
-Import('env_glib_glib prefix')
+Import('env_glib')
 
 #libpcre 
 libpcre_SOURCES = Split("\
@@ -25,8 +25,8 @@ libpcre_SOURCES = Split("\
 	pcre_version.c \
 	pcre_xclass.c")
 
-env_glib_glib_pcre = env_glib_glib.Clone()
-env_glib_glib_pcre.Append(CPPDEFINES=[
+env_glib_pcre = env_glib.Clone()
+env_glib_pcre.Append(CPPDEFINES=[
 	('G_LOG_DOMAIN','"\\"GLib-GRegex\\""'),
 	('SUPPORT_UCP'),
 	('SUPPORT_UTF8'),
@@ -39,7 +39,7 @@ env_glib_glib_pcre.Append(CPPDEFINES=[
 	('LINK_SIZE', '2'),
 	('POSIX_MALLOC_THRESHOLD', '10'),
 	('PCRE_STATIC')])
-env_glib_glib_pcre.Append(CPPPATH=['#glib/glib'])
-libpcre = env_glib_glib_pcre.StaticLibrary('libpcre', libpcre_SOURCES)
+env_glib_pcre.Append(CPPPATH=['#glib'])
+libpcre = env_glib_pcre.StaticLibrary('libpcre', libpcre_SOURCES)
 
 #Return(libcharset)
