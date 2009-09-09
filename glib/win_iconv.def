@@ -1,0 +1,4 @@
+EXPORTS
+iconv_open
+iconv_close
+iconv
