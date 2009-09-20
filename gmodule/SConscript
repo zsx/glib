@@ -34,4 +34,5 @@ env_gmodule.AddPostAction(gmodule_dll, 'mt.exe -nologo -manifest ${TARGET}.manif
 Alias('install', env_gmodule.Install('$PREFIX/include/glib-2.0/gmodule', gmodule_HEADERS))
 Alias('install', env_gmodule.Install('$PREFIX/bin', 'libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + '.dll'))
 Alias('install', env_gmodule.Install('$PREFIX/lib', 'libgmodule-2.0.lib'))
+Alias('install', env_gmodule.InstallAs('$PREFIX/lib/gmodule-2.0.lib', 'libgmodule-2.0.lib'))
 Alias('install', env_gmodule.Install('$PREFIX/pdb', 'libgmodule-2.0.pdb'))

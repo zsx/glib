@@ -9,3 +9,5 @@ libintl = env_libintl_proxy.SharedLibrary(['libintl-proxy' + env_libintl_proxy['
                                                 'libintl-proxy.lib'], libintl_SOURCES)
 
 Alias('install', env_libintl_proxy.Install('$PREFIX/bin', 'libintl-proxy'+env_libintl_proxy['LIB_SUFFIX'] + env_libintl_proxy['SHLIBSUFFIX']))
+Alias('install', env_libintl_proxy.Install('$PREFIX/lib', 'libintl-proxy.lib'))
+Alias('install', env_libintl_proxy.InstallAs('$PREFIX/lib/intl-proxy.lib', 'libintl-proxy.lib'))
