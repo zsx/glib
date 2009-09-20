@@ -13,6 +13,7 @@ env_gobject.Append(CPPPATH=['#', '#glib'])
 env_gobject.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
 
 #glib-mkenums
+env_gobject['DOT_IN_SUBS']['@PERL_PATH@'] = env_gobject['PERL']
 glib_mkenums = env_gobject.DotIn('glib-mkenums', 'glib-mkenums.in')
 
 Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums'))
@@ -128,3 +129,8 @@ Alias('insall', env_gobject.Install('$PREFIX/bin', 'glib-genmarshal.exe'))
 
 Alias('install', env_gobject.Install('$PREFIX/include/glib-2.0/gobject', gobject_HEADERS))
 Alias('install', env_gobject.Install('$PREFIX/bin', 'libgobject-2.0' + env_gobject['LIB_SUFFIX'] + '.dll'))
+Alias('install', env_gobject.Install('$PREFIX/lib', 'libgobject-2.0.lib'))
+Alias('install', env_gobject.InstallAs('$PREFIX/lib/gobject-2.0.lib', 'libgobject-2.0.lib'))
+
+if env['DEBUG'] == 1:
+    Alias('install', env_gobject.Install('$PREFIX/pdb', 'libgobject.pdb'))
