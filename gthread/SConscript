@@ -26,4 +26,5 @@ env_gthread.AddPostAction(gthread_dll, 'mt.exe -nologo -manifest ${TARGET}.manif
 
 Alias('install', env_gthread.Install('$PREFIX/bin', 'libgthread-2.0' + env_gthread['LIB_SUFFIX'] + '.dll'))
 Alias('install', env_gthread.Install('$PREFIX/lib', 'libgthread-2.0.lib'))
+Alias('install', env_gthread.InstallAs('$PREFIX/lib/gthread-2.0.lib', 'libgthread-2.0.lib'))
 Alias('install', env_gthread.Install('$PREFIX/pdb', 'libgthread-2.0.pdb'))

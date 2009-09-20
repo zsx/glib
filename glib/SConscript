@@ -10,6 +10,8 @@ env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
                                         'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
 
 Alias('install', env_glib_win_iconv.Install('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX']))
+Alias('install', env_glib_win_iconv.Install('$PREFIX/lib', 'libiconv.lib'))
+Alias('install', env_glib_win_iconv.InstallAs('$PREFIX/lib/iconv.lib', 'libiconv.lib'))
 
 #glib
 env_glib['CPPDEFINES']=['HAVE_CONFIG_H',
@@ -196,5 +198,6 @@ Alias('install', iheader)
 
 Alias('install', env_glib.Install('$PREFIX/bin', 'libglib-2.0'+env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX']))
 Alias('install', env_glib.Install('$PREFIX/lib', 'libglib-2.0.lib'))
+Alias('install', env_glib.InstallAs('$PREFIX/lib/glib-2.0.lib', 'libglib-2.0.lib'))
 
 Alias('install', env_glib.Install('$PREFIX/pdb', 'libglib-2.0.pdb'))
