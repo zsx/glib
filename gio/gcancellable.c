@@ -495,10 +495,10 @@ g_cancellable_get_fd (GCancellable *cancellable)
  * readable status. Reading to unset the readable status is done
  * with g_cancellable_reset().
  *
- * @Returns: %TRUE if @pollfd was successfully initialized, %FALSE on 
- *           failure to prepare the cancellable.
+ * Returns: %TRUE if @pollfd was successfully initialized, %FALSE on 
+ *          failure to prepare the cancellable.
  * 
- * @Since: 2.22
+ * Since: 2.22
  **/
 gboolean
 g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
@@ -510,9 +510,8 @@ g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
     return FALSE;
   g_return_val_if_fail (G_IS_CANCELLABLE (cancellable), FALSE);
 
-  priv = cancellable->priv;
-
 #ifdef G_OS_WIN32
+  priv = cancellable->priv;
   G_LOCK(cancellable);
   if (priv->event == NULL)
     {
@@ -558,7 +557,7 @@ g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
  * is not called. This can cause the application to run out of file 
  * descriptors when many #GCancellables are used at the same time.
  * 
- * @Since: 2.22
+ * Since: 2.22
  **/
 void
 g_cancellable_release_fd (GCancellable *cancellable)

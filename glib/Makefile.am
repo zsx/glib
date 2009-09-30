@@ -70,6 +70,7 @@ EXTRA_DIST += 			\
 	gregex.c		\
 	gregex.h		\
 	win_iconv.c		\
+	libglib-gdb.py.in	\
 	$(MIRRORING_TAB_SOURCE)
 
 # These may be in the builddir too
@@ -365,11 +366,26 @@ dist-hook: $(BUILT_EXTRA_DIST)
 	  if test -f $$f; then d=.; else d=$(srcdir); fi; \
 	  cp $$d/$$f $(distdir) || exit 1; done
 
+distclean-local:
+	if test $(srcdir) = .; then :; else \
+	    rm -f libglib-gdb.py; \
+	fi
+
+# install gdb scripts
+gdbdir = $(datadir)/glib-2.0/gdb
+dist_gdb_SCRIPTS = glib.py
+
+libglib-gdb.py: libglib-gdb.py.in
+	sed -e "s|\@datadir\@|$(datadir)|" $(srcdir)/libglib-gdb.py.in > libglib-gdb.py
+
+
+install-data-hook: libglib-gdb.py
+	mkdir -p $(DESTDIR)$(datadir)/gdb/auto-load$(ABS_GLIB_RUNTIME_LIBDIR)
+	$(INSTALL) libglib-gdb.py $(DESTDIR)$(datadir)/gdb/auto-load$(ABS_GLIB_RUNTIME_LIBDIR)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION)-gdb.py
 if HAVE_GLIB_RUNTIME_LIBDIR
-install-data-hook:
 	mkdir -p $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
 	mv $(DESTDIR)$(libdir)/libglib-2.0.so.0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
-	mv $(DESTDIR)$(libdir)/libglib-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+	mv $(DESTDIR)$(libdir)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION) $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
 	rm -f $(DESTDIR)$(libdir)/libglib-2.0.so
-	ln -s $(GLIB_RUNTIME_LIBDIR)/libglib-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/libglib-2.0.so
+	ln -s $(GLIB_RUNTIME_LIBDIR)/libglib-2.0.so.0.$(LT_CURRENT).$(LT_REVISION) $(DESTDIR)$(libdir)/libglib-2.0.so
 endif

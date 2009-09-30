@@ -1,19 +1,19 @@
 # glib simplified chinese translation
-# Copyright (C) YERA Free Software Foundation, Inc.
+# Copyright (C) 2009 Free Software Foundation, Inc.
 # He Qiangqiang <carton@263.net>, 2001.
 # Funda Wang <fundawang@linux.net.cn>, 2004, 2005.
 # yetist <yetist@gmail.com>, 2007.
 # Deng Xiyue <manphiz@gmail.com>, 2008, 2009.
-# Deng Xiyue <manphiz@gmail.com>, 2009.
-#
+# Aron Xu <happyaron.xu@gmail.com>, 2009.
+#     Note:"fd" is abbr. of "File Descriptor", 文件描述符
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: glib HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-24 13:37-0400\n"
-"PO-Revision-Date: 2009-03-27 14:56+0800\n"
-"Last-Translator: Ray Wang <wanglei1123@gmail.com>\n"
+"POT-Creation-Date: 2009-09-29 21:42-0400\n"
+"PO-Revision-Date: 2009-09-09 20:48+0800\n"
+"Last-Translator: Hinker <hinkerliu@gmail.com>\n"
 "Language-Team: Chinese/Simplified <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -102,7 +102,7 @@ msgstr "无法打开从“%s”到“%s”的转换器"
 
 #: glib/gconvert.c:632 glib/gconvert.c:1025 glib/giochannel.c:1402
 #: glib/giochannel.c:1444 glib/giochannel.c:2288 glib/gutf8.c:964
-#: glib/gutf8.c:1413
+#: glib/gutf8.c:1419
 msgid "Invalid byte sequence in conversion input"
 msgstr "转换输入中出现无效字符序列"
 
@@ -112,8 +112,8 @@ msgstr "转换输入中出现无效字符序列"
 msgid "Error during conversion: %s"
 msgstr "转换过程中出错：%s"
 
-#: glib/gconvert.c:672 glib/gutf8.c:960 glib/gutf8.c:1164 glib/gutf8.c:1305
-#: glib/gutf8.c:1409
+#: glib/gconvert.c:672 glib/gutf8.c:960 glib/gutf8.c:1170 glib/gutf8.c:1311
+#: glib/gutf8.c:1415
 msgid "Partial character sequence at end of input"
 msgstr "输入末尾出现未尽字符序列"
 
@@ -161,118 +161,118 @@ msgstr "无效的主机名"
 msgid "Error opening directory '%s': %s"
 msgstr "打开目录“%s”时发生错误：%s"
 
-#: glib/gfileutils.c:532 glib/gfileutils.c:620
+#: glib/gfileutils.c:529 glib/gfileutils.c:617
 #, c-format
 msgid "Could not allocate %lu bytes to read file \"%s\""
 msgstr "无法分配 %lu 字节以读取文件“%s”"
 
-#: glib/gfileutils.c:547
+#: glib/gfileutils.c:544
 #, c-format
 msgid "Error reading file '%s': %s"
 msgstr "读取文件“%s”出错：%s"
 
-#: glib/gfileutils.c:561
+#: glib/gfileutils.c:558
 #, c-format
 msgid "File \"%s\" is too large"
 msgstr "文件“%s”太大"
 
-#: glib/gfileutils.c:644
+#: glib/gfileutils.c:641
 #, c-format
 msgid "Failed to read from file '%s': %s"
 msgstr "读取文件“%s”失败：%s"
 
-#: glib/gfileutils.c:695 glib/gfileutils.c:782
+#: glib/gfileutils.c:692 glib/gfileutils.c:779
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "打开文件“%s”失败：%s"
 
-#: glib/gfileutils.c:712 glib/gmappedfile.c:141
+#: glib/gfileutils.c:709 glib/gmappedfile.c:141
 #, c-format
 msgid "Failed to get attributes of file '%s': fstat() failed: %s"
 msgstr "获得文件“%s”的属性失败：fstat() 失败：%s"
 
-#: glib/gfileutils.c:746
+#: glib/gfileutils.c:743
 #, c-format
 msgid "Failed to open file '%s': fdopen() failed: %s"
 msgstr "打开文件“%s”失败：fdopen() 失败：%s"
 
-#: glib/gfileutils.c:854
+#: glib/gfileutils.c:851
 #, c-format
 msgid "Failed to rename file '%s' to '%s': g_rename() failed: %s"
 msgstr "将文件“%s”重命名为“%s”失败：g_rename() 失败：%s"
 
-#: glib/gfileutils.c:896 glib/gfileutils.c:1333
+#: glib/gfileutils.c:893 glib/gfileutils.c:1359
 #, c-format
 msgid "Failed to create file '%s': %s"
 msgstr "创建文件“%s”失败：%s"
 
-#: glib/gfileutils.c:910
+#: glib/gfileutils.c:907
 #, c-format
 msgid "Failed to open file '%s' for writing: fdopen() failed: %s"
 msgstr "打开文件“%s”写入失败：fdopen() 失败：%s"
 
-#: glib/gfileutils.c:935
+#: glib/gfileutils.c:932
 #, c-format
 msgid "Failed to write file '%s': fwrite() failed: %s"
 msgstr "写入文件“%s”失败：fwrite() 失败：%s"
 
-#: glib/gfileutils.c:954
+#: glib/gfileutils.c:951
 #, c-format
 msgid "Failed to write file '%s': fflush() failed: %s"
 msgstr "写入文件“%s”失败：fflush() 失败：%s"
 
-#: glib/gfileutils.c:983
+#: glib/gfileutils.c:980
 #, c-format
 msgid "Failed to write file '%s': fsync() failed: %s"
 msgstr "写入文件“%s”失败：fsync() 失败：%s"
 
-#: glib/gfileutils.c:1002
+#: glib/gfileutils.c:999
 #, c-format
 msgid "Failed to close file '%s': fclose() failed: %s"
 msgstr "关闭文件“%s”失败：fclose() 失败：%s"
 
-#: glib/gfileutils.c:1120
+#: glib/gfileutils.c:1117
 #, c-format
 msgid "Existing file '%s' could not be removed: g_unlink() failed: %s"
 msgstr "无法删除已有文件“%s”：g_unlink() 失败：%s"
 
-#: glib/gfileutils.c:1295
+#: glib/gfileutils.c:1321
 #, c-format
 msgid "Template '%s' invalid, should not contain a '%s'"
 msgstr "模板“%s”无效，不应该包含“%s”"
 
-#: glib/gfileutils.c:1308
+#: glib/gfileutils.c:1334
 #, c-format
 msgid "Template '%s' doesn't contain XXXXXX"
 msgstr "模板“%s”的不包含 XXXXXX"
 
-#: glib/gfileutils.c:1739
+#: glib/gfileutils.c:1764
 #, c-format
 msgid "%u byte"
 msgid_plural "%u bytes"
 msgstr[0] "%u 字节"
 
-#: glib/gfileutils.c:1747
+#: glib/gfileutils.c:1772
 #, c-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: glib/gfileutils.c:1752
+#: glib/gfileutils.c:1777
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: glib/gfileutils.c:1757
+#: glib/gfileutils.c:1782
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: glib/gfileutils.c:1800
+#: glib/gfileutils.c:1825
 #, c-format
 msgid "Failed to read the symbolic link '%s': %s"
 msgstr "读取符号链接“%s”失败：%s"
 
-#: glib/gfileutils.c:1821
+#: glib/gfileutils.c:1846
 msgid "Symbolic links not supported"
 msgstr "不支持符号链接"
 
@@ -313,19 +313,19 @@ msgid "Error on line %d char %d: "
 msgstr "第%d行第%d个字符出错："
 
 #: glib/gmarkup.c:363 glib/gmarkup.c:441
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid UTF-8 encoded text in name - not valid '%s'"
-msgstr "无效的 UTF-8 编码文本 - “%s”无效"
+msgstr "无效的 UTF-8 编码的文本名称 - “%s”无效"
 
 #: glib/gmarkup.c:374
 #, c-format
 msgid "'%s' is not a valid name "
-msgstr ""
+msgstr "“%s” 不是有效的名称"
 
 #: glib/gmarkup.c:390
 #, c-format
 msgid "'%s' is not a valid name: '%c' "
-msgstr ""
+msgstr "“%s”不是有效的名称：“%c”"
 
 #: glib/gmarkup.c:494
 #, c-format
@@ -359,9 +359,9 @@ msgid ""
 msgstr "发现空的实体“&;”。有效的实体为：&amp; &quot; &lt; &gt; &apos;"
 
 #: glib/gmarkup.c:662
-#, fuzzy, c-format
+#, c-format
 msgid "Entity name '%-.*s' is not known"
-msgstr "未知的实体名“%s”"
+msgstr "未知的实体名“%-.*s”"
 
 #: glib/gmarkup.c:667
 msgid ""
@@ -509,7 +509,7 @@ msgstr "达到回溯上限"
 msgid "the pattern contains items not supported for partial matching"
 msgstr "表达式包含不被部分匹配支持的项"
 
-#: glib/gregex.c:154 gio/glocalfile.c:2105
+#: glib/gregex.c:154 gio/glocalfile.c:2102
 msgid "internal error"
 msgstr "内部错误"
 
@@ -721,66 +721,66 @@ msgstr "编译工作区超出正常范围"
 msgid "previously-checked referenced subpattern not found"
 msgstr "未找到之前检查过的引用过的子表达式"
 
-#: glib/gregex.c:526 glib/gregex.c:1607
+#: glib/gregex.c:522 glib/gregex.c:1603
 #, c-format
 msgid "Error while matching regular expression %s: %s"
 msgstr "匹配正则表达式 %s 出现错误：%s"
 
-#: glib/gregex.c:1098
+#: glib/gregex.c:1094
 msgid "PCRE library is compiled without UTF8 support"
 msgstr "PCRE 库编译时未包含 UTF8 支持"
 
-#: glib/gregex.c:1107
+#: glib/gregex.c:1103
 msgid "PCRE library is compiled without UTF8 properties support"
 msgstr "PCRE 库编译时未包含 UTF8 属性支持"
 
-#: glib/gregex.c:1161
+#: glib/gregex.c:1157
 #, c-format
 msgid "Error while compiling regular expression %s at char %d: %s"
 msgstr "编译正则表达式 %s (于字符 %d 处)时出错：%s"
 
-#: glib/gregex.c:1197
+#: glib/gregex.c:1193
 #, c-format
 msgid "Error while optimizing regular expression %s: %s"
 msgstr "优化正则表达式 %s 时出错：%s"
 
-#: glib/gregex.c:2035
+#: glib/gregex.c:2031
 msgid "hexadecimal digit or '}' expected"
 msgstr "期望十六进制数或 '}'"
 
-#: glib/gregex.c:2051
+#: glib/gregex.c:2047
 msgid "hexadecimal digit expected"
 msgstr "期望十六进制数"
 
-#: glib/gregex.c:2091
+#: glib/gregex.c:2087
 msgid "missing '<' in symbolic reference"
 msgstr "在符号引用中缺少“<”"
 
-#: glib/gregex.c:2100
+#: glib/gregex.c:2096
 msgid "unfinished symbolic reference"
 msgstr "未完成的符号引用"
 
-#: glib/gregex.c:2107
+#: glib/gregex.c:2103
 msgid "zero-length symbolic reference"
 msgstr "零长符号引用"
 
-#: glib/gregex.c:2118
+#: glib/gregex.c:2114
 msgid "digit expected"
 msgstr "期望数字"
 
-#: glib/gregex.c:2136
+#: glib/gregex.c:2132
 msgid "illegal symbolic reference"
 msgstr "非法的符号引用"
 
-#: glib/gregex.c:2198
+#: glib/gregex.c:2194
 msgid "stray final '\\'"
 msgstr "丢失了最后的“\\”"
 
-#: glib/gregex.c:2202
+#: glib/gregex.c:2198
 msgid "unknown escape sequence"
 msgstr "未知的转义序列"
 
-#: glib/gregex.c:2212
+#: glib/gregex.c:2208
 #, c-format
 msgid "Error while parsing replacement text \"%s\" at char %lu: %s"
 msgstr "分析替换文本\"%s\" 时在字符 %lu 处发生错误：%s"
@@ -911,12 +911,12 @@ msgstr "从子进程管道中读取足够的数据失败(%s)"
 msgid "Character out of range for UTF-8"
 msgstr "字符超出 UTF-8 范围"
 
-#: glib/gutf8.c:1132 glib/gutf8.c:1141 glib/gutf8.c:1273 glib/gutf8.c:1282
-#: glib/gutf8.c:1423 glib/gutf8.c:1519
+#: glib/gutf8.c:1138 glib/gutf8.c:1147 glib/gutf8.c:1279 glib/gutf8.c:1288
+#: glib/gutf8.c:1429 glib/gutf8.c:1525
 msgid "Invalid sequence in conversion input"
 msgstr "转换输入中出现无效序列"
 
-#: glib/gutf8.c:1434 glib/gutf8.c:1530
+#: glib/gutf8.c:1440 glib/gutf8.c:1536
 msgid "Character out of range for UTF-16"
 msgstr "字符超出 UTF-16 范围"
 
@@ -991,114 +991,114 @@ msgstr "不是普通文件"
 msgid "File is empty"
 msgstr "文件为空"
 
-#: glib/gkeyfile.c:765
+#: glib/gkeyfile.c:764
 #, c-format
 msgid ""
 "Key file contains line '%s' which is not a key-value pair, group, or comment"
 msgstr "键文件中的行“%s”不是键-值对、组或注释"
 
-#: glib/gkeyfile.c:825
+#: glib/gkeyfile.c:824
 #, c-format
 msgid "Invalid group name: %s"
 msgstr "无效的组名：%s"
 
-#: glib/gkeyfile.c:847
+#: glib/gkeyfile.c:846
 msgid "Key file does not start with a group"
 msgstr "键文件不以组开始"
 
-#: glib/gkeyfile.c:873
+#: glib/gkeyfile.c:872
 #, c-format
 msgid "Invalid key name: %s"
 msgstr "无效的键名：%s"
 
-#: glib/gkeyfile.c:900
+#: glib/gkeyfile.c:899
 #, c-format
 msgid "Key file contains unsupported encoding '%s'"
 msgstr "键文件包含不支持的编码“%s”"
 
-#: glib/gkeyfile.c:1116 glib/gkeyfile.c:1278 glib/gkeyfile.c:2507
-#: glib/gkeyfile.c:2573 glib/gkeyfile.c:2708 glib/gkeyfile.c:2841
-#: glib/gkeyfile.c:2994 glib/gkeyfile.c:3181 glib/gkeyfile.c:3242
+#: glib/gkeyfile.c:1115 glib/gkeyfile.c:1277 glib/gkeyfile.c:2506
+#: glib/gkeyfile.c:2572 glib/gkeyfile.c:2707 glib/gkeyfile.c:2840
+#: glib/gkeyfile.c:2993 glib/gkeyfile.c:3180 glib/gkeyfile.c:3241
 #, c-format
 msgid "Key file does not have group '%s'"
 msgstr "键文件没有组“%s”"
 
-#: glib/gkeyfile.c:1290
+#: glib/gkeyfile.c:1289
 #, c-format
 msgid "Key file does not have key '%s'"
 msgstr "键文件没有键“%s”"
 
-#: glib/gkeyfile.c:1397 glib/gkeyfile.c:1512
+#: glib/gkeyfile.c:1396 glib/gkeyfile.c:1511
 #, c-format
 msgid "Key file contains key '%s' with value '%s' which is not UTF-8"
 msgstr "键文件包含“%s”，其值“%s”不是 UTF-8"
 
-#: glib/gkeyfile.c:1417 glib/gkeyfile.c:1911
+#: glib/gkeyfile.c:1416 glib/gkeyfile.c:1910
 #, c-format
 msgid "Key file contains key '%s' which has value that cannot be interpreted."
 msgstr "键文件包含键“%s”，其值无法解释。"
 
-#: glib/gkeyfile.c:1532
+#: glib/gkeyfile.c:1531
 #, fuzzy, c-format
 msgid ""
 "Key file contains key '%s' which has a value that cannot be interpreted."
-msgstr "键文件包含键“%s”，其值无法解释。"
+msgstr "关键文件包含关键“%s”，其值无法解释。"
 
-#: glib/gkeyfile.c:2126 glib/gkeyfile.c:2338
+#: glib/gkeyfile.c:2125 glib/gkeyfile.c:2337
 #, c-format
 msgid ""
 "Key file contains key '%s' in group '%s' which has value that cannot be "
 "interpreted."
 msgstr "键文件在“%2$s”中包含“%1$s”，其值无法解释。"
 
-#: glib/gkeyfile.c:2522 glib/gkeyfile.c:2723 glib/gkeyfile.c:3253
+#: glib/gkeyfile.c:2521 glib/gkeyfile.c:2722 glib/gkeyfile.c:3252
 #, c-format
 msgid "Key file does not have key '%s' in group '%s'"
 msgstr "键文件的组“%2$s”中不包含键“%1$s”"
 
-#: glib/gkeyfile.c:3487
+#: glib/gkeyfile.c:3486
 msgid "Key file contains escape character at end of line"
 msgstr "键文件在行尾含有转义字符"
 
-#: glib/gkeyfile.c:3509
+#: glib/gkeyfile.c:3508
 #, c-format
 msgid "Key file contains invalid escape sequence '%s'"
 msgstr "键文件中包含无效的转义序列“%s”"
 
-#: glib/gkeyfile.c:3651
+#: glib/gkeyfile.c:3650
 #, c-format
 msgid "Value '%s' cannot be interpreted as a number."
 msgstr "无法将值“%s”解释为数值。"
 
-#: glib/gkeyfile.c:3665
+#: glib/gkeyfile.c:3664
 #, c-format
 msgid "Integer value '%s' out of range"
 msgstr "整数值“%s”超出范围"
 
-#: glib/gkeyfile.c:3698
+#: glib/gkeyfile.c:3697
 #, c-format
 msgid "Value '%s' cannot be interpreted as a float number."
 msgstr "无法将值“%s”解释为浮点数。"
 
-#: glib/gkeyfile.c:3722
+#: glib/gkeyfile.c:3721
 #, c-format
 msgid "Value '%s' cannot be interpreted as a boolean."
 msgstr "无法将值“%s”解释为布尔值。"
 
-#: gio/gbufferedinputstream.c:417 gio/gbufferedinputstream.c:498
-#: gio/ginputstream.c:190 gio/ginputstream.c:322 gio/ginputstream.c:563
-#: gio/ginputstream.c:688 gio/goutputstream.c:201 gio/goutputstream.c:656
+#: gio/gbufferedinputstream.c:415 gio/gbufferedinputstream.c:496
+#: gio/ginputstream.c:186 gio/ginputstream.c:318 gio/ginputstream.c:557
+#: gio/ginputstream.c:682 gio/goutputstream.c:197 gio/goutputstream.c:652
 #, c-format
 msgid "Too large count value passed to %s"
 msgstr "传递给 %s 的计数值太大了"
 
-#: gio/gbufferedinputstream.c:885 gio/ginputstream.c:898 gio/giostream.c:309
-#: gio/goutputstream.c:1085
+#: gio/gbufferedinputstream.c:883 gio/ginputstream.c:892 gio/giostream.c:305
+#: gio/goutputstream.c:1081
 msgid "Stream is already closed"
 msgstr "流已经关闭"
 
-#: gio/gcancellable.c:420 gio/glocalfile.c:2098 gio/gsimpleasyncresult.c:650
-#: gio/gsimpleasyncresult.c:676
+#: gio/gcancellable.c:420 gio/glocalfile.c:2095 gio/gsimpleasyncresult.c:648
+#: gio/gsimpleasyncresult.c:674
 msgid "Operation was cancelled"
 msgstr "操作被取消"
 
@@ -1116,7 +1116,7 @@ msgstr "%s 文件类型"
 msgid "%s type"
 msgstr "%s 类型"
 
-#: gio/gdatainputstream.c:313
+#: gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
 msgstr "非预期的过早的流结束符"
 
@@ -1162,7 +1162,7 @@ msgstr "驱动未实现探出"
 #: gio/gdrive.c:489
 #, fuzzy
 msgid "drive doesn't implement eject or eject_with_operation"
-msgstr "驱动未实现探出"
+msgstr "驱动器未执行弹出或 eject_with_operation"
 
 #: gio/gdrive.c:566
 msgid "drive doesn't implement polling for media"
@@ -1171,12 +1171,12 @@ msgstr "驱动未实现媒体轮询"
 #: gio/gdrive.c:771
 #, fuzzy
 msgid "drive doesn't implement start"
-msgstr "驱动未实现探出"
+msgstr "驱动未执行开始"
 
 #: gio/gdrive.c:873
 #, fuzzy
 msgid "drive doesn't implement stop"
-msgstr "驱动未实现探出"
+msgstr "驱动未执行停止"
 
 #: gio/gemblem.c:325
 #, c-format
@@ -1221,12 +1221,12 @@ msgstr "不支持该操作"
 #. Translators: This is an error message when trying to find
 #. * the enclosing (user visible) mount of a file, but none
 #. * exists.
-#: gio/gfile.c:1347 gio/glocalfile.c:1065 gio/glocalfile.c:1076
-#: gio/glocalfile.c:1089
+#: gio/gfile.c:1347 gio/glocalfile.c:1066 gio/glocalfile.c:1077
+#: gio/glocalfile.c:1090
 msgid "Containing mount does not exist"
 msgstr "包含的挂载不存在"
 
-#: gio/gfile.c:2399 gio/glocalfile.c:2250
+#: gio/gfile.c:2399 gio/glocalfile.c:2247
 msgid "Can't copy over directory"
 msgstr "无法复制目录"
 
@@ -1234,7 +1234,7 @@ msgstr "无法复制目录"
 msgid "Can't copy directory over directory"
 msgstr "无法将目录复制到目录"
 
-#: gio/gfile.c:2467 gio/glocalfile.c:2259
+#: gio/gfile.c:2467 gio/glocalfile.c:2256
 msgid "Target file exists"
 msgstr "目标文件已存在"
 
@@ -1342,7 +1342,7 @@ msgstr "类型 %s 没有实现 GIcon 接口的 from_tokens() 方法"
 msgid "Can't handle the supplied version the icon encoding"
 msgstr "无法处理提供的图标编码版本"
 
-#: gio/ginputstream.c:199
+#: gio/ginputstream.c:195
 msgid "Input stream doesn't implement read"
 msgstr "输入流未实现读取"
 
@@ -1352,18 +1352,18 @@ msgstr "输入流未实现读取"
 #. Translators: This is an error you get if there is
 #. * already an operation running against this stream when
 #. * you try to start one
-#: gio/ginputstream.c:908 gio/giostream.c:319 gio/goutputstream.c:1095
+#: gio/ginputstream.c:902 gio/giostream.c:315 gio/goutputstream.c:1091
 msgid "Stream has outstanding operation"
 msgstr "流有异常操作"
 
 #: gio/ginetsocketaddress.c:182 gio/ginetsocketaddress.c:199
 #: gio/gunixsocketaddress.c:174
 msgid "Not enough space for socket address"
-msgstr ""
+msgstr "没有足够的空间套接字地址"
 
 #: gio/ginetsocketaddress.c:212
 msgid "Unsupported socket address"
-msgstr ""
+msgstr "不支持的套接字地址"
 
 #: gio/glocaldirectorymonitor.c:295
 msgid "Unable to find default local directory monitor type"
@@ -1374,105 +1374,105 @@ msgstr "无法找默认的本地目录监视器类型"
 msgid "Invalid filename %s"
 msgstr "无效的文件名名：%s"
 
-#: gio/glocalfile.c:973
+#: gio/glocalfile.c:974
 #, c-format
 msgid "Error getting filesystem info: %s"
 msgstr "读取文件系统信息出错：%s"
 
-#: gio/glocalfile.c:1109
+#: gio/glocalfile.c:1110
 msgid "Can't rename root directory"
 msgstr "无法重命名根目录"
 
-#: gio/glocalfile.c:1129 gio/glocalfile.c:1155
+#: gio/glocalfile.c:1130 gio/glocalfile.c:1156
 #, c-format
 msgid "Error renaming file: %s"
 msgstr "重命名文件出错：%s"
 
-#: gio/glocalfile.c:1138
+#: gio/glocalfile.c:1139
 msgid "Can't rename file, filename already exist"
 msgstr "无法重命名文件，该文件名已存在"
 
-#: gio/glocalfile.c:1151 gio/glocalfile.c:2127 gio/glocalfile.c:2156
-#: gio/glocalfile.c:2312 gio/glocalfileoutputstream.c:550
+#: gio/glocalfile.c:1152 gio/glocalfile.c:2124 gio/glocalfile.c:2153
+#: gio/glocalfile.c:2309 gio/glocalfileoutputstream.c:550
 #: gio/glocalfileoutputstream.c:603 gio/glocalfileoutputstream.c:648
 #: gio/glocalfileoutputstream.c:1130
 msgid "Invalid filename"
 msgstr "无效的文件名"
 
-#: gio/glocalfile.c:1307
+#: gio/glocalfile.c:1308
 #, c-format
 msgid "Error opening file: %s"
 msgstr "打开文件出错：%s"
 
-#: gio/glocalfile.c:1317
+#: gio/glocalfile.c:1318
 msgid "Can't open directory"
 msgstr "无法打开目录"
 
-#: gio/glocalfile.c:1442
+#: gio/glocalfile.c:1443
 #, c-format
 msgid "Error removing file: %s"
 msgstr "移除文件出错：%s"
 
-#: gio/glocalfile.c:1811
+#: gio/glocalfile.c:1808
 #, c-format
 msgid "Error trashing file: %s"
 msgstr "将文件放到垃圾箱出错：%s"
 
-#: gio/glocalfile.c:1834
+#: gio/glocalfile.c:1831
 #, c-format
 msgid "Unable to create trash dir %s: %s"
 msgstr "创建垃圾箱目录 %s 失败：%s"
 
-#: gio/glocalfile.c:1855
+#: gio/glocalfile.c:1852
 msgid "Unable to find toplevel directory for trash"
 msgstr "无法找到垃圾箱的顶级目录"
 
-#: gio/glocalfile.c:1934 gio/glocalfile.c:1954
+#: gio/glocalfile.c:1931 gio/glocalfile.c:1951
 msgid "Unable to find or create trash directory"
 msgstr "无法找到或创建垃圾箱目录"
 
-#: gio/glocalfile.c:1988
+#: gio/glocalfile.c:1985
 #, c-format
 msgid "Unable to create trashing info file: %s"
 msgstr "创建垃圾信息文件失败：%s"
 
-#: gio/glocalfile.c:2017 gio/glocalfile.c:2022 gio/glocalfile.c:2097
-#: gio/glocalfile.c:2104
+#: gio/glocalfile.c:2014 gio/glocalfile.c:2019 gio/glocalfile.c:2094
+#: gio/glocalfile.c:2101
 #, c-format
 msgid "Unable to trash file: %s"
 msgstr "无法将文件移动到回收站：%s"
 
-#: gio/glocalfile.c:2131
+#: gio/glocalfile.c:2128
 #, c-format
 msgid "Error creating directory: %s"
 msgstr "创建目录出错：%s"
 
-#: gio/glocalfile.c:2160
+#: gio/glocalfile.c:2157
 #, c-format
 msgid "Error making symbolic link: %s"
 msgstr "创建符号链接出错：%s"
 
-#: gio/glocalfile.c:2222 gio/glocalfile.c:2316
+#: gio/glocalfile.c:2219 gio/glocalfile.c:2313
 #, c-format
 msgid "Error moving file: %s"
 msgstr "移动文件出错：%s"
 
-#: gio/glocalfile.c:2245
+#: gio/glocalfile.c:2242
 msgid "Can't move directory over directory"
 msgstr "无法将目录移动到目录"
 
-#: gio/glocalfile.c:2272 gio/glocalfileoutputstream.c:928
+#: gio/glocalfile.c:2269 gio/glocalfileoutputstream.c:928
 #: gio/glocalfileoutputstream.c:942 gio/glocalfileoutputstream.c:957
 #: gio/glocalfileoutputstream.c:973 gio/glocalfileoutputstream.c:987
 msgid "Backup file creation failed"
 msgstr "备份文件创建失败"
 
-#: gio/glocalfile.c:2291
+#: gio/glocalfile.c:2288
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "移除目标文件出错：%s"
 
-#: gio/glocalfile.c:2305
+#: gio/glocalfile.c:2302
 msgid "Move between mounts not supported"
 msgstr "不支持在挂载之间移动"
 
@@ -1502,83 +1502,87 @@ msgstr "获取文件“%s”状态出错：%s"
 msgid " (invalid encoding)"
 msgstr " (无效的编码)"
 
-#: gio/glocalfileinfo.c:1759
+#: gio/glocalfileinfo.c:1750
 #, c-format
 msgid "Error stating file descriptor: %s"
 msgstr "获取文件描述符状态时出错：%s"
 
-#: gio/glocalfileinfo.c:1804
+#: gio/glocalfileinfo.c:1795
 msgid "Invalid attribute type (uint32 expected)"
 msgstr "无效的属性类型(应为 uint32)"
 
-#: gio/glocalfileinfo.c:1822
+#: gio/glocalfileinfo.c:1813
 msgid "Invalid attribute type (uint64 expected)"
 msgstr "无效的属性类型(应为 uint64)"
 
-#: gio/glocalfileinfo.c:1841 gio/glocalfileinfo.c:1860
+#: gio/glocalfileinfo.c:1832 gio/glocalfileinfo.c:1851
 msgid "Invalid attribute type (byte string expected)"
 msgstr "无效的属性类型(应为 byte string)"
 
 #: gio/glocalfileinfo.c:1886
+msgid "Cannot set permissions on symlinks"
+msgstr "无法为符号链设置权限"
+
+#: gio/glocalfileinfo.c:1902
 #, c-format
 msgid "Error setting permissions: %s"
 msgstr "设置访问权限出错：%s"
 
-#: gio/glocalfileinfo.c:1937
+#: gio/glocalfileinfo.c:1953
 #, c-format
 msgid "Error setting owner: %s"
 msgstr "设置所有者出错：%s"
 
-#: gio/glocalfileinfo.c:1960
+#: gio/glocalfileinfo.c:1976
 msgid "symlink must be non-NULL"
 msgstr "符号链接必须是非空"
 
-#: gio/glocalfileinfo.c:1970 gio/glocalfileinfo.c:1989
-#: gio/glocalfileinfo.c:2000
+#: gio/glocalfileinfo.c:1986 gio/glocalfileinfo.c:2005
+#: gio/glocalfileinfo.c:2016
 #, c-format
 msgid "Error setting symlink: %s"
 msgstr "设置符号链接出错：%s"
 
-#: gio/glocalfileinfo.c:1979
+#: gio/glocalfileinfo.c:1995
 msgid "Error setting symlink: file is not a symlink"
 msgstr "设定符号链接出错：文件不是符号链接"
 
-#: gio/glocalfileinfo.c:2105
-#, fuzzy, c-format
+#: gio/glocalfileinfo.c:2121
+#, c-format
 msgid "Error setting modification or access time: %s"
-msgstr "设置访问权限出错：%s"
+msgstr "错误设置修改或访问时间：%s"
 
-#: gio/glocalfileinfo.c:2128
+#: gio/glocalfileinfo.c:2144
 msgid "SELinux context must be non-NULL"
 msgstr "SELinux 上下文必须是非空"
 
-#: gio/glocalfileinfo.c:2143
+#: gio/glocalfileinfo.c:2159
 #, c-format
 msgid "Error setting SELinux context: %s"
 msgstr "设置 SELinux 上下文出错：%s"
 
-#: gio/glocalfileinfo.c:2150
+#: gio/glocalfileinfo.c:2166
 msgid "SELinux is not enabled on this system"
 msgstr "此系统尚未启用 SELinux"
 
-#: gio/glocalfileinfo.c:2242
+#: gio/glocalfileinfo.c:2258
 #, c-format
 msgid "Setting attribute %s not supported"
 msgstr "不支持设置属性 %s"
 
-#: gio/glocalfileinputstream.c:169 gio/glocalfileoutputstream.c:701
+#: gio/glocalfileinputstream.c:165 gio/glocalfileoutputstream.c:701
 #, c-format
 msgid "Error reading from file: %s"
 msgstr "读取文件出错：%s"
 
-#: gio/glocalfileinputstream.c:200 gio/glocalfileinputstream.c:212
-#: gio/glocalfileinputstream.c:324 gio/glocalfileoutputstream.c:449
+#: gio/glocalfileinputstream.c:196 gio/glocalfileinputstream.c:208
+#: gio/glocalfileinputstream.c:320 gio/glocalfileoutputstream.c:449
 #: gio/glocalfileoutputstream.c:1005
 #, c-format
 msgid "Error seeking in file: %s"
 msgstr "在文件中查找时出错：%s"
 
-#: gio/glocalfileinputstream.c:245 gio/glocalfileoutputstream.c:235
+#: gio/glocalfileinputstream.c:241 gio/glocalfileoutputstream.c:235
 #: gio/glocalfileoutputstream.c:330
 #, c-format
 msgid "Error closing file: %s"
@@ -1682,7 +1686,7 @@ msgstr "挂载未实现弹出"
 #: gio/gmount.c:537
 #, fuzzy
 msgid "mount doesn't implement unmount or unmount_with_operation"
-msgstr "挂载未实现卸载"
+msgstr "挂载未执行卸载或 unmount_with_operation"
 
 #. Translators: This is an error
 #. * message for mount objects that
@@ -1690,7 +1694,7 @@ msgstr "挂载未实现卸载"
 #: gio/gmount.c:624
 #, fuzzy
 msgid "mount doesn't implement eject or eject_with_operation"
-msgstr "挂载未实现弹出"
+msgstr "挂载未执行弹出或  eject_with_operation"
 
 #. Translators: This is an error
 #. * message for mount objects that
@@ -1716,166 +1720,160 @@ msgstr "挂载未实现同步内容类型猜测"
 #: gio/gnetworkaddress.c:295
 #, c-format
 msgid "Hostname '%s' contains '[' but not ']'"
-msgstr ""
+msgstr "主机名 “%s” 包含“[”但是缺少“]”"
 
-#: gio/goutputstream.c:210 gio/goutputstream.c:411
+#: gio/goutputstream.c:206 gio/goutputstream.c:407
 msgid "Output stream doesn't implement write"
 msgstr "输出流未实现写入"
 
-#: gio/goutputstream.c:371 gio/goutputstream.c:780
+#: gio/goutputstream.c:368 gio/goutputstream.c:776
 msgid "Source stream is already closed"
 msgstr "来源流已经关闭"
 
 #: gio/gresolver.c:736
-#, fuzzy, c-format
+#, c-format
 msgid "Error resolving '%s': %s"
-msgstr "读取文件“%s”出错：%s"
+msgstr "错误解析 “%s”：%s"
 
 #: gio/gresolver.c:786
-#, fuzzy, c-format
+#, c-format
 msgid "Error reverse-resolving '%s': %s"
-msgstr "读取文件“%s”出错：%s"
+msgstr "错误反向解析 “%s”：%s"
 
 #: gio/gresolver.c:821 gio/gresolver.c:899
 #, c-format
 msgid "No service record for '%s'"
-msgstr ""
+msgstr "没有 “%s” 的服务记录"
 
 #: gio/gresolver.c:826 gio/gresolver.c:904
 #, c-format
 msgid "Temporarily unable to resolve '%s'"
-msgstr ""
+msgstr "暂时无法解析 “%s”"
 
 #: gio/gresolver.c:831 gio/gresolver.c:909
-#, fuzzy, c-format
+#, c-format
 msgid "Error resolving '%s'"
-msgstr "移除文件出错：%s"
+msgstr "错误解析 “%s”"
 
 #: gio/gsocket.c:277
 msgid "Invalid socket, not initialized"
-msgstr ""
+msgstr "无效的套接字，不能被初始化"
 
 #: gio/gsocket.c:284
 #, c-format
 msgid "Invalid socket, initialization failed due to: %s"
-msgstr ""
+msgstr "无效的套接字，初始化失败的原因是：%s"
 
 #: gio/gsocket.c:292
-#, fuzzy
 msgid "Socket is already closed"
-msgstr "来源流已经关闭"
+msgstr "套接字已经关闭"
 
 #: gio/gsocket.c:405
-#, fuzzy, c-format
+#, c-format
 msgid "creating GSocket from fd: %s"
-msgstr "读取文件出错：%s"
+msgstr "从文件描述符创建 GSocket：%s"
 
 #: gio/gsocket.c:439 gio/gsocket.c:453 gio/gsocket.c:1911
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create socket: %s"
-msgstr "创建垃圾箱目录 %s 失败：%s"
+msgstr "无法创建套接字：%s"
 
 #: gio/gsocket.c:439
 msgid "Unknown protocol was specified"
-msgstr ""
+msgstr "指定了未知协议"
 
 #: gio/gsocket.c:758
-#, fuzzy
 msgid "Cancellable initialization not supported"
-msgstr "不支持该操作"
+msgstr "不支持可撤销的初始化"
 
 #: gio/gsocket.c:1112
 #, c-format
 msgid "could not get local address: %s"
-msgstr ""
+msgstr "不能获取本地地址：%s"
 
 #: gio/gsocket.c:1145
 #, c-format
 msgid "could not get remote address: %s"
-msgstr ""
+msgstr "不能获取远程地址： %s"
 
 #: gio/gsocket.c:1203
 #, c-format
 msgid "could not listen: %s"
-msgstr ""
+msgstr "无法监听：%s"
 
 #: gio/gsocket.c:1277
-#, fuzzy, c-format
+#, c-format
 msgid "Error binding to address: %s"
-msgstr "写入文件出错：%s"
+msgstr "错误绑定地址：%s"
 
 #: gio/gsocket.c:1397
-#, fuzzy, c-format
+#, c-format
 msgid "Error accepting connection: %s"
-msgstr "转换过程中出错：%s"
+msgstr "接受连接出错：%s"
 
 #: gio/gsocket.c:1510
-#, fuzzy
 msgid "Error connecting: "
-msgstr "截断文件出错：%s"
+msgstr "连接出错 :"
 
 #: gio/gsocket.c:1514
 msgid "Connection in progress"
-msgstr ""
+msgstr "正在连接"
 
 #: gio/gsocket.c:1519
-#, fuzzy, c-format
+#, c-format
 msgid "Error connecting: %s"
-msgstr "打开文件出错：%s"
+msgstr "连接出错 :%s"
 
 #: gio/gsocket.c:1559
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to get pending error: %s"
-msgstr "无法将文件移动到回收站：%s"
+msgstr "无法获取未决的错误：%s"
 
 #: gio/gsocket.c:1655
-#, fuzzy, c-format
+#, c-format
 msgid "Error receiving data: %s"
-msgstr "移除文件出错：%s"
+msgstr "接收数据出错：%s"
 
 #: gio/gsocket.c:1798
-#, fuzzy, c-format
+#, c-format
 msgid "Error sending data: %s"
-msgstr "打开文件出错：%s"
+msgstr "发送数据出错：%s"
 
 #: gio/gsocket.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid "Error closing socket: %s"
-msgstr "关闭文件出错：%s"
+msgstr "关闭套接字出错：%s"
 
 #: gio/gsocket.c:2475
 #, c-format
 msgid "Waiting for socket condition: %s"
-msgstr ""
+msgstr "等待套接字状态：%s"
 
-#: gio/gsocket.c:2709 gio/gsocket.c:2790
-#, fuzzy, c-format
+#: gio/gsocket.c:2714 gio/gsocket.c:2795
+#, c-format
 msgid "Error sending message: %s"
-msgstr "打开文件出错：%s"
+msgstr "发送信息出错：%s"
 
-#: gio/gsocket.c:2734
-#, fuzzy
+#: gio/gsocket.c:2739
 msgid "GSocketControlMessage not supported on windows"
-msgstr "win32 不支持关联的修改"
+msgstr "Windows 不支持 GSocketControlMessage"
 
-#: gio/gsocket.c:2992 gio/gsocket.c:3131
-#, fuzzy, c-format
+#: gio/gsocket.c:2997 gio/gsocket.c:3136
+#, c-format
 msgid "Error receiving message: %s"
-msgstr "移除文件出错：%s"
+msgstr "接受信息出错：%s"
 
 #: gio/gsocketclient.c:521 gio/gsocketclient.c:770
-#, fuzzy
 msgid "Unknown error on connect"
-msgstr "未知错误"
+msgstr "连接时出现未知错误"
 
 #: gio/gsocketlistener.c:192
-#, fuzzy
 msgid "Listener is already closed"
-msgstr "流已经关闭"
+msgstr "监听器已关闭"
 
 #: gio/gsocketlistener.c:233
 msgid "Added socket is closed"
-msgstr ""
+msgstr "新增套接字已关闭"
 
 #: gio/gthemedicon.c:499
 #, c-format
@@ -1885,30 +1883,29 @@ msgstr "无法处理 GThemedIcon 编码的版本 %d"
 #: gio/gunixconnection.c:151
 #, c-format
 msgid "Expecting 1 control message, got %d"
-msgstr ""
+msgstr "期望一个控制信息，却得到 %d"
 
 #: gio/gunixconnection.c:164
-#, fuzzy
 msgid "Unexpected type of ancillary data"
-msgstr "非预期的过早的流结束符"
+msgstr "非预期的辅助数据类型"
 
 #: gio/gunixconnection.c:182
 #, c-format
 msgid "Expecting one fd, but got %d\n"
-msgstr ""
+msgstr "期望一个文件描述符，却得到 %d\n"
 
 #: gio/gunixconnection.c:198
 msgid "Received invalid fd"
-msgstr ""
+msgstr "收到无效文件描述符"
 
-#: gio/gunixinputstream.c:358 gio/gunixinputstream.c:378
-#: gio/gunixinputstream.c:456 gio/gunixoutputstream.c:443
+#: gio/gunixinputstream.c:354 gio/gunixinputstream.c:374
+#: gio/gunixinputstream.c:452 gio/gunixoutputstream.c:439
 #, c-format
 msgid "Error reading from unix: %s"
 msgstr "读取 unix 出错：%s"
 
-#: gio/gunixinputstream.c:411 gio/gunixinputstream.c:593
-#: gio/gunixoutputstream.c:398 gio/gunixoutputstream.c:549
+#: gio/gunixinputstream.c:407 gio/gunixinputstream.c:589
+#: gio/gunixoutputstream.c:394 gio/gunixoutputstream.c:545
 #, c-format
 msgid "Error closing unix: %s"
 msgstr "关闭 unix 出错：%s"
@@ -1917,14 +1914,14 @@ msgstr "关闭 unix 出错：%s"
 msgid "Filesystem root"
 msgstr "文件系统根目录"
 
-#: gio/gunixoutputstream.c:344 gio/gunixoutputstream.c:365
+#: gio/gunixoutputstream.c:340 gio/gunixoutputstream.c:361
 #, c-format
 msgid "Error writing to unix: %s"
 msgstr "写入 unix 出错：%s"
 
 #: gio/gunixsocketaddress.c:182
 msgid "Abstract unix domain socket addresses not supported on this system"
-msgstr ""
+msgstr "本系统不支持摘要 Unix 域套接字地址"
 
 #: gio/gvolume.c:452
 msgid "volume doesn't implement eject"
@@ -1936,7 +1933,7 @@ msgstr "卷未实现弹出"
 #: gio/gvolume.c:531
 #, fuzzy
 msgid "volume doesn't implement eject or eject_with_operation"
-msgstr "卷未实现弹出"
+msgstr "卷未执行弹出或  eject_with_operation"
 
 #: gio/gwin32appinfo.c:277
 msgid "Can't find application"
@@ -1959,17 +1956,14 @@ msgstr "win32 不支持关联的修改"
 msgid "Association creation not supported on win32"
 msgstr "win32 不支持关联的创建"
 
-#: tests/gio-ls.c:27
-msgid "do not hide entries"
-msgstr "不要隐藏项目"
+#~ msgid "do not hide entries"
+#~ msgstr "不要隐藏项目"
 
-#: tests/gio-ls.c:29
-msgid "use a long listing format"
-msgstr "使用长列表格式"
+#~ msgid "use a long listing format"
+#~ msgstr "使用长列表格式"
 
-#: tests/gio-ls.c:37
-msgid "[FILE...]"
-msgstr "[文件...]"
+#~ msgid "[FILE...]"
+#~ msgstr "[文件...]"
 
 #~ msgid ""
 #~ "Character '%s' is not valid at the start of an entity name; the & "

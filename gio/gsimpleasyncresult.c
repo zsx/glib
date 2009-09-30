@@ -486,7 +486,7 @@ g_simple_async_result_get_op_res_gboolean (GSimpleAsyncResult *simple)
  **/
 void
 g_simple_async_result_set_from_error (GSimpleAsyncResult *simple,
-                                      GError             *error)
+                                      const GError       *error)
 {
   g_return_if_fail (G_IS_SIMPLE_ASYNC_RESULT (simple));
   g_return_if_fail (error != NULL);
@@ -574,7 +574,7 @@ g_simple_async_result_complete (GSimpleAsyncResult *simple)
 
 #ifndef G_DISABLE_CHECKS
   current_source = g_main_current_source ();
-  if (current_source)
+  if (current_source && !g_source_is_destroyed (current_source))
     {
       current_context = g_source_get_context (current_source);
       if (current_context == g_main_context_default ())
@@ -582,8 +582,6 @@ g_simple_async_result_complete (GSimpleAsyncResult *simple)
       if (simple->context != current_context)
 	g_warning ("g_simple_async_result_complete() called from wrong context!");
     }
-  else
-    g_warning ("g_simple_async_result_complete() called from outside main loop!");
 #endif
 
   if (simple->callback)

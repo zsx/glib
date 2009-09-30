@@ -955,7 +955,8 @@ g_local_file_query_filesystem_info (GFile         *file,
      free == 0 case as "both of these are invalid".
    */
 #ifndef G_OS_WIN32
-  if (statfs_buffer.f_bavail == 0 && statfs_buffer.f_bfree == 0)
+  if (statfs_result == 0 &&
+      statfs_buffer.f_bavail == 0 && statfs_buffer.f_bfree == 0)
     no_size = TRUE;
 #endif
   
@@ -1720,12 +1721,11 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   char uid_str[32];
   struct stat global_stat, trash_stat;
   gboolean res;
-  int statres;
-      
+
   if (g_once_init_enter (&home_dev_set))
     {
       struct stat home_stat;
-      
+
       g_stat (g_get_home_dir (), &home_stat);
       home_dev = home_stat.st_dev;
       g_once_init_leave (&home_dev_set, 1);
@@ -1739,9 +1739,8 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   if (topdir == NULL)
     return FALSE;
 
-  globaldir = g_build_filename (topdir, ".Trash", NULL); 
-  statres = g_lstat (globaldir, &global_stat);
- if (g_lstat (globaldir, &global_stat) == 0 &&
+  globaldir = g_build_filename (topdir, ".Trash", NULL);
+  if (g_lstat (globaldir, &global_stat) == 0 &&
       S_ISDIR (global_stat.st_mode) &&
       (global_stat.st_mode & S_ISVTX) != 0)
     {
@@ -1759,7 +1758,7 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   /* No global trash dir, or it failed the tests, fall back to $topdir/.Trash-$uid */
   uid = geteuid ();
   g_snprintf (uid_str, sizeof (uid_str), "%lu", (unsigned long) uid);
-  
+
   tmpname = g_strdup_printf (".Trash-%s", uid_str);
   trashdir = g_build_filename (topdir, tmpname, NULL);
   g_free (tmpname);
@@ -1768,17 +1767,15 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
     {
       g_free (topdir);
       g_free (trashdir);
-      return
-	S_ISDIR (trash_stat.st_mode) &&
-	trash_stat.st_uid == uid;
+      return S_ISDIR (trash_stat.st_mode) &&
+	     trash_stat.st_uid == uid;
     }
   g_free (trashdir);
 
   /* User specific trash didn't exist, can we create it? */
   res = g_access (topdir, W_OK) == 0;
-  
   g_free (topdir);
-  
+
   return res;
 }
 

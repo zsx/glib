@@ -117,13 +117,11 @@ g_data_input_stream_set_property (GObject      *object,
 				  const GValue *value,
 				  GParamSpec   *pspec)
 {
-  GDataInputStreamPrivate *priv;
   GDataInputStream        *dstream;
 
   dstream = G_DATA_INPUT_STREAM (object);
-  priv = dstream->priv;
 
-   switch (prop_id) 
+   switch (prop_id)
     {
     case PROP_BYTE_ORDER:
       g_data_input_stream_set_byte_order (dstream, g_value_get_enum (value));
@@ -817,21 +815,16 @@ scan_for_chars (GDataInputStream *stream,
 		const char       *stop_chars)
 {
   GBufferedInputStream *bstream;
-  GDataInputStreamPrivate *priv;
   const char *buffer;
   gsize start, end, peeked;
   int i;
-  gssize found_pos;
   gsize available, checked;
   const char *stop_char;
 
-  priv = stream->priv;
-  
   bstream = G_BUFFERED_INPUT_STREAM (stream);
 
   checked = *checked_out;
-  found_pos = -1;
-  
+
   start = checked;
   buffer = (const char *)g_buffered_input_stream_peek_buffer (bstream, &available) + start;
   end = available;
@@ -1203,7 +1196,7 @@ g_data_input_stream_read_until_async (GDataInputStream    *stream,
  *     On an error, it will return %NULL and @error will be set. If there's no
  *     content to read, it will still return %NULL, but @error won't be set.
  *
- * Since: 2,20
+ * Since: 2.20
  */
 gchar *
 g_data_input_stream_read_line_finish (GDataInputStream  *stream,
