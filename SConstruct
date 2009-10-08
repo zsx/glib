@@ -10,9 +10,9 @@ opts.Add(PathVariable('PERL', 'Path to the executable perl', r'C:\Perl\bin\perl.
 env = Environment(variables = opts,
                   ENV=os.environ, tools = ['default', GBuilder])
 GLIB_MAJOR_VERSION=2
-GLIB_MINOR_VERSION=21
-GLIB_MICRO_VERSION=6
-GLIB_INTERFACE_AGE=0
+GLIB_MINOR_VERSION=22
+GLIB_MICRO_VERSION=1
+GLIB_INTERFACE_AGE=1
 GLIB_BINARY_AGE=GLIB_MINOR_VERSION * 100 + GLIB_MICRO_VERSION
 GLIB_VERSION="%d.%d.%d" % (GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION)
 
