@@ -57,7 +57,7 @@ env.DotIn('config.h', 'config.h.win32.in')
 env.DotIn('glibconfig.h', 'glibconfig.h.win32.in')
 env.DotIn('glib-gettextize', 'glib-gettextize.in')
 
-env.Alias('install', env.Install('$PREFIX/lib/include', 'glibconfig.h'))
+env.Alias('install', env.Install('$PREFIX/lib/glib-2.0/include', 'glibconfig.h'))
 env.Alias('install', env.Install('$PREFIX/bin', 'glib-gettextize'))
 
 env.AppendENVPath('PATH', '#glib;#win32/libintl-proxy')
