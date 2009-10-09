@@ -21,6 +21,7 @@ Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums'))
 
 #glib-genmarshal
 env_gobject_genmarshal = env_gobject.Clone(PDB = 'glib-genmarshal.pdb')
+Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-genmarshal.exe'))
 
 def dot_strings(target, source, env):
     t = file(str(target[0]), 'w')
