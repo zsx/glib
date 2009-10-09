@@ -15,6 +15,7 @@ env_gobject.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
 #glib-mkenums
 env_gobject['DOT_IN_SUBS']['@PERL_PATH@'] = env_gobject['PERL']
 glib_mkenums = env_gobject.DotIn('glib-mkenums', 'glib-mkenums.in')
+env_gobject.Depends(glib_mkenums, 'SConscript')
 
 Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums'))
 
