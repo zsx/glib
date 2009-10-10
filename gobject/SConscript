@@ -72,6 +72,7 @@ gobject_HEADERS = Split("\
 	gvaluearray.h		\
 	gvaluecollector.h	\
 	gvaluetypes.h		\
+	gobjectnotifyqueue.c	\
 	gmarshal.h")
 
 gobject_SOURCES = Split("\
