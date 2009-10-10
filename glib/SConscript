@@ -201,3 +201,19 @@ Alias('install', env_glib.Install('$PREFIX/lib', 'libglib-2.0.lib'))
 Alias('install', env_glib.InstallAs('$PREFIX/lib/glib-2.0.lib', 'libglib-2.0.lib'))
 
 Alias('install', env_glib.Install('$PREFIX/pdb', 'libglib-2.0.pdb'))
+
+#spawn
+env_gspawn_win32_helper = env_glib.Clone(PDB = 'gspawn-win32-helper.pdb')
+env_gspawn_win32_helper.Append(LDFLAGS='/SUBSYSTEM:WINDOWS')
+env_gspawn_win32_helper.StaticObject('gspawn-win32-helper', 'gspawn-win32-helper.c')
+helper = env_gspawn_win32_helper.Program('gspawn-win32-helper', ['gspawn-win32-helper.obj', 'libglib-2.0.lib'])
+env_gspawn_win32_helper.Alias('install', env_gspawn_win32_helper.Install('$PREFIX/bin', 'gspawn-win32-helper.exe'))
+env_gspawn_win32_helper.AddPostAction(helper, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
+env_gspawn_win32_helper_console = env_glib.Clone(PDB = 'gspawn-win32-helper-console.pdb')
+env_gspawn_win32_helper_console.Append(CPPDEFINES='HELPER_CONSOLE')
+env_gspawn_win32_helper_console.Append(LDFLAGS='/SUBSYSTEM:CONSOLE')
+env_gspawn_win32_helper_console.StaticObject('gspawn-win32-helper-console', 'gspawn-win32-helper.c')
+helper_console = env_gspawn_win32_helper_console.Program('gspawn-win32-helper-console', ['gspawn-win32-helper-console.obj', 'libglib-2.0.lib'])
+env_gspawn_win32_helper_console.Alias('install', env_gspawn_win32_helper_console.Install('$PREFIX/bin', 'gspawn-win32-helper-console.exe'))
+env_gspawn_win32_helper_console.AddPostAction(helper_console, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
