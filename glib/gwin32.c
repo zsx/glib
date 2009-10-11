@@ -110,8 +110,8 @@ g_win32_getlocale (void)
 
   lcid = GetThreadLocale ();
 
-  if (!GetLocaleInfo (lcid, LOCALE_SISO639LANGNAME, iso639, sizeof (iso639)) ||
-      !GetLocaleInfo (lcid, LOCALE_SISO3166CTRYNAME, iso3166, sizeof (iso3166)))
+  if (!GetLocaleInfoA (lcid, LOCALE_SISO639LANGNAME, iso639, sizeof (iso639)) ||
+      !GetLocaleInfoA (lcid, LOCALE_SISO3166CTRYNAME, iso3166, sizeof (iso3166)))
     return g_strdup ("C");
   
   /* Strip off the sorting rules, keep only the language part.  */
