@@ -4,10 +4,10 @@ Import('env')
 env_gio = env.Clone(PDB = 'libgio-2.0.pdb')
 
 env_gio['CPPDEFINES']=['HAVE_CONFIG_H',
-                                ('G_LOG_DOMAN', '\\\"GLib-GIO\\\"'),
+                                ('G_LOG_DOMAN', '"\\\"GLib-GIO\\\""'),
                                 'G_DISABLE_DEPRECATED',
                                 'GIO_COMPILATION',
-                                'GIO_MODULE_DIR', 'gio/modules'] + env_gio['DEBUG_CPPDEFINES']
+                                ('GIO_MODULE_DIR', r'\"%s/share/gio/modules\"' % env['PREFIX'].replace('\\', r'/'))] + env_gio['DEBUG_CPPDEFINES']
 env_gio.Append(CPPPATH=['#', '#glib', '#gmodule', '#gio', '#win32/libintl-proxy'])
 
 env_gio['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
