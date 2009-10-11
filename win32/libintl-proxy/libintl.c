@@ -160,7 +160,7 @@ setup (void)
 
   if (!beenhere)
     {
-      HMODULE intl_dll = LoadLibrary ("intl.dll");
+      HMODULE intl_dll = LoadLibrary (TEXT("intl.dll"));
 
       if (intl_dll != NULL &&
 	  use_intl_dll (intl_dll))
