@@ -16,8 +16,11 @@ env_gobject.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
 env_gobject['DOT_IN_SUBS']['@PERL_PATH@'] = env_gobject['PERL']
 glib_mkenums = env_gobject.DotIn('glib-mkenums', 'glib-mkenums.in')
 env_gobject.Depends(glib_mkenums, 'SConscript')
+env_gobject.Command('glib-mkenums.bat', 'glib-mkenums', '''echo %s %s\\bin\\glib-mkenums.pl > $TARGET''' % (env_gobject['PERL'], env_gobject['PREFIX']))
 
 Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums'))
+Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums.bat'))
+Alias('install', env_gobject.InstallAs('$PREFIX/bin/glib-mkenums.pl', 'glib-mkenums'))
 
 #glib-genmarshal
 env_gobject_genmarshal = env_gobject.Clone(PDB = 'glib-genmarshal.pdb')
