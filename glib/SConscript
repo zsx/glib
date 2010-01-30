@@ -166,7 +166,7 @@ if ARGUMENTS.get('build_test', 0):
 SConscript(subdirs, exports='env_glib')
 
 env_glib.Append(CPPPATH=['#glib', '#win32/libintl-proxy'])
-env_glib.Append(CPPDEFINES=['PCRE_STATIC'])
+env_glib.Append(CPPDEFINES=['PCRE_STATIC', 'DLL_EXPORT'])
 env_glib.Append(CFLAGS=env_glib['DEBUG_CFLAGS'])
 
 env_glib.DotIn('glib.rc', 'glib.rc.in')
