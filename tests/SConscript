@@ -65,15 +65,17 @@ for i in tests:
     else:
         e.Program(i, i + '.c')
 
-env_test['ENV']['PATH'] += ';' + ';'.join([os.path.join('glib', 'glib'), 
-                                          os.path.join('glib', 'gmodule'), 
-                                          os.path.join('glib', 'gthread'), 
-                                          os.path.join('glib', 'gobject'),
-                                          os.path.join('glib', 'win32', 'libintl-proxy')]) 
+env_test['ENV']['PATH'] += ';' + ';'.join(['glib', 'gthread', 'gobject', os.path.join('win32', 'libintl-proxy')])
 env_test['ENV']['srcdir'] = os.path.dirname('tests/') #for iochannel-test
 
 for x in tests:
-    if x not in ['checksum-test', 'file-test', 'mapping-test', 'module-test', 'child-test', 'spawn-test']:
+    if x not in ['checksum-test', 
+                 'file-test', 
+                 'mapping-test', 
+                 'module-test', 
+                 'child-test', 
+                 #'spawn-test'
+                 ]:
         env_test.AlwaysBuild(env_test.Alias('test', [], os.path.join('tests', x + '.exe')))
 
 env_test.SharedLibrary('libmoduletestplugin_a.c')
