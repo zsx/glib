@@ -211,7 +211,7 @@ env_gspawn_win32_helper.Alias('install', env_gspawn_win32_helper.Install('$PREFI
 env_gspawn_win32_helper.AddPostAction(helper, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 env_gspawn_win32_helper_console = env_glib.Clone(PDB = 'gspawn-win32-helper-console.pdb')
-env_gspawn_win32_helper_console.Append(CPPDEFINES='HELPER_CONSOLE')
+env_gspawn_win32_helper_console.Append(CPPDEFINES=['HELPER_CONSOLE', 'DISABLE_CLOSE_DESCRIPTORS'])
 env_gspawn_win32_helper_console.Append(LDFLAGS='/SUBSYSTEM:CONSOLE')
 env_gspawn_win32_helper_console.StaticObject('gspawn-win32-helper-console', 'gspawn-win32-helper.c')
 helper_console = env_gspawn_win32_helper_console.Program('gspawn-win32-helper-console', ['gspawn-win32-helper-console.obj', 'libglib-2.0.lib'])
