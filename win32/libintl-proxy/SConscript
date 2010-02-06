@@ -7,6 +7,7 @@ env_libintl_proxy = env.Clone(PDB = 'libintl-proxy.pdb')
 libintl_SOURCES = Split("libintl.c libintl.def")
 libintl = env_libintl_proxy.SharedLibrary(['libintl-proxy' + env_libintl_proxy['LIB_SUFFIX'],
                                                 'libintl-proxy.lib'], libintl_SOURCES)
+env_libintl_proxy.AddPostAction(libintl, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 Alias('install', env_libintl_proxy.Install('$PREFIX/bin', 'libintl-proxy'+env_libintl_proxy['LIB_SUFFIX'] + env_libintl_proxy['SHLIBSUFFIX']))
 Alias('install', env_libintl_proxy.Install('$PREFIX/bin', 'intl.dll'))
