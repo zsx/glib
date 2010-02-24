@@ -338,6 +338,9 @@ g_content_type_guess (const char   *filename,
 
   if (type)
     return type;
+  
+  if (result_uncertain)
+	  *result_uncertain = FALSE;
 
   if (data && looks_like_text (data, data_size))
     return g_strdup (".txt");
