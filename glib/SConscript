@@ -1,17 +1,20 @@
 # vim: ft=python expandtab
+from site_init import *
 Import('env')
 
-env_glib = env.Clone()
+env_glib = env.Clone(PARENT_ENV = env)
 env_glib['PDB'] = 'libglib-2.0.pdb'
 
 # win_iconv
-env_glib_win_iconv = env_glib.Clone(PDB = 'libiconv.pdb')
+env_glib_win_iconv = env_glib.Clone(PDB = 'libiconv.pdb', PARENT_ENV = env_glib)
 env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
                                         'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
 
-Alias('install', env_glib_win_iconv.Install('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX']))
-Alias('install', env_glib_win_iconv.Install('$PREFIX/lib', 'libiconv.lib'))
-Alias('install', env_glib_win_iconv.InstallAs('$PREFIX/lib/iconv.lib', 'libiconv.lib'))
+InstallRun('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX'], env_glib_win_iconv)
+InstallDev('$PREFIX/lib', 'libiconv.lib', env_glib_win_iconv)
+InstallDevAs('$PREFIX/lib/iconv.lib', 'libiconv.lib', env_glib_win_iconv)
+
+#DumpInstalledFiles(env_glib_win_iconv)
 
 #glib
 env_glib['CPPDEFINES']=['HAVE_CONFIG_H',
@@ -191,29 +194,30 @@ env_glib.Depends('libglib-2.0' + env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'
         '#win32/libintl-proxy/libintl-proxy.lib')
 
 env_glib.AddPostAction(glib_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
-iheader = []
-iheader.append(env_glib.Install('$PREFIX/include/glib-2.0', glibinclude_HEADERS))
-iheader.append(env_glib.Install('$PREFIX/include/glib-2.0/glib', glibsubinclude_HEADERS))
-Alias('install', iheader)
+InstallDev('$PREFIX/include/glib-2.0', glibinclude_HEADERS, env_glib)
+InstallDev('$PREFIX/include/glib-2.0/glib', glibsubinclude_HEADERS, env_glib)
 
-Alias('install', env_glib.Install('$PREFIX/bin', 'libglib-2.0'+env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX']))
-Alias('install', env_glib.Install('$PREFIX/lib', 'libglib-2.0.lib'))
-Alias('install', env_glib.InstallAs('$PREFIX/lib/glib-2.0.lib', 'libglib-2.0.lib'))
+InstallRun('$PREFIX/bin', 'libglib-2.0'+env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'], env_glib)
+InstallDev('$PREFIX/lib', 'libglib-2.0.lib', env_glib)
+InstallDevAs('$PREFIX/lib/glib-2.0.lib', 'libglib-2.0.lib', env_glib)
 
-Alias('install', env_glib.Install('$PREFIX/pdb', 'libglib-2.0.pdb'))
+InstallDev('$PREFIX/pdb', 'libglib-2.0.pdb', env_glib)
 
+DumpInstalledFiles(env_glib)
 #spawn
-env_gspawn_win32_helper = env_glib.Clone(PDB = 'gspawn-win32-helper.pdb')
+env_gspawn_win32_helper = env_glib.Clone(PDB = 'gspawn-win32-helper.pdb', PARENT_ENV = env_glib)
 env_gspawn_win32_helper.Append(LDFLAGS='/SUBSYSTEM:WINDOWS')
 env_gspawn_win32_helper.StaticObject('gspawn-win32-helper', 'gspawn-win32-helper.c')
 helper = env_gspawn_win32_helper.Program('gspawn-win32-helper', ['gspawn-win32-helper.obj', 'libglib-2.0.lib'])
-env_gspawn_win32_helper.Alias('install', env_gspawn_win32_helper.Install('$PREFIX/bin', 'gspawn-win32-helper.exe'))
+InstallRun('$PREFIX/bin', 'gspawn-win32-helper.exe', env_gspawn_win32_helper)
 env_gspawn_win32_helper.AddPostAction(helper, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-env_gspawn_win32_helper_console = env_glib.Clone(PDB = 'gspawn-win32-helper-console.pdb')
+env_gspawn_win32_helper_console = env_glib.Clone(PDB = 'gspawn-win32-helper-console.pdb', PARENT_ENV = env_glib)
 env_gspawn_win32_helper_console.Append(CPPDEFINES=['HELPER_CONSOLE', 'DISABLE_CLOSE_DESCRIPTORS'])
 env_gspawn_win32_helper_console.Append(LDFLAGS='/SUBSYSTEM:CONSOLE')
 env_gspawn_win32_helper_console.StaticObject('gspawn-win32-helper-console', 'gspawn-win32-helper.c')
 helper_console = env_gspawn_win32_helper_console.Program('gspawn-win32-helper-console', ['gspawn-win32-helper-console.obj', 'libglib-2.0.lib'])
-env_gspawn_win32_helper_console.Alias('install', env_gspawn_win32_helper_console.Install('$PREFIX/bin', 'gspawn-win32-helper-console.exe'))
+InstallRun('$PREFIX/bin', 'gspawn-win32-helper-console.exe', env_gspawn_win32_helper_console)
 env_gspawn_win32_helper_console.AddPostAction(helper_console, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+#DumpInstalledFiles(env_gspawn_win32_helper)
+#DumpInstalledFiles(env_gspawn_win32_helper_console)

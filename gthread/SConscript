@@ -1,7 +1,8 @@
 # vim: ft=python expandtab
+from site_init import *
 Import('env')
 
-env_gthread = env.Clone(PDB = 'libgthread-2.0.pdb')
+env_gthread = env.Clone(PDB = 'libgthread-2.0.pdb', PARENT_ENV = env)
 
 env_gthread['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', r'\"GThread\"'),
@@ -24,7 +25,8 @@ gthread_dll=env_gthread.SharedLibrary(['libgthread-2.0' + env_gthread['LIB_SUFFI
 
 env_gthread.AddPostAction(gthread_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-Alias('install', env_gthread.Install('$PREFIX/bin', 'libgthread-2.0' + env_gthread['LIB_SUFFIX'] + '.dll'))
-Alias('install', env_gthread.Install('$PREFIX/lib', 'libgthread-2.0.lib'))
-Alias('install', env_gthread.InstallAs('$PREFIX/lib/gthread-2.0.lib', 'libgthread-2.0.lib'))
-Alias('install', env_gthread.Install('$PREFIX/pdb', 'libgthread-2.0.pdb'))
+InstallRun('$PREFIX/bin', 'libgthread-2.0' + env_gthread['LIB_SUFFIX'] + '.dll', env_gthread)
+InstallDev('$PREFIX/lib', 'libgthread-2.0.lib', env_gthread)
+InstallDev('$PREFIX/pdb', 'libgthread-2.0.pdb', env_gthread)
+InstallDevAs('$PREFIX/lib/gthread-2.0.lib', 'libgthread-2.0.lib', env_gthread)
+DumpInstalledFiles(env_gthread)

@@ -1,4 +1,5 @@
 # vim: ft=python expandtab
+from site_init import *
 
 Import('env')
 
@@ -9,8 +10,8 @@ libintl = env_libintl_proxy.SharedLibrary(['libintl-proxy' + env_libintl_proxy['
                                                 'libintl-proxy.lib'], libintl_SOURCES)
 env_libintl_proxy.AddPostAction(libintl, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-Alias('install', env_libintl_proxy.Install('$PREFIX/bin', 'libintl-proxy'+env_libintl_proxy['LIB_SUFFIX'] + env_libintl_proxy['SHLIBSUFFIX']))
-Alias('install', env_libintl_proxy.Install('$PREFIX/bin', 'intl.dll'))
-Alias('install', env_libintl_proxy.Install('$PREFIX/include/glib-2.0', 'libintl.h'))
-Alias('install', env_libintl_proxy.Install('$PREFIX/lib', 'libintl-proxy.lib'))
-Alias('install', env_libintl_proxy.InstallAs('$PREFIX/lib/intl-proxy.lib', 'libintl-proxy.lib'))
+InstallRun('$PREFIX/bin', 'libintl-proxy'+env_libintl_proxy['LIB_SUFFIX'] + env_libintl_proxy['SHLIBSUFFIX'], env_libintl_proxy)
+InstallRun('$PREFIX/bin', 'intl.dll', env_libintl_proxy)
+InstallDev('$PREFIX/include/glib-2.0', 'libintl.h', env_libintl_proxy)
+InstallDev('$PREFIX/lib', 'libintl-proxy.lib', env_libintl_proxy)
+InstallDevAs('$PREFIX/lib/intl-proxy.lib', 'libintl-proxy.lib', env_libintl_proxy)
