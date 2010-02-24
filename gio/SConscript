@@ -1,7 +1,8 @@
 # vim: ft=python expandtab
+from site_init import *
 Import('env')
 
-env_gio = env.Clone(PDB = 'libgio-2.0.pdb')
+env_gio = env.Clone(PDB = 'libgio-2.0.pdb', PARENT_ENV = env)
 
 env_gio['CPPDEFINES']=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '"\\\"GLib-GIO\\\""'),
@@ -218,8 +219,8 @@ env_gio.Depends(gio_dll, ['#glib/libglib-2.0.lib',
                               ])
 env_gio.AddPostAction(gio_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-Alias('install', env_gio.Install('$PREFIX/include/glib-2.0/gio', gio_HEADERS + ['gioenumtypes.h']))
-Alias('install', env_gio.Install('$PREFIX/bin', 'libgio-2.0' + env_gio['LIB_SUFFIX'] + '.dll'))
-Alias('install', env_gio.Install('$PREFIX/lib', 'libgio-2.0.lib'))
-Alias('install', env_gio.InstallAs('$PREFIX/lib/gio-2.0.lib', 'libgio-2.0.lib'))
-Alias('install', env_gio.Install('$PREFIX/pdb', 'libgio-2.0.pdb'))
+InstallRun('$PREFIX/bin', 'libgio-2.0' + env_gio['LIB_SUFFIX'] + '.dll', env_gio)
+InstallDev('$PREFIX/include/glib-2.0/gio', gio_HEADERS + ['gioenumtypes.h'], env_gio)
+InstallDev('$PREFIX/lib', 'libgio-2.0.lib', env_gio)
+InstallDev('$PREFIX/pdb', 'libgio-2.0.pdb', env_gio)
+InstallDevAs('$PREFIX/lib/gio-2.0.lib', 'libgio-2.0.lib', env_gio)
