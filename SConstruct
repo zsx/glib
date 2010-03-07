@@ -53,7 +53,7 @@ pcs = ('glib-2.0.pc',
 
 for pc in pcs:
     env.DotIn(pc, pc + '.in')
-InstallDev('$PREFIX/lib/pkgconfig', pc, env)
+InstallDev('$PREFIX/lib/pkgconfig', pcs, env)
 
 env.DotIn('config.h', 'config.h.win32.in')
 env.DotIn('glibconfig.h', 'glibconfig.h.win32.in')
