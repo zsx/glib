@@ -4,10 +4,10 @@ Import('env')
 
 env_gthread = env.Clone(PDB = 'libgthread-2.0.pdb', PARENT_ENV = env)
 
-env_gthread['CPPDEFINES']=['HAVE_CONFIG_H',
+env_gthread.Append(CPPDEFINES=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', r'\"GThread\"'),
                                 ('G_THREAD_SOURCE', r'\"gthread-win32.c\"'),
-                                'G_DISABLE_DEPRECATED'] + env_gthread['DEBUG_CPPDEFINES']
+                                'G_DISABLE_DEPRECATED'] + env_gthread['DEBUG_CPPDEFINES'])
 env_gthread.Append(CPPPATH=['#', '#glib', '#gthread'])
 
 gthread_SOURCES = Split("\
@@ -16,12 +16,11 @@ gthread_SOURCES = Split("\
 env_gthread.Depends('gthread-impl' + env_gthread['OBJSUFFIX'], 'gthread-win32.c') 
 env_gthread.DotIn('gthread.rc', 'gthread.rc.in')
 env_gthread.RES('gthread.rc')
-
+env_gthread.Append(LIBS=['libglib-2.0', 'user32'],
+                   LIBPATH=['$PREFIX/lib', '#glib'])
 gthread_dll=env_gthread.SharedLibrary(['libgthread-2.0' + env_gthread['LIB_SUFFIX'] + env_gthread['SHLIBSUFFIX'],
                                     'libgthread-2.0.lib'],
-                                   gthread_SOURCES + ['gthread.def', 'gthread.res'], 
-                                   LIBS=['libglib-2.0', 'user32'],
-                                   LIBPATH=['$PREFIX/lib', '#glib'])
+                                   gthread_SOURCES + ['gthread.def', 'gthread.res'])
 
 env_gthread.AddPostAction(gthread_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
