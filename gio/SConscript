@@ -4,11 +4,11 @@ Import('env')
 
 env_gio = env.Clone(PDB = 'libgio-2.0.pdb', PARENT_ENV = env)
 
-env_gio['CPPDEFINES']=['HAVE_CONFIG_H',
+env_gio.Append(CPPDEFINES=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '"\\\"GLib-GIO\\\""'),
                                 'G_DISABLE_DEPRECATED',
                                 'GIO_COMPILATION',
-                                ('GIO_MODULE_DIR', r'\"%s/share/gio/modules\"' % env['PREFIX'].replace('\\', r'/'))] + env_gio['DEBUG_CPPDEFINES']
+                                ('GIO_MODULE_DIR', r'\"%s/share/gio/modules\"' % env['PREFIX'].replace('\\', r'/'))] + env_gio['DEBUG_CPPDEFINES'])
 env_gio.Append(CPPPATH=['#', '#glib', '#gmodule', '#gio', '#win32/libintl-proxy'])
 
 env_gio['DOT_SYMBOLS_FLAGS'] = '/DINCLUDE_VARIABLES /DINCLUDE_INTERNAL_SYMBOLS /DG_OS_WIN32 /DALL_FILES'
@@ -198,20 +198,20 @@ SConscript(subdirs, exports = "env_gio")
 
 env_gio.DotIn('gio.rc', 'gio.rc.in')
 env_gio.RES('gio.rc')
+env_gio.Append(LIBS=['libglib-2.0',
+                     'libgobject-2.0',
+                     'libgmodule-2.0',
+                     'shlwapi',
+                     'ws2_32',
+                     'dnsapi',
+                     'kernel32',
+                     'user32',
+                     'advapi32',
+                     'shell32'],
+               LIBPATH=['$PREFIX/lib', '#glib', '#gobject', '#gmodule', 'win32/libgiowin32'])
 gio_dll=env_gio.SharedLibrary(['libgio-2.0' + env_gio['LIB_SUFFIX'] + env_gio['SHLIBSUFFIX'],
                                     'libgio-2.0.lib'],
-                                   gio_SOURCES + ['gio.def', 'gio.res', 'win32/libgiowin32.lib'], 
-                                   LIBS=['libglib-2.0',
-                                         'libgobject-2.0',
-                                         'libgmodule-2.0',
-                                         'shlwapi',
-                                         'ws2_32',
-                                         'dnsapi',
-                                         'kernel32',
-                                         'user32',
-                                         'advapi32',
-                                         'shell32'],
-                                   LIBPATH=['$PREFIX/lib', '#glib', '#gobject', '#gmodule', 'win32/libgiowin32'])
+                                   gio_SOURCES + ['gio.def', 'gio.res', 'win32/libgiowin32.lib'])
 env_gio.Depends(gio_dll, gio_HEADERS)
 env_gio.Depends(gio_dll, ['#glib/libglib-2.0.lib',
                               '#gobject/libgobject-2.0.lib',

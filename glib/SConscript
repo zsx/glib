@@ -17,10 +17,10 @@ InstallDevAs('$PREFIX/lib/iconv.lib', 'libiconv.lib', env_glib_win_iconv)
 #DumpInstalledFiles(env_glib_win_iconv)
 
 #glib
-env_glib['CPPDEFINES']=['HAVE_CONFIG_H',
+env_glib.Append(CPPDEFINES=['HAVE_CONFIG_H',
                             ('G_LOG_DOMAN', '\\\"GLib\\\"'),
                             'G_DISABLE_DEPRECATED',
-                            'GLIB_COMPILATION'] + env_glib['DEBUG_CPPDEFINES']
+                            'GLIB_COMPILATION'] + env_glib['DEBUG_CPPDEFINES'])
 
 env_glib.Append(CPPPATH=['#', '#glib', '#win32/libintl-proxy'])
 
@@ -174,21 +174,22 @@ env_glib.Append(CFLAGS=env_glib['DEBUG_CFLAGS'])
 
 env_glib.DotIn('glib.rc', 'glib.rc.in')
 env_glib.RES('glib.rc')
+env_glib.Append(LIBS=['libintl-proxy',
+                      'ws2_32', 
+                      'user32', 
+                      'advapi32', 
+                      'shell32', 
+                      'wsock32',
+                      'ole32'], 
+                LIBPATH=['#win32/libintl-proxy'])
 glib_dll = env_glib.SharedLibrary(['libglib-2.0' + env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'], 'libglib-2.0.lib'],
         libglib_SOURCES + EXTRA_libglib_SOURCES 
         + ['glib.def', 
            'glib.res',
            'libcharset/libcharset.lib', 
            'gnulib/libgnulib.lib', 
-           'pcre/libpcre.lib'], 
-        LIBS=['libintl-proxy',
-              'ws2_32', 
-              'user32', 
-              'advapi32', 
-              'shell32', 
-              'wsock32',
-              'ole32'], 
-        LIBPATH='#win32/libintl-proxy')
+           'pcre/libpcre.lib'] 
+        )
 
 env_glib.Depends('libglib-2.0' + env_glib['LIB_SUFFIX'] + env_glib['SHLIBSUFFIX'], 
         '#win32/libintl-proxy/libintl-proxy.lib')
