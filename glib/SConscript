@@ -12,6 +12,7 @@ env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
 
 InstallRun('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX'], env_glib_win_iconv)
 InstallDev('$PREFIX/lib', 'libiconv.lib', env_glib_win_iconv)
+InstallDev('$PREFIX/include', 'iconv.h', env_glib_win_iconv)
 InstallDevAs('$PREFIX/lib/iconv.lib', 'libiconv.lib', env_glib_win_iconv)
 
 #DumpInstalledFiles(env_glib_win_iconv)
