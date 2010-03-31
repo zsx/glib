@@ -19,6 +19,7 @@
  */
 #include "config.h"
 #include "gtestutils.h"
+#include <glib.h>
 #include "galias.h"
 #include <sys/types.h>
 #ifdef G_OS_UNIX
@@ -40,6 +41,12 @@
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif /* HAVE_SYS_SELECT_H */
+ 
+/* Global variable for storing assertion messages; this is the counterpart to
+ * glibc's (private) __abort_msg variable, and allows developers and crash
+ * analysis systems like Apport and ABRT to fish out assertion messages from
+ * core dumps, instead of having to catch them on screen output. */
+char *__glib_assert_msg = NULL;
 
 /* --- structures --- */
 struct GTestCase
@@ -1297,6 +1304,15 @@ g_assertion_message (const char     *domain,
                    func, func[0] ? ":" : "",
                    " ", message, NULL);
   g_printerr ("**\n%s\n", s);
+
+  /* store assertion message in global variable, so that it can be found in a
+   * core dump */
+  if (__glib_assert_msg != NULL)
+      /* free the old one */
+      free (__glib_assert_msg);
+  __glib_assert_msg = (char*) malloc (strlen (s) + 1);
+  strcpy (__glib_assert_msg, s);
+
   g_test_log (G_TEST_LOG_ERROR, s, NULL, 0, NULL);
   g_free (s);
   abort();

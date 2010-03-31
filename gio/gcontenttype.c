@@ -295,7 +295,7 @@ looks_like_text (const guchar *data,
   for (i = 0; i < data_size; i++)
     {
       c = data[i];
-      if (g_ascii_iscntrl (c) && !g_ascii_isspace (c))
+      if (g_ascii_iscntrl (c) && !g_ascii_isspace (c) && c != '\b')
 	return FALSE;
     }
   return TRUE;
@@ -326,6 +326,9 @@ g_content_type_guess (const char   *filename,
   char *dot;
 
   type = NULL;
+
+  if (result_uncertain)
+    *result_uncertain = FALSE;
 
   if (filename)
     {
@@ -748,7 +751,7 @@ g_content_type_get_icon (const char *type)
   char *mimetype_icon, *generic_mimetype_icon, *q;
   char *xdg_mimetype_icon, *legacy_mimetype_icon;
   char *xdg_mimetype_generic_icon;
-  char *icon_names[4];
+  char *icon_names[5];
   int n = 0;
   const char *p;
   GIcon *themed_icon;
@@ -832,7 +835,8 @@ looks_like_text (const guchar *data, gsize data_size)
       c = data[i];
       
       if (g_ascii_iscntrl (c) &&
-	  !g_ascii_isspace (c))
+	  !g_ascii_isspace (c) &&
+	  c != '\b')
 	return FALSE;
     }
   return TRUE;

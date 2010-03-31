@@ -46,6 +46,40 @@ typedef enum {
   G_APP_INFO_CREATE_SUPPORTS_URIS  = (1 << 1)   /*< nick=supports-uris >*/
 } GAppInfoCreateFlags;
 
+/**
+ * GConverterFlags:
+ * @G_CONVERTER_NO_FLAGS: No flags.
+ * @G_CONVERTER_INPUT_AT_END: At end of input data
+ * @G_CONVERTER_FLUSH: Flush data
+ *
+ * Flags used when calling a g_converter_convert().
+ *
+ * Since: 2.24
+ */
+typedef enum {
+  G_CONVERTER_NO_FLAGS     = 0,         /*< nick=none >*/
+  G_CONVERTER_INPUT_AT_END = (1 << 0),  /*< nick=input-at-end >*/
+  G_CONVERTER_FLUSH        = (1 << 1)   /*< nick=flush >*/
+} GConverterFlags;
+
+/**
+ * GConverterResult:
+ * @G_CONVERTER_ERROR: There was an error during conversion.
+ * @G_CONVERTER_CONVERTED: Some data was consumed or produced
+ * @G_CONVERTER_FINISHED: The conversion is finished
+ * @G_CONVERTER_FLUSHED: Flushing is finished
+ *
+ * Results returned from g_converter_convert().
+ *
+ * Since: 2.24
+ */
+typedef enum {
+  G_CONVERTER_ERROR     = 0,  /*< nick=error >*/
+  G_CONVERTER_CONVERTED = 1,  /*< nick=converted >*/
+  G_CONVERTER_FINISHED  = 2,  /*< nick=finished >*/
+  G_CONVERTER_FLUSHED   = 3   /*< nick=flushed >*/
+} GConverterResult;
+
 
 /**
  * GDataStreamByteOrder:
@@ -267,12 +301,18 @@ typedef enum {
  * GFileMonitorFlags:
  * @G_FILE_MONITOR_NONE: No flags set.
  * @G_FILE_MONITOR_WATCH_MOUNTS: Watch for mount events.
+ * @G_FILE_MONITOR_SEND_MOVED: Pair DELETED and CREATED events caused
+ *   by file renames (moves) and send a single G_FILE_MONITOR_EVENT_MOVED
+ *   event instead (NB: not supported on all backends; the default
+ *   behaviour -without specifying this flag- is to send single DELETED
+ *   and CREATED events).
  *
  * Flags used to set what a #GFileMonitor will watch for.
  */
 typedef enum {
   G_FILE_MONITOR_NONE         = 0,
-  G_FILE_MONITOR_WATCH_MOUNTS = (1 << 0)
+  G_FILE_MONITOR_WATCH_MOUNTS = (1 << 0),
+  G_FILE_MONITOR_SEND_MOVED   = (1 << 1)
 } GFileMonitorFlags;
 
 
@@ -327,6 +367,7 @@ typedef enum {
  * @G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED: a file attribute was changed.
  * @G_FILE_MONITOR_EVENT_PRE_UNMOUNT: the file location will soon be unmounted.
  * @G_FILE_MONITOR_EVENT_UNMOUNTED: the file location was unmounted.
+ * @G_FILE_MONITOR_EVENT_MOVED: the file was moved.
  *
  * Specifies what type of event a monitor event is.
  **/
@@ -337,7 +378,8 @@ typedef enum {
   G_FILE_MONITOR_EVENT_CREATED,
   G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
   G_FILE_MONITOR_EVENT_PRE_UNMOUNT,
-  G_FILE_MONITOR_EVENT_UNMOUNTED
+  G_FILE_MONITOR_EVENT_UNMOUNTED,
+  G_FILE_MONITOR_EVENT_MOVED
 } GFileMonitorEvent;
 
 
@@ -385,6 +427,8 @@ typedef enum {
  *     this limit. Since 2.20
  * @G_IO_ERROR_NOT_INITIALIZED: The object has not been initialized. Since 2.22
  * @G_IO_ERROR_ADDRESS_IN_USE: The requested address is already in use. Since 2.22
+ * @G_IO_ERROR_PARTIAL_INPUT: Need more input to finish operation. Since 2.24
+ * @G_IO_ERROR_INVALID_DATA: There input data was invalid. Since 2.24
  *
  * Error codes returned by GIO functions.
  *
@@ -423,7 +467,9 @@ typedef enum {
   G_IO_ERROR_FAILED_HANDLED,
   G_IO_ERROR_TOO_MANY_OPEN_FILES,
   G_IO_ERROR_NOT_INITIALIZED,
-  G_IO_ERROR_ADDRESS_IN_USE
+  G_IO_ERROR_ADDRESS_IN_USE,
+  G_IO_ERROR_PARTIAL_INPUT,
+  G_IO_ERROR_INVALID_DATA
 } GIOErrorEnum;
 
 
@@ -634,6 +680,23 @@ typedef enum {
   G_SOCKET_PROTOCOL_UDP     = 17,
   G_SOCKET_PROTOCOL_SCTP    = 132
 } GSocketProtocol;
+
+/**
+ * GZlibCompressorFormat:
+ * @G_ZLIB_COMPRESSOR_FORMAT_ZLIB: deflate compression with zlib header
+ * @G_ZLIB_COMPRESSOR_FORMAT_GZIP: gzip file format
+ * @G_ZLIB_COMPRESSOR_FORMAT_RAW: deflate compression with no header
+ *
+ * Used to select the type of data format to use for #GZlibDecompressor
+ * and #GZlibCompressor.
+ *
+ * Since: 2.24
+ */
+typedef enum {
+  G_ZLIB_COMPRESSOR_FORMAT_ZLIB,
+  G_ZLIB_COMPRESSOR_FORMAT_GZIP,
+  G_ZLIB_COMPRESSOR_FORMAT_RAW
+} GZlibCompressorFormat;
 
 G_END_DECLS
 

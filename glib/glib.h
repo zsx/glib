@@ -35,6 +35,7 @@
 #include <glib/gatomic.h>
 #include <glib/gbacktrace.h>
 #include <glib/gbase64.h>
+#include <glib/gbitlock.h>
 #include <glib/gbookmarkfile.h>
 #include <glib/gcache.h>
 #include <glib/gchecksum.h>
@@ -85,6 +86,8 @@
 #include <glib/gunicode.h>
 #include <glib/gurifuncs.h>
 #include <glib/gutils.h>
+#include <glib/gvarianttype.h>
+#include <glib/gvariant.h>
 #ifdef G_PLATFORM_WIN32
 #include <glib/gwin32.h>
 #endif

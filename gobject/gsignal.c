@@ -1285,7 +1285,7 @@ g_signal_query (guint         signal_id,
  *  %G_SIGNAL_RUN_FIRST or %G_SIGNAL_RUN_LAST.
  * @class_offset: The offset of the function pointer in the class structure
  *  for this type. Used to invoke a class method generically. Pass 0 to
- *  not associate a class method with this signal.
+ *  not associate a class method slot with this signal.
  * @accumulator: the accumulator for this signal; may be %NULL.
  * @accu_data: user data for the @accumulator.
  * @c_marshaller: the function to translate arrays of parameter values to
@@ -1304,6 +1304,11 @@ g_signal_query (guint         signal_id,
  *
  * When registering a signal and looking up a signal, either separator can
  * be used, but they cannot be mixed.
+ *
+ * If 0 is used for @class_offset subclasses cannot override the class handler
+ * in their <code>class_init</code> method by doing
+ * <code>super_class->signal_handler = my_signal_handler</code>. Instead they
+ * will have to use g_signal_override_class_handler().
  *
  * Returns: the signal id
  */
@@ -1971,7 +1976,7 @@ g_signal_chain_from_overridden_handler (gpointer instance,
       va_start (var_args, instance);
 
       signal_return_type = node->return_type;
-      instance_and_params = g_slice_alloc (sizeof (GValue) * (n_params + 1));
+      instance_and_params = g_slice_alloc0 (sizeof (GValue) * (n_params + 1));
       param_values = instance_and_params + 1;
 
       for (i = 0; i < node->n_params; i++)
@@ -1980,13 +1985,11 @@ g_signal_chain_from_overridden_handler (gpointer instance,
           GType ptype = node->param_types[i] & ~G_SIGNAL_TYPE_STATIC_SCOPE;
           gboolean static_scope = node->param_types[i] & G_SIGNAL_TYPE_STATIC_SCOPE;
 
-          param_values[i].g_type = 0;
           SIGNAL_UNLOCK ();
-          g_value_init (param_values + i, ptype);
-          G_VALUE_COLLECT (param_values + i,
-                           var_args,
-                           static_scope ? G_VALUE_NOCOPY_CONTENTS : 0,
-                           &error);
+          G_VALUE_COLLECT_INIT (param_values + i, ptype,
+				var_args,
+				static_scope ? G_VALUE_NOCOPY_CONTENTS : 0,
+				&error);
           if (error)
             {
               g_warning ("%s: %s", G_STRLOC, error);
@@ -2940,7 +2943,7 @@ g_signal_emit_valist (gpointer instance,
 
   n_params = node->n_params;
   signal_return_type = node->return_type;
-  instance_and_params = g_slice_alloc (sizeof (GValue) * (n_params + 1));
+  instance_and_params = g_slice_alloc0 (sizeof (GValue) * (n_params + 1));
   param_values = instance_and_params + 1;
 
   for (i = 0; i < node->n_params; i++)
@@ -2949,13 +2952,11 @@ g_signal_emit_valist (gpointer instance,
       GType ptype = node->param_types[i] & ~G_SIGNAL_TYPE_STATIC_SCOPE;
       gboolean static_scope = node->param_types[i] & G_SIGNAL_TYPE_STATIC_SCOPE;
 
-      param_values[i].g_type = 0;
       SIGNAL_UNLOCK ();
-      g_value_init (param_values + i, ptype);
-      G_VALUE_COLLECT (param_values + i,
-		       var_args,
-		       static_scope ? G_VALUE_NOCOPY_CONTENTS : 0,
-		       &error);
+      G_VALUE_COLLECT_INIT (param_values + i, ptype,
+			    var_args,
+			    static_scope ? G_VALUE_NOCOPY_CONTENTS : 0,
+			    &error);
       if (error)
 	{
 	  g_warning ("%s: %s", G_STRLOC, error);

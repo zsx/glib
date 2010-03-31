@@ -30,6 +30,14 @@
 #include <windns.h>
 #include <mswsock.h>
 
+#ifdef HAVE_WSPIAPI_H
+/* <wspiapi.h> in the Windows SDK and in mingw-w64 has wrappers for
+ * inline workarounds for getaddrinfo, getnameinfo and freeaddrinfo if
+ * they aren't present at run-time (on Windows 2000).
+ */
+#include <wspiapi.h>
+#endif
+
 #else /* !G_OS_WIN32 */
 
 #include <sys/types.h>
@@ -73,7 +81,7 @@ GList *_g_resolver_addresses_from_addrinfo (const char       *hostname,
 
 void   _g_resolver_address_to_sockaddr     (GInetAddress            *address,
 					    struct sockaddr_storage *sa,
-					    gsize                   *sa_len);
+					    gsize                   *len);
 char  *_g_resolver_name_from_nameinfo      (GInetAddress     *address,
 					    const gchar      *name,
 					    gint              gni_retval,

@@ -204,19 +204,26 @@ g_file_test (const gchar *filename,
     return TRUE;
       
   if (test & G_FILE_TEST_IS_REGULAR)
-    return (attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0;
+    {
+      if ((attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0)
+	return TRUE;
+    }
 
   if (test & G_FILE_TEST_IS_DIR)
-    return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    {
+      if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+	return TRUE;
+    }
 
-  if (test & G_FILE_TEST_IS_EXECUTABLE)
+  /* "while" so that we can exit this "loop" with a simple "break" */
+  while (test & G_FILE_TEST_IS_EXECUTABLE)
     {
       const gchar *lastdot = strrchr (filename, '.');
       const gchar *pathext = NULL, *p;
       int extlen;
 
       if (lastdot == NULL)
-	return FALSE;
+        break;
 
       if (_stricmp (lastdot, ".exe") == 0 ||
 	  _stricmp (lastdot, ".cmd") == 0 ||
@@ -228,7 +235,7 @@ g_file_test (const gchar *filename,
 
       pathext = g_getenv ("PATHEXT");
       if (pathext == NULL)
-	return FALSE;
+        break;
 
       pathext = g_utf8_casefold (pathext, -1);
 
@@ -256,7 +263,7 @@ g_file_test (const gchar *filename,
 
       g_free ((gchar *) pathext);
       g_free ((gchar *) lastdot);
-      return FALSE;
+      break;
     }
 
   return FALSE;
@@ -1735,9 +1742,12 @@ g_build_filename (const gchar *first_element,
   return str;
 }
 
-#define KILOBYTE_FACTOR 1024.0
-#define MEGABYTE_FACTOR (1024.0 * 1024.0)
-#define GIGABYTE_FACTOR (1024.0 * 1024.0 * 1024.0)
+#define KILOBYTE_FACTOR (G_GOFFSET_CONSTANT (1024))
+#define MEGABYTE_FACTOR (KILOBYTE_FACTOR * KILOBYTE_FACTOR)
+#define GIGABYTE_FACTOR (MEGABYTE_FACTOR * KILOBYTE_FACTOR)
+#define TERABYTE_FACTOR (GIGABYTE_FACTOR * KILOBYTE_FACTOR)
+#define PETABYTE_FACTOR (TERABYTE_FACTOR * KILOBYTE_FACTOR)
+#define EXABYTE_FACTOR  (PETABYTE_FACTOR * KILOBYTE_FACTOR)
 
 /**
  * g_format_size_for_display:
@@ -1768,19 +1778,34 @@ g_format_size_for_display (goffset size)
       
       if (size < (goffset) MEGABYTE_FACTOR)
 	{
-	  displayed_size = (gdouble) size / KILOBYTE_FACTOR;
+	  displayed_size = (gdouble) size / (gdouble) KILOBYTE_FACTOR;
 	  return g_strdup_printf (_("%.1f KB"), displayed_size);
 	}
       else if (size < (goffset) GIGABYTE_FACTOR)
 	{
-	  displayed_size = (gdouble) size / MEGABYTE_FACTOR;
+	  displayed_size = (gdouble) size / (gdouble) MEGABYTE_FACTOR;
 	  return g_strdup_printf (_("%.1f MB"), displayed_size);
 	}
-      else
+      else if (size < (goffset) TERABYTE_FACTOR)
 	{
-	  displayed_size = (gdouble) size / GIGABYTE_FACTOR;
+	  displayed_size = (gdouble) size / (gdouble) GIGABYTE_FACTOR;
 	  return g_strdup_printf (_("%.1f GB"), displayed_size);
 	}
+      else if (size < (goffset) PETABYTE_FACTOR)
+	{
+	  displayed_size = (gdouble) size / (gdouble) TERABYTE_FACTOR;
+	  return g_strdup_printf (_("%.1f TB"), displayed_size);
+	}
+      else if (size < (goffset) EXABYTE_FACTOR)
+	{
+	  displayed_size = (gdouble) size / (gdouble) PETABYTE_FACTOR;
+	  return g_strdup_printf (_("%.1f PB"), displayed_size);
+	}
+      else
+        {
+	  displayed_size = (gdouble) size / (gdouble) EXABYTE_FACTOR;
+	  return g_strdup_printf (_("%.1f EB"), displayed_size);
+        }
     }
 }
 

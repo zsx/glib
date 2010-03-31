@@ -86,50 +86,11 @@
  *
  **/
 
-static void g_app_info_base_init (gpointer g_class);
-static void g_app_info_class_init (gpointer g_class,
-				   gpointer class_data);
-
-
-GType
-g_app_info_get_type (void)
-{
-  static volatile gsize g_define_type_id__volatile = 0;
-
-  if (g_once_init_enter (&g_define_type_id__volatile))
-    {
-     const GTypeInfo app_info_info =
-      {
-        sizeof (GAppInfoIface), /* class_size */
-	g_app_info_base_init,   /* base_init */
-	NULL,		/* base_finalize */
-	g_app_info_class_init,
-	NULL,		/* class_finalize */
-	NULL,		/* class_data */
-	0,
-	0,              /* n_preallocs */
-	NULL
-      };
-      GType g_define_type_id =
-	g_type_register_static (G_TYPE_INTERFACE, I_("GAppInfo"),
-				&app_info_info, 0);
-
-      g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_OBJECT);
-
-      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id);
-    }
-
-  return g_define_type_id__volatile;
-}
+typedef GAppInfoIface GAppInfoInterface;
+G_DEFINE_INTERFACE (GAppInfo, g_app_info, G_TYPE_OBJECT)
 
 static void
-g_app_info_class_init (gpointer g_class,
-		       gpointer class_data)
-{
-}
-
-static void
-g_app_info_base_init (gpointer g_class)
+g_app_info_default_init (GAppInfoInterface *iface)
 {
 }
 
@@ -224,6 +185,33 @@ g_app_info_get_name (GAppInfo *appinfo)
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   return (* iface->get_name) (appinfo);
+}
+
+/**
+ * g_app_info_get_display_name:
+ * @appinfo: a #GAppInfo.
+ *
+ * Gets the display name of the application. The display name is often more
+ * descriptive to the user than the name itself.
+ *
+ * Returns: the display name of the application for @appinfo, or the name if
+ * no display name is available.
+ *
+ * Since: 2.24
+ **/
+const char *
+g_app_info_get_display_name (GAppInfo *appinfo)
+{
+  GAppInfoIface *iface;
+
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
+
+  iface = G_APP_INFO_GET_IFACE (appinfo);
+
+  if (iface->get_display_name == NULL)
+    return (* iface->get_name) (appinfo);
+
+  return (* iface->get_display_name) (appinfo);
 }
 
 /**

@@ -192,14 +192,15 @@ typedef struct _GFileInfoClass   GFileInfoClass;
 #define G_FILE_ATTRIBUTE_STANDARD_SIZE "standard::size"                     /* uint64 */
 
 /**
- * G_FILE_ATTRIBUTE_ALLOCATED_SIZE:
+ * G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE:
  *
  * A key in the "standard" namespace for getting the amount of disk space
  * that is consumed by the file (in bytes).  This will generally be larger
  * than the file size (due to block size overhead) but can occasionally be
  * smaller (for example, for sparse files).
- *
  * Corresponding #GFileAttributeType is %G_FILE_ATTRIBUTE_TYPE_UINT64.
+ *
+ * Since: 2.20
  **/
 #define G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE "standard::allocated-size" /* uint64 */
 
@@ -368,7 +369,7 @@ typedef struct _GFileInfoClass   GFileInfoClass;
  * A key in the "mountable" namespace for getting the unix device file.
  * Corresponding #GFileAttributeType is %G_FILE_ATTRIBUTE_TYPE_STRING.
  *
- * Since: 2.22.
+ * Since: 2.22
  **/
 #define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE_FILE "mountable::unix-device-file" /* string */
 
@@ -781,6 +782,30 @@ typedef struct _GFileInfoClass   GFileInfoClass;
  * Corresponding #GFileAttributeType is %G_FILE_ATTRIBUTE_TYPE_UINT32.
  **/
 #define G_FILE_ATTRIBUTE_TRASH_ITEM_COUNT "trash::item-count"     /* uint32 */
+
+/**
+ * G_FILE_ATTRIBUTE_TRASH_ORIG_PATH:
+ *
+ * A key in the "trash" namespace.  When requested against
+ * items in "trash:///", will return the original path to the file before it
+ * was trashed. Corresponding #GFileAttributeType is
+ * %G_FILE_ATTRIBUTE_TYPE_STRING.
+ *
+ * Since: 2.24.
+ **/
+#define G_FILE_ATTRIBUTE_TRASH_ORIG_PATH "trash::orig-path"     /* string */
+
+/**
+ * G_FILE_ATTRIBUTE_TRASH_DELETION_DATE:
+ *
+ * A key in the "trash" namespace.  When requested against
+ * items in "trash:///", will return the date and time when the file
+ * was trashed. The format of the returned string is YYYY-MM-DDThh:mm:ss.
+ * Corresponding #GFileAttributeType is %G_FILE_ATTRIBUTE_TYPE_STRING.
+ *
+ * Since: 2.24.
+ **/
+#define G_FILE_ATTRIBUTE_TRASH_DELETION_DATE "trash::deletion-date"  /* string */
 
 GType              g_file_info_get_type                  (void) G_GNUC_CONST;
 

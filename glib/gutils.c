@@ -2038,7 +2038,7 @@ g_set_application_name (const gchar *application_name)
   G_UNLOCK (g_application_name);
 
   if (already_set)
-    g_warning ("g_set_application() name called multiple times");
+    g_warning ("g_set_application_name() called multiple times");
 }
 
 /**

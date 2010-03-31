@@ -54,6 +54,7 @@ g_type_class_peek_static
 g_type_class_unref
 g_type_class_peek_parent
 g_type_class_add_private
+g_type_add_class_private
 g_type_interface_peek
 g_type_interface_peek_parent
 g_type_default_interface_ref
@@ -101,6 +102,8 @@ G_DEFINE_TYPE
 G_DEFINE_TYPE_WITH_CODE
 G_DEFINE_ABSTRACT_TYPE
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE
+G_DEFINE_INTERFACE
+G_DEFINE_INTERFACE_WITH_CODE
 G_IMPLEMENT_INTERFACE
 G_DEFINE_TYPE_EXTENDED
 
@@ -115,6 +118,7 @@ g_type_check_is_value_type
 g_type_check_value
 g_type_check_value_holds
 g_type_instance_get_private
+g_type_class_get_private
 g_type_test_flags
 g_type_name_from_instance
 g_type_name_from_class
@@ -202,6 +206,7 @@ g_type_module_register_flags
 
 G_DEFINE_DYNAMIC_TYPE
 G_DEFINE_DYNAMIC_TYPE_EXTENDED
+G_IMPLEMENT_INTERFACE_DYNAMIC
 
 <SUBSECTION Standard>
 G_TYPE_MODULE
@@ -344,6 +349,8 @@ G_TYPE_REGEX
 G_TYPE_ARRAY
 G_TYPE_BYTE_ARRAY
 G_TYPE_PTR_ARRAY
+G_TYPE_VARIANT
+G_TYPE_VARIANT_TYPE
 GStrv
 
 <SUBSECTION Standard>
@@ -358,6 +365,8 @@ g_regex_get_type
 g_array_get_type
 g_byte_array_get_type
 g_ptr_array_get_type
+g_variant_get_gtype
+g_variant_type_get_gtype
 </SECTION>
 
 <SECTION>

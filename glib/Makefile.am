@@ -19,6 +19,12 @@ gregex_c =
 gregex_h =
 endif
 
+if HAVE_GCC_BUILTINS_FOR_ATOMIC_OPERATIONS
+gatomic_c = gatomic-gcc.c
+else
+gatomic_c = gatomic.c
+endif
+
 SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre . tests
 
 DIST_SUBDIRS = libcharset gnulib pcre update-pcre tests
@@ -35,10 +41,10 @@ AM_CPPFLAGS = 				\
 glib.def: glib.symbols
 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g') > glib.def
 
-galias.h: glib.symbols
+galias.h: $(srcdir)/makegalias.pl glib.symbols
 	  $(PERL) $(srcdir)/makegalias.pl < $(srcdir)/glib.symbols > galias.h
 
-galiasdef.c: glib.symbols
+galiasdef.c: $(srcdir)/makegalias.pl glib.symbols
 	  $(PERL) $(srcdir)/makegalias.pl -def < $(srcdir)/glib.symbols > galiasdef.c
 
 if OS_LINUX
@@ -100,11 +106,14 @@ uninstall-ms-lib:
 libglib_2_0_la_SOURCES = 	\
 	garray.c		\
 	gasyncqueue.c		\
-	gatomic.c		\
+	$(gatomic_c)		\
 	gbacktrace.c		\
 	gbase64.c		\
+	gbitlock.c		\
 	gbookmarkfile.c 	\
 	gbsearcharray.h		\
+	gbuffer.c		\
+	gbuffer.h		\
 	gcache.c		\
 	gchecksum.c		\
 	gcompletion.c		\
@@ -165,9 +174,21 @@ libglib_2_0_la_SOURCES = 	\
 	gunicodeprivate.h	\
 	gurifuncs.c 		\
 	gutils.c		\
+	gvariant.h		\
+	gvariant.c		\
+	gvariant-core.h		\
+	gvariant-core.c		\
+	gvariant-internal.h	\
+	gvariant-parser.c	\
+	gvariant-serialiser.h	\
+	gvariant-serialiser.c	\
+	gvarianttypeinfo.h	\
+	gvarianttypeinfo.c	\
+	gvarianttype.c		\
 	gdebug.h		\
 	gprintf.c		\
 	gprintfint.h
+
 
 EXTRA_libglib_2_0_la_SOURCES = \
 	giounix.c	\
@@ -189,6 +210,7 @@ glibsubinclude_HEADERS =   \
 	gatomic.h	\
 	gbacktrace.h	\
 	gbase64.h	\
+	gbitlock.h	\
 	gbookmarkfile.h \
 	gcache.h	\
 	gchecksum.h	\
@@ -242,6 +264,8 @@ glibsubinclude_HEADERS =   \
 	gunicode.h	\
 	gurifuncs.h 		\
 	gutils.h	\
+	gvarianttype.h	\
+	gvariant.h	\
 	gwin32.h	\
 	gprintf.h
 
@@ -360,11 +384,22 @@ endif
 glib-2.0.lib: libglib-2.0.la glib.def
 	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libglib-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:glib.def -out:$@
 
-dist-hook: $(BUILT_EXTRA_DIST)
+dist-hook: $(BUILT_EXTRA_DIST) ../build/win32/vs9/glib.vcproj
 	files='$(BUILT_EXTRA_DIST)'; \
 	for f in $$files; do \
 	  if test -f $$f; then d=.; else d=$(srcdir); fi; \
 	  cp $$d/$$f $(distdir) || exit 1; done
+
+../build/win32/vs9/glib.vcproj: $(top_srcdir)/build/win32/vs9/glib.vcprojin
+	for F in $(libglib_2_0_la_SOURCES); do \
+		case $$F in \
+		*-gcc.c) \
+			;; \
+		*.c)	echo '   <File RelativePath="..\..\..\glib\'$$F'" />' \
+			;; \
+		esac; \
+	done >libglib.sourcefiles
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/glib.vcprojin >$@
 
 distclean-local:
 	if test $(srcdir) = .; then :; else \

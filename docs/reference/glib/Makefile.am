@@ -45,7 +45,12 @@ IGNORE_HFILES=			\
 	glib-mirroring-tab	\
 	gnulib			\
 	pcre			\
-	update-pcre
+	update-pcre		\
+	gbuffer.h		\
+	gvariant-internal.h	\
+	gvariant-serialiser.h	\
+	gvariant-core.h		\
+	gvarianttypeinfo.h
 
 # Images to copy into HTML directory
 HTML_IMAGES =  				\
@@ -64,7 +69,8 @@ content_files =				\
 	version.xml			\
 	glib-gettextize.xml		\
 	gtester.xml			\
-	gtester-report.xml
+	gtester-report.xml		\
+	gvariant-varargs.xml
 
 # Extra options to supply to gtkdoc-fixref
 FIXXREF_OPTIONS=

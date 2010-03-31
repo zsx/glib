@@ -21,9 +21,17 @@
  */
 
 #include "config.h"
-#include "gurifuncs.h"
-#include "string.h"
 
+#include "gurifuncs.h"
+
+#include <glib/gstrfuncs.h>
+#include <glib/gmessages.h>
+#include <glib/gstring.h>
+#include <glib/gmem.h>
+
+#include <string.h>
+
+#include "config.h"
 #include "galias.h"
 
 /**

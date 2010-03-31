@@ -1,5 +1,349 @@
+Overview of Changes from GLib 2.23.6 to GLib 2.24.0
+===================================================
+
+* Bug fixes:
+ 613601 buglet in dup_close_on_exec_fd
+ 584284 g_data_input_stream_read_until_async behaves confusingly
+ 613748 Write errors in middle of copy cause hang
+ 613923 splice_stream_with_progress: wrong error handling
+ 613667 Typo in GObject documentation
+ 613618 gvariant format string docs unclear
+
+* Translation updates:
+ Basque
+ Ukrainian
+ Vietnamese
+
+
+Overview of Changes from GLib 2.23.5 to GLib 2.23.6
+===================================================
+
+* Class private data:
+  - support for private data associated with a GTypeClass
+
+* GVariant merge is now complete:
+  - loading functions and parser merged
+
+* Windows improvements:
+  - socket fixes
+  - various build improvements
+  - removal of GCC/C99isms in favour of portable code
+  - drop unmaintained Visual Studio 8 support
+
+* Minor API addition:
+  - g_desktop_app_info_get_filename()
+
+* Bugs fixed:
+ 521707 Class private data
+ 612502 build fails on glib/tests/gvariant.c
+ 612832 [GDesktopAppInfo] New function g_desktop_app_info_get_filename
+ 612702 [PATCH] Fix GSocket-related crash on Windows
+ 612736 Improve the documentation about single include
+ 610858 gvariant test fails sometimes
+ 612327 uninitialized variable
+
+* New translations:
+ Afrikaans
+ LowGerman
+
+* Updated translations:
+ Czech
+ Finnish
+ Galician
+ Greek
+ Punjabi
+ Romanian
+ Serbian
+
+
+Overview of Changes from GLib 2.23.4 to GLib 2.23.5
+===================================================
+
+* New API addition: g_malloc_n() and friends used to implement an
+  overflow-safe family of g_new() macros.
+
+* GVariant:
+ - GVariantBuilder and GVariantIter are now merged.
+ - The variable arguments API is now merged.
+ - The parser will be in a future release.
+
+* GIO:
+ - Remove GUtf8InputStream (which never appeared in a stable release)
+   for now since it doesn't satisfy the needs of its main intended use
+   case.  We hope to reimplement this feature in a better form in a
+   future release.
+
+* Bugs fixed:
+ 609531 missing licence headers
+ 612107 Missing G_FILE_ATTRIBUTE_TRASH_ORIG_PATH
+ 611897 g_io_modules_scan_all_in_directory leaks
+ 608196 Overflow-safe g_new family
+ 611696 gio uses GetAddrInfo which requires special handing on windows 2k
+ 605667 Don't use G_PARAM_SPEC_VALUE_TYPE when we know the pspec is valid
+ 610860 test_g_file_open_readwrite fails if $HOME is unwritable
+ 552912 glib-2.18 /live-g-file/test_copy_move failed when run as root
+ 609813 Renaming a file discards file notes
+
+* Updated translations:
+ Basque
+ Brazilian Portuguese
+ British English
+ Bulgarian
+ Catalan
+ Danish
+ Estonian
+ French
+ German
+ Hungarian
+ Italian
+ Lithuanian
+ Norwegian bokmål
+ Portuguese
+ Russian
+ Slovenian
+ Spanish
+ Swedish
+ Traditional Chinese
+
+
+Overview of Changes from GLib 2.23.3 to GLib 2.23.4
+===================================================
+
+* GVariant: The core of GVariant has been merged now, with some
+ API still to follow.
+
+* GIO:
+ - There is a new interface GFileDescriptorBased for file descriptor
+   based IO. GLocalFile{Input,Output}Stream implement it
+ - Use splice(2) to transfer data between file descriptors without
+   extraneous copies
+ - Add a way to request move events from file monitors
+
+* Bugs fixed:
+ 609143 *result_uncertain is never assigned in g_content_type_guess
+ 604086 Use splice(2) when doing local file copies
+ 547890 No move events for GFileMonitorEvent?
+ 568760 nautilus freezes due to a bug in garray.c:322
+ 609962 Add info about the use of G_DEFINE_INTERFACE
+ 609564 g_base64_encode_close docs should mention outbuf size...
+ 610484 g_variant_equal bug
+ 610131 libasyncns does not compile on Solaris 8
+ 609530 missing single header include guards
+
+* Updated translations:
+ Czech
+ Estonian
+ Galician
+ German
+ Korean
+ Polish
+ Slovenian
+ Spanish
+ Traditional Chinese
+
+
+Overview of Changes from GLib 2.23.2 to GLib 2.23.3
+===================================================
+
+* GLib now has a facility for locks that consume only one bit of
+  storage inside an integer: g_bit_lock()
+
+* GVariant: The serializer has been merged, with more API to follow
+
+* Bugs fixed
+ 548967 1 bit mutex lock
+ 604967 2.22.3 libasyncns build fails on HP-UX 11.11
+ 608602 G_VALUE_COLLECT_INIT variables shadow those in G_VALUE_COLLECT
+ 608743 Crash in g_hostname_to_ascii visiting certain website in epiphany
+ 599197 array ref and unref functions crash on NULL array.
+ 608159 mem leak in g_io_modules_scan_all_in_directory
+
+* Translation updates
+ Brazilian Portuguese
+ Czech
+ French
+ Norwegian bokmål
+ Slovenian
+ Spanish
+ Thai
+
+
+Overview of Changes from GLib 2.23.1 to GLib 2.23.2
+===================================================
+
+* We are now using gcc builtins for atomic operations when available
+
+* g_assert() grew the ability to store assertions in core dumps
+
+* GIO supports lazy loading of GIO modules, and there is a new
+  gio-querymodule utility that goes along with this.
+  Packagers will need to adapt to this.
+
+* Threading changes:
+ - The requirements for g_thread_init() have been relaxed slightly,
+   it can be called multiple times, and does not have to be the first
+   call.
+ - GObject now links to GThread and threads are enabled automatically
+   when g_type_init() is called.
+ - Thread-safety issues with boxed types in GObject have been fixed.
+
+* GObject:
+ - Another bunch of performance work has landed
+
+* GVariant:
+ - GVariantType has been merged, with the rest of the GVariant
+   API to follow.
+
+* Bugs fixed:
+ 568760 nautilus freezes due to a bug in garray.c:322
+ 602417 Document lifecycles of GSimpleAsyncResult and friends
+ 604824 crash in Epiphany: Selecting my Slashdot bo...
+ 448888 don't init g_slice for always-malloc
+ 531902 Use GCC atomic buildins for g_atomic*
+ 554887 boxed type registration is not thread safe
+ 586150 unresolved symbols when building glib 2.21.2 on OS X Tiger
+ 589176 row gvalue transform array exponentially
+ 594872 Support storing assertion messages into core dump
+ 602240 Upgrade libasyncns to 0.8
+ 603590 Speed up G_VALUE_COLLECT
+ 604457 gutf8inputstream.c: increasing unknown size pointer
+ 605686 GCharsetConverter doesn't flush
+ 605733 g_memory_output_stream_new violates GObject standards
+ 605883 g_object_new() processes varargs even when there are none
+ 605977 invalid utf-8 conversion in g_local_file_get_parse_name(...
+ 606775 Enable threads by default in gobject
+
+* Translation updates:
+ Asturian
+ Basque
+ Bengali
+ Bulgarian
+ Estonian
+ Norwegian bokmål
+ Spanish
+ Thai
+ Ukrainian
+
+
+Overview of Changes from GLib 2.23.0 to GLib 2.23.1
+===================================================
+
+* GObject performance work has landed:
+ - Construction of simple objects is much faster
+ - Interface lookup is lock-free and constant-time now
+ - Reduced locking overhead when dealing with types
+
+* GType now has a G_DEFINE_INTERFACE convenience macro
+
+* GIO gained GUtf8InputStream, an input stream that
+  performs utf-8 validation
+
+* GLib now has byte-swap macros for gsize and gssize
+
+* Bugs fixed:
+557151 Determining the newly_constructed boolean in gobject.c...
+557100 Performance improvements for GObjectClasses that don't...
+501166 Warning message says IA__g_type_init instead of g_type_init
+585375 Performance and Contention problems with g_type_class_ref...
+587892 Race in GType when instantiating the same class for the...
+603270 Input Stream validating utf8
+603476 gioenums.h:62: error: comma at end of enumerator list
+603540 g_time_val_from_iso8601 uses uninitialised variable
+603982 Stack overflow when reading file async with filter
+604645 G_DEFINE_INTERFACE_* documentation is not generated
+604875 Use of sa_len conflicts with system header
+320482 provide G_DEFINE_TYPE like macros for interfaces
+
+* Updated translations:
+ Estonian
+ Hebrew
+ Norwegian bokmål
+ Vietnamese
+ Welsh
+
+
+Overview of Changes from GLib 2.22.x to GLib 2.23.0
+===================================================
+
+* GIO:
+ - GConverter: a generic interface for stateful conversions of data,
+   suitable for charset conversion, compression, decompression, regexp
+   replacement. Concrete implementations are GCharsetConverter,
+   GZlibCompressor and GZlibDecompressor. GConverterInputStream,
+   GConverterOutputStream are stream implementations that convert data
+   while loading or saving it.
+ - GMounts can now have a 'default location': a path that reflects
+   the main entry point for the user (e.g. the home directory).
+ - As a consequence of the compression support, GIO depends on zlib now.
+
+* GObject:
+ - G_IMPLEMENT_INTERFACE_DYNAMIC: a convenience macro for adding
+   interfaces to dynamic types.
+
+* GModule:
+ - The -pthread flag has been added to all gmodule .pc files, because
+   it is not generally permissible to load modules that are linked
+   against libpthread if the program has not been compiled with threading
+   support.
+
+* Bugs fixed:
+ 601637 GUnixFDMessage should contain a GUnixFDList
+ 585566 GSocketListener API issues
+ 572252 Bug in g_file_test() function.
+ 600550 g_app_info_create_from_commandline doesn't treat arguments properly
+ 541236 not detecting exact content type
+ 350200 [PATCH] GTypeModule derived class unref does not unload plugin
+ 589631 Please enclose literal values with double quotes
+ 577711 cross compile check for g++ broken
+ 600620 Support X-GNOME-FullName in GAppInfo
+ 598899 GWin32DirectoryMonitor is broken
+ 593809 Nautilus does not restore the position of the icons on the desktop...
+ 563627 g_get_prgname() threadsafety
+ 600141 Add -pthread to gmodule pkg-config
+ 593856 file and directory monitors don't work when glib is compiled...
+ 324930 Nautilus should disallow copying of symlink to FAT drive early
+ 587300 Deadlock when calling g_cancellable_disconnect in a...
+ 595138 GFile not robust with invalid input
+ 591216 Warning building resolver.o
+ 590016 Does not compile under MinGW32 + Wine
+ 591214 Warnings building gcancellable.o
+ 561998 Have specific entry points (paths) for mounts...
+ 508157 Add G_IMPLEMENT_INTERFACE_DYNAMIC
+ 535159 g_file_has_parent
+
+* Updated translations:
+ Brazilian Portuguese
+ Catalan
+ Estonian
+ Galician
+ Norwegian bokmål
+ Shavian
+ Slovenian
+ Spanish
+ Swedish
+
+
+Overview of Changes from GLib 2.22.1 to GLib 2.22.2
+===================================================
+
+* GIO:
+ - Support case-sensitive globs in the shared mime database,
+   including support for the newer cache format that allows these.
+   Case-sensitive globs have been introduced in shared-mime-info
+   version 0.70
+
+* GObject:
+ - Speed up creation of simple objects
+
+* Bugs fixed:
+ 597194 Typo in _G_TYPE_CVH macro
+
+* Updated translations:
+ Russian
+
+
 Overview of Changes from GLib 2.22.0 to GLib 2.22.1
-=================================================
+===================================================
 
 * Bugs fixed:
  596064 Test file marked for translation

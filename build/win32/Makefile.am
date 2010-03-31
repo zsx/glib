@@ -1,8 +1,7 @@
-SUBDIRS = \
-	dirent \
-	vs8 \
+SUBDIRS = 	\
+	dirent 	\
 	vs9
 
-EXTRA_DIST = \
-	make.msc \
+EXTRA_DIST = 		\
+	make.msc 	\
 	module.defs

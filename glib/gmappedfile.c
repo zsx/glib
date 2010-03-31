@@ -38,9 +38,8 @@
 #include <windows.h>
 #include <io.h>
 
-#ifdef _MSC_VER
-#define fstat(a,b) _fstat(a,b)
-#endif
+#define fstat(a,b) _fstati64(a,b)
+#define stat _stati64
 
 #endif
 
@@ -53,6 +52,7 @@
 #include "gstdio.h"
 #include "gstrfuncs.h"
 #include "gatomic.h"
+#include "gbuffer.h"
 
 #include "glibintl.h"
 
@@ -68,13 +68,41 @@
 
 struct _GMappedFile 
 {
-  gsize  length;
   gchar *contents;
+  gsize  length;
+  gpointer free_func;
   int    ref_count;
 #ifdef G_OS_WIN32
   HANDLE mapping;
 #endif
 };
+
+/* Make sure the layout of GMappedFile is the same as GBuffer's */
+G_STATIC_ASSERT (G_STRUCT_OFFSET (GMappedFile, contents) ==
+                 G_STRUCT_OFFSET (GBuffer, data));
+G_STATIC_ASSERT (G_STRUCT_OFFSET (GMappedFile, length) ==
+                 G_STRUCT_OFFSET (GBuffer, size));
+G_STATIC_ASSERT (G_STRUCT_OFFSET (GMappedFile, ref_count) ==
+                 G_STRUCT_OFFSET (GBuffer, ref_count));
+G_STATIC_ASSERT (G_STRUCT_OFFSET (GMappedFile, free_func) ==
+                 G_STRUCT_OFFSET (GBuffer, free_func));
+
+static void
+g_mapped_file_destroy (GMappedFile *file)
+{
+  if (file->length)
+    {
+#ifdef HAVE_MMAP
+      munmap (file->contents, file->length);
+#endif
+#ifdef G_OS_WIN32
+      UnmapViewOfFile (file->contents);
+      CloseHandle (file->mapping);
+#endif
+    }
+
+  g_slice_free (GMappedFile, file);
+}
 
 /**
  * g_mapped_file_new:
@@ -129,6 +157,7 @@ g_mapped_file_new (const gchar  *filename,
 
   file = g_slice_new0 (GMappedFile);
   file->ref_count = 1;
+  file->free_func = g_mapped_file_destroy;
 
   if (fstat (fd, &st) == -1)
     {
@@ -148,7 +177,7 @@ g_mapped_file_new (const gchar  *filename,
   if (st.st_size == 0)
     {
       file->length = 0;
-      file->contents = "";
+      file->contents = NULL;
       close (fd);
       return file;
     }
@@ -242,7 +271,9 @@ g_mapped_file_get_length (GMappedFile *file)
  * Note that the contents may not be zero-terminated,
  * even if the #GMappedFile is backed by a text file.
  *
- * Returns: the contents of @file.
+ * If the file is empty then %NULL is returned.
+ *
+ * Returns: the contents of @file, or %NULL.
  *
  * Since: 2.8
  */
@@ -310,20 +341,7 @@ g_mapped_file_unref (GMappedFile *file)
   g_return_if_fail (file->ref_count > 0);
 
   if (g_atomic_int_dec_and_test (&file->ref_count))
-    {
-      if (file->length)
-        {
-#ifdef HAVE_MMAP
-          munmap (file->contents, file->length);
-#endif
-#ifdef G_OS_WIN32
-          UnmapViewOfFile (file->contents);
-          CloseHandle (file->mapping);
-#endif
-        }
-
-      g_slice_free (GMappedFile, file);
-    }
+    g_mapped_file_destroy (file);
 }
 
 #define __G_MAPPED_FILE_C__

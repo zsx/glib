@@ -305,7 +305,8 @@ g_socket_details_from_fd (GSocket *socket)
   int value;
   int errsv;
 #ifdef G_OS_WIN32
-  BOOL bool_val;
+  /* See bug #611756 */
+  BOOL bool_val = FALSE;
 #else
   int bool_val;
 #endif
@@ -388,7 +389,14 @@ g_socket_details_from_fd (GSocket *socket)
   if (getsockopt (fd, SOL_SOCKET, SO_KEEPALIVE,
 		  (void *)&bool_val, &optlen) == 0)
     {
+#ifndef G_OS_WIN32
+      /* Experimentation indicates that the SO_KEEPALIVE value is
+       * actually a char on Windows, even if documentation claims it
+       * to be a BOOL which is a typedef for int. So this g_assert()
+       * fails. See bug #611756.
+       */
       g_assert (optlen == sizeof bool_val);
+#endif
       socket->priv->keepalive = !!bool_val;
     }
   else
@@ -606,6 +614,12 @@ g_socket_finalize (GObject *object)
     g_socket_close (socket, NULL);
 
 #ifdef G_OS_WIN32
+  if (socket->priv->event != WSA_INVALID_EVENT)
+    {
+      WSACloseEvent (socket->priv->event);
+      socket->priv->event = WSA_INVALID_EVENT;
+    }
+
   g_assert (socket->priv->requested_conditions == NULL);
 #endif
 
@@ -1297,7 +1311,7 @@ g_socket_bind (GSocket         *socket,
  *
  * Returns: %TRUE if this socket can be used with IPv4.
  *
- * Since: 2.22.
+ * Since: 2.22
  **/
 gboolean
 g_socket_speaks_ipv4 (GSocket *socket)
@@ -1993,14 +2007,6 @@ g_socket_close (GSocket  *socket,
 	}
       break;
     }
-
-#ifdef G_OS_WIN32
-  if (socket->priv->event != WSA_INVALID_EVENT)
-    {
-      WSACloseEvent (socket->priv->event);
-      socket->priv->event = WSA_INVALID_EVENT;
-    }
-#endif
 
   socket->priv->connected = FALSE;
   socket->priv->closed = TRUE;
@@ -3038,9 +3044,8 @@ g_socket_receive_message (GSocket                 *socket,
 	  if (index == allocated)
 	    {
 	      /* estimated 99% case: exactly 1 control message */
-	      allocated = MIN (allocated * 2, 1);
+	      allocated = MAX (allocated * 2, 1);
 	      my_messages = g_new (GSocketControlMessage *, (allocated + 1));
-	      allocated = 1;
 	    }
 
 	  my_messages[index++] = message;

@@ -303,12 +303,6 @@ canonicalize_filename (const char *filename)
   return canon;
 }
 
-/**
- * _g_local_file_new:
- * @filename: filename of the file to create.
- * 
- * Returns: new local #GFile.
- **/
 GFile *
 _g_local_file_new (const char *filename)
 {
@@ -423,7 +417,7 @@ g_local_file_get_parse_name (GFile *file)
 					     charset, "UTF-8", NULL, NULL, NULL);
 	  
 	  if (roundtripped_filename == NULL ||
-	      strcmp (utf8_filename, roundtripped_filename) != 0)
+	      strcmp (filename, roundtripped_filename) != 0)
 	    {
 	      g_free (utf8_filename);
 	      utf8_filename = NULL;
@@ -742,7 +736,7 @@ get_mount_info (GFileInfo             *fs_info,
 		const char            *path,
 		GFileAttributeMatcher *matcher)
 {
-  struct stat buf;
+  GStatBuf buf;
   gboolean got_info;
   gpointer info_as_ptr;
   guint mount_info;
@@ -1053,7 +1047,7 @@ g_local_file_find_enclosing_mount (GFile         *file,
                                    GError       **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  struct stat buf;
+  GStatBuf buf;
   char *mountpoint;
   GMount *mount;
 
@@ -1099,7 +1093,9 @@ g_local_file_set_display_name (GFile         *file,
 {
   GLocalFile *local, *new_local;
   GFile *new_file, *parent;
-  struct stat statbuf;
+  GStatBuf statbuf;
+  GVfsClass *class;
+  GVfs *vfs;
   int errsv;
 
   parent = g_file_get_parent (file);
@@ -1158,7 +1154,12 @@ g_local_file_set_display_name (GFile         *file,
       g_object_unref (new_file);
       return NULL;
     }
-  
+
+  vfs = g_vfs_get_default ();
+  class = G_VFS_GET_CLASS (vfs);
+  if (class->local_file_moved)
+    class->local_file_moved (vfs, local->filename, new_local->filename);
+
   return new_file;
 }
 
@@ -1510,7 +1511,7 @@ get_parent (const char *path,
             dev_t      *parent_dev)
 {
   char *parent, *tmp;
-  struct stat parent_stat;
+  GStatBuf parent_stat;
   int num_recursions;
   char *path_copy;
 
@@ -1719,12 +1720,12 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   char *topdir, *globaldir, *trashdir, *tmpname;
   uid_t uid;
   char uid_str[32];
-  struct stat global_stat, trash_stat;
+  GStatBuf global_stat, trash_stat;
   gboolean res;
 
   if (g_once_init_enter (&home_dev_set))
     {
-      struct stat home_stat;
+      GStatBuf home_stat;
 
       g_stat (g_get_home_dir (), &home_stat);
       home_dev = home_stat.st_dev;
@@ -1786,7 +1787,7 @@ g_local_file_trash (GFile         *file,
 		    GError       **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  struct stat file_stat, home_stat;
+  GStatBuf file_stat, home_stat;
   const char *homedir;
   char *trashdir, *topdir, *infodir, *filesdir;
   char *basename, *trashname, *trashfile, *infoname, *infofile;
@@ -1796,9 +1797,11 @@ g_local_file_trash (GFile         *file,
   gboolean is_homedir_trash;
   char delete_time[32];
   int fd;
-  struct stat trash_stat, global_stat;
+  GStatBuf trash_stat, global_stat;
   char *dirname, *globaldir;
-  
+  GVfsClass *class;
+  GVfs *vfs;
+
   if (g_lstat (local->filename, &file_stat) != 0)
     {
       int errsv = errno;
@@ -2021,6 +2024,11 @@ g_local_file_trash (GFile         *file,
       return FALSE;
     }
 
+  vfs = g_vfs_get_default ();
+  class = G_VFS_GET_CLASS (vfs);
+  if (class->local_file_moved)
+    class->local_file_moved (vfs, local->filename, trashfile);
+
   g_free (trashfile);
 
   /* TODO: Do we need to update mtime/atime here after the move? */
@@ -2151,6 +2159,10 @@ g_local_file_make_symbolic_link (GFile         *file,
 	g_set_error_literal (error, G_IO_ERROR,
                              G_IO_ERROR_INVALID_FILENAME,
                              _("Invalid filename"));
+      else if (errsv == EPERM)
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_NOT_SUPPORTED,
+		     _("Filesystem does not support symbolic links"));
       else
 	g_set_error (error, G_IO_ERROR,
 		     g_io_error_from_errno (errsv),
@@ -2190,7 +2202,7 @@ g_local_file_move (GFile                  *source,
 		   GError                **error)
 {
   GLocalFile *local_source, *local_destination;
-  struct stat statbuf;
+  GStatBuf statbuf;
   gboolean destination_exist, source_is_dir;
   char *backup_name;
   int res;

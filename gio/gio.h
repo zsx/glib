@@ -34,6 +34,10 @@
 #include <gio/gbufferedoutputstream.h>
 #include <gio/gcancellable.h>
 #include <gio/gcontenttype.h>
+#include <gio/gconverter.h>
+#include <gio/gconverterinputstream.h>
+#include <gio/gconverteroutputstream.h>
+#include <gio/gcharsetconverter.h>
 #include <gio/gdatainputstream.h>
 #include <gio/gdataoutputstream.h>
 #include <gio/gdrive.h>
@@ -89,6 +93,8 @@
 #include <gio/gvfs.h>
 #include <gio/gvolume.h>
 #include <gio/gvolumemonitor.h>
+#include <gio/gzlibcompressor.h>
+#include <gio/gzlibdecompressor.h>
 
 #undef __GIO_GIO_H_INSIDE__
 

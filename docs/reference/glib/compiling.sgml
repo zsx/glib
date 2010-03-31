@@ -1,3 +1,7 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+]>
 <refentry id="glib-compiling" revision="17 Jan 2002">
 <refmeta>
 <refentrytitle>Compiling GLib Applications</refentrytitle>
@@ -71,6 +75,15 @@ by using the command line option <literal>-DG_DISABLE_DEPRECATED=1</literal>.
 The recommended way of using GLib has always been to only include the 
 toplevel headers <filename>glib.h</filename>, 
 <filename>glib-object.h</filename>, <filename>gio.h</filename>.
+Still, there are some exceptions; these headers have to be included separately:
+<filename>gmodule.h</filename>,
+<filename>glib/gi18n-lib.h</filename> or <filename>glib/gi18n.h</filename> (see
+the <link linkend="glib-I18N">Internationalization section</link>),
+<filename>glib/gprintf.h</filename> and <filename>glib/gstdio.h</filename>
+(we don't want to pull in all of stdio).
+</para>
+
+<para>
 Starting with 2.17, GLib enforces this by generating an error
 when individual headers are directly included. To help with the 
 transition, the enforcement is not turned on by default for GLib 

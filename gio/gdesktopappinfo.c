@@ -62,6 +62,7 @@
 #define ADDED_ASSOCIATIONS_GROUP    "Added Associations" 
 #define REMOVED_ASSOCIATIONS_GROUP  "Removed Associations" 
 #define MIME_CACHE_GROUP            "MIME Cache"
+#define FULL_NAME_KEY               "X-GNOME-FullName"
 
 static void     g_desktop_app_info_iface_init         (GAppInfoIface    *iface);
 static GList *  get_all_desktop_entries_for_mime_type (const char       *base_mime_type,
@@ -84,6 +85,7 @@ struct _GDesktopAppInfo
 
   char *name;
   /* FIXME: what about GenericName ? */
+  char *fullname;
   char *comment;
   char *icon_name;
   GIcon *icon;
@@ -147,6 +149,7 @@ g_desktop_app_info_finalize (GObject *object)
   g_free (info->desktop_id);
   g_free (info->filename);
   g_free (info->name);
+  g_free (info->fullname);
   g_free (info->comment);
   g_free (info->icon_name);
   if (info->icon)
@@ -247,6 +250,7 @@ g_desktop_app_info_new_from_keyfile (GKeyFile *key_file)
   info->filename = NULL;
 
   info->name = g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_NAME, NULL, NULL);
+  info->fullname = g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, FULL_NAME_KEY, NULL, NULL);
   info->comment = g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_COMMENT, NULL, NULL);
   info->nodisplay = g_key_file_get_boolean (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_NO_DISPLAY, NULL) != FALSE;
   info->icon_name =  g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_ICON, NULL, NULL);
@@ -414,6 +418,7 @@ g_desktop_app_info_dup (GAppInfo *appinfo)
   new_info->desktop_id = g_strdup (info->desktop_id);
   
   new_info->name = g_strdup (info->name);
+  new_info->fullname = g_strdup (info->fullname);
   new_info->comment = g_strdup (info->comment);
   new_info->nodisplay = info->nodisplay;
   new_info->icon_name = g_strdup (info->icon_name);
@@ -464,6 +469,16 @@ g_desktop_app_info_get_name (GAppInfo *appinfo)
   return info->name;
 }
 
+static const char *
+g_desktop_app_info_get_display_name (GAppInfo *appinfo)
+{
+  GDesktopAppInfo *info = G_DESKTOP_APP_INFO (appinfo);
+
+  if (info->fullname == NULL)
+    return g_desktop_app_info_get_name (appinfo);
+  return info->fullname;
+}
+
 /**
  * g_desktop_app_info_get_is_hidden:
  * @info: a #GDesktopAppInfo.
@@ -477,6 +492,23 @@ gboolean
 g_desktop_app_info_get_is_hidden (GDesktopAppInfo *info)
 {
   return info->hidden;
+}
+
+/**
+ * g_desktop_app_info_get_filename:
+ * @info: a #GDesktopAppInfo
+ *
+ * When @info was created from a known filename, return it.  In some
+ * situations such as the #GDesktopAppInfo returned from
+ * g_desktop_app_info_new_from_keyfile(), this function will return %NULL.
+ *
+ * Returns: The full path to the file for @info, or %NULL if not known.
+ * Since: 2.24
+ */
+const char *
+g_desktop_app_info_get_filename (GDesktopAppInfo *info)
+{
+  return info->filename;
 }
 
 static const char *
@@ -701,16 +733,18 @@ expand_application_parameters (GDesktopAppInfo   *info,
 {
   GList *uri_list = *uris;
   const char *p = info->exec;
-  GString *expanded_exec = g_string_new (NULL);
+  GString *expanded_exec;
   gboolean res;
-  
+
   if (info->exec == NULL)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                            _("Desktop file didn't specify Exec field"));
       return FALSE;
     }
-  
+
+  expanded_exec = g_string_new (NULL);
+
   while (*p)
     {
       if (p[0] == '%' && p[1] != '\0')
@@ -720,10 +754,10 @@ expand_application_parameters (GDesktopAppInfo   *info,
 	}
       else
 	g_string_append_c (expanded_exec, *p);
-      
+
       p++;
     }
-  
+
   /* No file substitutions */
   if (uri_list == *uris && uri_list != NULL)
     {
@@ -731,7 +765,7 @@ expand_application_parameters (GDesktopAppInfo   *info,
       g_string_append_c (expanded_exec, ' ');
       expand_macro ('f', expanded_exec, info, uris);
     }
-  
+
   res = g_shell_parse_argv (expanded_exec->str, argc, argv, error);
   g_string_free (expanded_exec, TRUE);
   return res;
@@ -1482,6 +1516,10 @@ g_desktop_app_info_ensure_saved (GDesktopAppInfo  *info,
   g_key_file_set_string (key_file, G_KEY_FILE_DESKTOP_GROUP,
 			 G_KEY_FILE_DESKTOP_KEY_NAME, info->name);
 
+  if (info->fullname != NULL)
+    g_key_file_set_string (key_file, G_KEY_FILE_DESKTOP_GROUP,
+			   FULL_NAME_KEY, info->fullname);
+
   g_key_file_set_string (key_file, G_KEY_FILE_DESKTOP_GROUP,
 			 G_KEY_FILE_DESKTOP_KEY_COMMENT, info->comment);
   
@@ -1588,6 +1626,8 @@ g_app_info_create_from_commandline (const char           *commandline,
   char *basename;
   GDesktopAppInfo *info;
 
+  g_return_val_if_fail (commandline, NULL);
+
   info = g_object_new (G_TYPE_DESKTOP_APP_INFO, NULL);
 
   info->filename = NULL;
@@ -1609,7 +1649,7 @@ g_app_info_create_from_commandline (const char           *commandline,
     {
       /* FIXME: this should be more robust. Maybe g_shell_parse_argv and use argv[0] */
       split = g_strsplit (commandline, " ", 2);
-      basename = g_path_get_basename (split[0]);
+      basename = split[0] ? g_path_get_basename (split[0]) : NULL;
       g_strfreev (split);
       info->name = basename;
       if (info->name == NULL)
@@ -1643,6 +1683,7 @@ g_desktop_app_info_iface_init (GAppInfoIface *iface)
   iface->can_delete = g_desktop_app_info_can_delete;
   iface->do_delete = g_desktop_app_info_delete;
   iface->get_commandline = g_desktop_app_info_get_commandline;
+  iface->get_display_name = g_desktop_app_info_get_display_name;
 }
 
 static gboolean
@@ -2356,7 +2397,7 @@ mime_info_cache_dir_add_desktop_entries (MimeInfoCacheDir  *dir,
   
   for (i = 0; new_desktop_file_ids[i] != NULL; i++)
     {
-      if (!g_list_find_custom (desktop_file_ids, new_desktop_file_ids[i], strcmp))
+      if (!g_list_find_custom (desktop_file_ids, new_desktop_file_ids[i], (GCompareFunc) strcmp))
 	desktop_file_ids = g_list_append (desktop_file_ids,
 					  g_strdup (new_desktop_file_ids[i]));
     }
@@ -2617,49 +2658,11 @@ get_all_desktop_entries_for_mime_type (const char *base_mime_type,
 
 /* GDesktopAppInfoLookup interface: */
 
-static void g_desktop_app_info_lookup_base_init (gpointer g_class);
-static void g_desktop_app_info_lookup_class_init (gpointer g_class,
-						  gpointer class_data);
-
-GType
-g_desktop_app_info_lookup_get_type (void)
-{
-  static volatile gsize g_define_type_id__volatile = 0;
-
-  if (g_once_init_enter (&g_define_type_id__volatile))
-    {
-      const GTypeInfo desktop_app_info_lookup_info =
-      {
-        sizeof (GDesktopAppInfoLookupIface), /* class_size */
-	g_desktop_app_info_lookup_base_init,   /* base_init */
-	NULL,		/* base_finalize */
-	g_desktop_app_info_lookup_class_init,
-	NULL,		/* class_finalize */
-	NULL,		/* class_data */
-	0,
-	0,              /* n_preallocs */
-	NULL
-      };
-      GType g_define_type_id =
-	g_type_register_static (G_TYPE_INTERFACE, I_("GDesktopAppInfoLookup"),
-				&desktop_app_info_lookup_info, 0);
-
-      g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_OBJECT);
-
-      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id);
-    }
-
-  return g_define_type_id__volatile;
-}
+typedef GDesktopAppInfoLookupIface GDesktopAppInfoLookupInterface;
+G_DEFINE_INTERFACE (GDesktopAppInfoLookup, g_desktop_app_info_lookup, G_TYPE_OBJECT)
 
 static void
-g_desktop_app_info_lookup_class_init (gpointer g_class,
-				      gpointer class_data)
-{
-}
-
-static void
-g_desktop_app_info_lookup_base_init (gpointer g_class)
+g_desktop_app_info_lookup_default_init (GDesktopAppInfoLookupInterface *iface)
 {
 }
 

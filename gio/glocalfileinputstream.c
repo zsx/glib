@@ -33,6 +33,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include "gcancellable.h"
+#include "gfiledescriptorbased.h"
 #include "gioerror.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileinfo.h"
@@ -44,8 +45,12 @@
 
 #include "gioalias.h"
 
+
+static void       g_file_descriptor_based_iface_init   (GFileDescriptorBasedIface *iface);
 #define g_local_file_input_stream_get_type _g_local_file_input_stream_get_type
-G_DEFINE_TYPE (GLocalFileInputStream, g_local_file_input_stream, G_TYPE_FILE_INPUT_STREAM);
+G_DEFINE_TYPE_WITH_CODE (GLocalFileInputStream, g_local_file_input_stream, G_TYPE_FILE_INPUT_STREAM,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE_DESCRIPTOR_BASED,
+						g_file_descriptor_based_iface_init));
 
 struct _GLocalFileInputStreamPrivate {
   int fd;
@@ -75,6 +80,7 @@ static GFileInfo *g_local_file_input_stream_query_info (GFileInputStream  *strea
 							const char        *attributes,
 							GCancellable      *cancellable,
 							GError           **error);
+static int        g_local_file_input_stream_get_fd     (GFileDescriptorBased *stream);
 
 static void
 g_local_file_input_stream_finalize (GObject *object)
@@ -110,6 +116,12 @@ g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
 }
 
 static void
+g_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface)
+{
+  iface->get_fd = g_local_file_input_stream_get_fd;
+}
+
+static void
 g_local_file_input_stream_init (GLocalFileInputStream *info)
 {
   info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info,
@@ -118,12 +130,6 @@ g_local_file_input_stream_init (GLocalFileInputStream *info)
   info->priv->do_close = TRUE;
 }
 
-/**
- * g_local_file_input_stream_new:
- * @fd: File Descriptor.
- * 
- * Returns: #GFileInputStream for the given file descriptor.
- **/
 GFileInputStream *
 _g_local_file_input_stream_new (int fd)
 {
@@ -342,3 +348,11 @@ g_local_file_input_stream_query_info (GFileInputStream  *stream,
 					 attributes,
 					 error);
 }
+
+static int
+g_local_file_input_stream_get_fd (GFileDescriptorBased *fd_based)
+{
+  GLocalFileInputStream *stream = G_LOCAL_FILE_INPUT_STREAM (fd_based);
+  return stream->priv->fd;
+}
+

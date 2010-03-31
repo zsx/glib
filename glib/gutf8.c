@@ -95,7 +95,23 @@
       (Result) <<= 6;							      \
       (Result) |= ((Chars)[(Count)] & 0x3f);				      \
     }
-
+    
+/**
+ * Check whether a Unicode (5.2) char is in a valid range.
+ *
+ * The first check comes from the Unicode guarantee to never encode
+ * a point above 0x0010ffff, since UTF-16 couldn't represent it.
+ * 
+ * The second check covers surrogate pairs (category Cs).
+ * 
+ * The last two checks cover "Noncharacter": defined as:
+ *   "A code point that is permanently reserved for
+ *    internal use, and that should never be interchanged. In
+ *    Unicode 3.1, these consist of the values U+nFFFE and U+nFFFF
+ *    (where n is from 0 to 10_16) and the values U+FDD0..U+FDEF."
+ *
+ * @param Char the character
+ */
 #define UNICODE_VALID(Char)                   \
     ((Char) < 0x110000 &&                     \
      (((Char) & 0xFFFFF800) != 0xD800) &&     \
@@ -199,13 +215,14 @@ g_utf8_prev_char (const gchar *p)
 
 /**
  * g_utf8_strlen:
- * @p: pointer to the start of a UTF-8 encoded string.
+ * @p: pointer to the start of a UTF-8 encoded string
  * @max: the maximum number of bytes to examine. If @max
  *       is less than 0, then the string is assumed to be
- *       nul-terminated. If @max is 0, @p will not be examined and 
+ *       nul-terminated. If @max is 0, @p will not be examined and
  *       may be %NULL.
- * 
- * Returns the length of the string in characters.
+ *
+ * Computes the length of the string in characters, not including
+ * the terminating nul character.
  *
  * Return value: the length of the string in characters
  **/
@@ -229,13 +246,13 @@ g_utf8_strlen (const gchar *p,
     {
       if (max == 0 || !*p)
         return 0;
-      
-      p = g_utf8_next_char (p);          
+
+      p = g_utf8_next_char (p);
 
       while (p - start < max && *p)
         {
           ++len;
-          p = g_utf8_next_char (p);          
+          p = g_utf8_next_char (p);
         }
 
       /* only do the last len increment if we got a complete

@@ -38,7 +38,13 @@ typedef struct _GAsyncInitable                GAsyncInitable;
 typedef struct _GBufferedInputStream          GBufferedInputStream;
 typedef struct _GBufferedOutputStream         GBufferedOutputStream;
 typedef struct _GCancellable                  GCancellable;
+typedef struct _GCharsetConverter             GCharsetConverter;
+typedef struct _GConverter                    GConverter;
+typedef struct _GConverterInputStream         GConverterInputStream;
+typedef struct _GConverterOutputStream        GConverterOutputStream;
 typedef struct _GDataInputStream              GDataInputStream;
+typedef struct _GZlibCompressor               GZlibCompressor;
+typedef struct _GZlibDecompressor             GZlibDecompressor;
 
 /**
  * GDrive:
@@ -69,6 +75,7 @@ typedef struct _GFileInfo                     GFileInfo;
 typedef struct _GFileAttributeMatcher         GFileAttributeMatcher;
 typedef struct _GFileAttributeInfo            GFileAttributeInfo;
 typedef struct _GFileAttributeInfoList        GFileAttributeInfoList;
+typedef struct _GFileDescriptorBased          GFileDescriptorBased;
 typedef struct _GFileInputStream              GFileInputStream;
 typedef struct _GFileOutputStream             GFileOutputStream;
 typedef struct _GFileIOStream                 GFileIOStream;

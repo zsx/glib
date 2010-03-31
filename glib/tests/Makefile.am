@@ -47,6 +47,12 @@ array_test_LDADD    = $(progs_ldadd)
 TEST_PROGS         += hostutils
 hostutils_LDADD     = $(progs_ldadd)
 
+TEST_PROGS         += gvariant
+gvariant_LDADD      = $(progs_ldadd)
+
+TEST_PROGS         += mem-overflow
+mem_overflow_LDADD  = $(progs_ldadd)
+
 if OS_UNIX
 
 # some testing of gtester funcitonality

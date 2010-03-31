@@ -22,9 +22,9 @@ m4_define(glib_configure_in)
 # set glib_binary_age _and_ glib_interface_age to 0.
 #
 m4_define([glib_major_version], [2])
-m4_define([glib_minor_version], [22])
-m4_define([glib_micro_version], [2])
-m4_define([glib_interface_age], [2])
+m4_define([glib_minor_version], [24])
+m4_define([glib_micro_version], [1])
+m4_define([glib_interface_age], [1])
 m4_define([glib_binary_age],
           [m4_eval(100 * glib_minor_version + glib_micro_version)])
 m4_define([glib_version],
@@ -267,7 +267,7 @@ AC_PROG_CC
 AC_PROG_CPP
 
 dnl Check for a working C++ compiler, but do not bail out, if none is found.
-AC_CHECK_PROGS(CXX, [$CCC c++ g++ gcc CC cxx cc++ cl], [gcc])
+AC_CHECK_TOOLS(CXX, [$CCC c++ g++ gcc CC cxx cc++ cl], [gcc])
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_TRY_COMPILE(,[class a { int b; } c;], ,CXX=)
@@ -457,6 +457,17 @@ fi
 AC_MSG_RESULT($enable_iconv_cache)
 
 
+dnl
+dnl zlib support
+dnl
+found_zlib=no
+AC_CHECK_LIB(z, inflate, [AC_CHECK_HEADER(zlib.h, found_zlib=yes)])
+
+if test "x$found_zlib" = "xno" ; then
+   AC_MSG_ERROR([*** Working zlib library and headers not found ***])
+fi
+ZLIB_LIBS='-lz'
+AC_SUBST(ZLIB_LIBS)
 dnl
 dnl gettext support
 dnl
@@ -864,7 +875,7 @@ fi
 # check for header files
 AC_CHECK_HEADERS([dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h])
 AC_CHECK_HEADERS([sys/time.h sys/times.h sys/wait.h unistd.h values.h])
-AC_CHECK_HEADERS([sys/select.h sys/types.h stdint.h sched.h malloc.h])
+AC_CHECK_HEADERS([sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h])
 AC_CHECK_HEADERS([sys/vfs.h sys/mount.h sys/vmount.h sys/statfs.h sys/statvfs.h])
 AC_CHECK_HEADERS([mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h])
 AC_CHECK_HEADERS([sys/uio.h])
@@ -958,6 +969,7 @@ AC_CHECK_FUNCS(chown lchmod lchown fchmod fchown link statvfs statfs utimes getg
 AC_CHECK_FUNCS(getmntent_r setmntent endmntent hasmntopt getmntinfo)
 # Check for high-resolution sleep functions
 AC_CHECK_FUNCS(nanosleep nsleep)
+AC_CHECK_FUNCS(splice)
 
 AC_CHECK_HEADERS(crt_externs.h)
 AC_CHECK_FUNCS(_NSGetEnviron)
@@ -995,29 +1007,37 @@ if $glib_failed ; then
 fi
 
 AC_CHECK_FUNCS(getprotobyname_r endservent)
-AC_CHECK_HEADERS([netdb.h winsock2.h mswsock.h])
+AC_CHECK_HEADERS([netdb.h wspiapi.h])
 
 # For gio/libasyncns
 if test $glib_native_win32 = no; then
   AC_CHECK_FUNCS(strndup setresuid setreuid)
   AC_CHECK_HEADERS(sys/prctl.h arpa/nameser_compat.h)
-  AC_CHECK_FUNC(res_query, ,
-    [AC_CHECK_LIB(resolv, res_query, [ LIBASYNCNS_LIBADD="-lresolv" ],
-      [ save_libs="$LIBS"
-        LIBS="-lresolv $LIBS"
-        AC_MSG_CHECKING([for res_query in -lresolv (alternate version)])
-        AC_LINK_IFELSE(
-          [AC_LANG_PROGRAM([[#include <resolv.h>]], [[res_query(0,0,0,0,0)]])],
-          [ AC_MSG_RESULT(yes)
-  	  LIBASYNCNS_LIBADD="-lresolv" ],
-          [ AC_MSG_RESULT(no)
-            AC_CHECK_LIB(bind, res_query,
-              [ LIBASYNCNS_LIBADD="-lbind" ],
-  	    [ AC_MSG_ERROR(res_query not found) ] ) ] )
-        LIBS="$save_libs"
-      ] )
-    ]
-  )
+
+  # We can't just use AC_CHECK_FUNC/AC_CHECK_LIB here. Bug 586150
+  AC_MSG_CHECKING([for res_query])
+  AC_TRY_LINK([#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>],
+              [res_query("test", 0, 0, (void *)0, 0);],
+              [AC_MSG_RESULT([yes])],
+              [save_libs="$LIBS"
+               LIBS="-lresolv $LIBS"
+               AC_TRY_LINK([#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>],
+                           [res_query("test", 0, 0, (void *)0, 0);],
+                           [AC_MSG_RESULT([in -lresolv])
+                            LIBASYNCNS_LIBADD="-lresolv"],
+                           [LIBS="-lbind $save_libs"
+                            AC_TRY_LINK([#include <resolv.h>],
+                                        [res_query("test", 0, 0, (void *)0, 0);],
+                                        [AC_MSG_RESULT([in -lbind])
+                                         LIBASYNCNS_LIBADD="-lbind"],
+                                        [AC_MSG_ERROR(not found)])])
+               LIBS="$save_libs"])
   AC_SUBST(LIBASYNCNS_LIBADD)
 fi
 
@@ -2338,6 +2358,7 @@ case $host in
     ;;
 esac
 
+AM_CONDITIONAL(HAVE_THREADS, [test "$have_threads" != "none"])
 AC_DEFINE_UNQUOTED(G_THREAD_SOURCE,"gthread-$have_threads.c",
 		   [Source file containing theread implementation])
 AC_SUBST(G_THREAD_CFLAGS)
@@ -2401,109 +2422,154 @@ dnl ********************************
 
 AC_MSG_CHECKING([whether to use assembler code for atomic operations])
 
+glib_cv_gcc_has_builtin_atomic_operations=no
 if test x"$GCC" = xyes; then
-  case $host_cpu in
-    i386)
-      AC_MSG_RESULT([none])
-      glib_memory_barrier_needed=no
-      ;;
-    i?86)
-      AC_MSG_RESULT([i486])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_I486, 1,
-		   	 [i486 atomic implementation])
-      glib_memory_barrier_needed=no
-      ;;
-    sparc*)
-      SPARCV9_WARNING="Try to rerun configure with CFLAGS='-mcpu=v9',
-		when you are using a sparc with v9 instruction set (most
-		sparcs nowadays). This will make the code for atomic
-		operations much faster.	The resulting code will not run
-		on very old sparcs though."
+  AC_MSG_CHECKING([whether GCC supports build-in atomic intrinsics])
+  AC_TRY_LINK([],
+	      [int i;
+	       __sync_synchronize ();
+	       __sync_bool_compare_and_swap (&i, 0, 1);
+	       __sync_fetch_and_add (&i, 1);
+	      ],
+	      [glib_cv_gcc_has_builtin_atomic_operations=yes],
+	      [glib_cv_gcc_has_builtin_atomic_operations=no])
 
-      AC_LINK_IFELSE([[
-        main () 
-        {
-	  int tmp1, tmp2, tmp3;
-          __asm__ __volatile__("casx [%2], %0, %1" 
-	                       : "=&r" (tmp1), "=&r" (tmp2) : "r" (&tmp3));
-        }]],
-	AC_MSG_RESULT([sparcv9])
-        AC_DEFINE_UNQUOTED(G_ATOMIC_SPARCV9, 1,
-		   	   [sparcv9 atomic implementation]),
-	AC_MSG_RESULT([no])
-        AC_MSG_WARN([[$SPARCV9_WARNING]]))
-      glib_memory_barrier_needed=yes
-      ;;
-    alpha*)
-      AC_MSG_RESULT([alpha])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_ALPHA, 1,
-		   	 [alpha atomic implementation])
-      glib_memory_barrier_needed=yes
-      ;;
-    x86_64)
-      AC_MSG_RESULT([x86_64])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_X86_64, 1,
-		   	 [x86_64 atomic implementation])
-      glib_memory_barrier_needed=no
-     ;;
-    powerpc*)
-      AC_MSG_RESULT([powerpc])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_POWERPC, 1,
-		   	 [powerpc atomic implementation])
-      glib_memory_barrier_needed=yes
-      AC_MSG_CHECKING([whether asm supports numbered local labels])
-      AC_TRY_COMPILE(
-		,[ 
-			__asm__ __volatile__ ("1:       nop\n"
-					      "         bne-    1b")
-		],[
-			AC_DEFINE_UNQUOTED(ASM_NUMERIC_LABELS, 1, [define if asm blocks can use numeric local labels])
-			AC_MSG_RESULT([yes])
-		],[
-			AC_MSG_RESULT([no])
-		])
-      ;;	
-    ia64)
-      AC_MSG_RESULT([ia64])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_IA64, 1,
-		   	 [ia64 atomic implementation])
-      glib_memory_barrier_needed=yes
-      ;;	
-    s390|s390x)
-      AC_MSG_RESULT([s390])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_S390, 1,
-		   	 [s390 atomic implementation])
-      glib_memory_barrier_needed=no
-      ;;	
-    arm*)
-      AC_MSG_RESULT([arm])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
-                         [arm atomic implementation])
-      glib_memory_barrier_needed=no
-      ;;
-    crisv32*|etraxfs*)
-      AC_MSG_RESULT([crisv32])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_CRISV32, 1,
-		   	 [crisv32 atomic implementation])
-      glib_memory_barrier_needed=no
-      ;;
-    cris*|etrax*)
-      AC_MSG_RESULT([cris])
-      AC_DEFINE_UNQUOTED(G_ATOMIC_CRIS, 1,
-			 [cris atomic implementation])
-      glib_memory_barrier_needed=no
-      ;;
-    *)
-      AC_MSG_RESULT([none])
-      glib_memory_barrier_needed=yes
-      ;;
-  esac
+  AC_MSG_RESULT($glib_cv_gcc_has_builtin_atomic_operations)
+  if test $glib_cv_gcc_has_builtin_atomic_operations = yes; then
+    glib_memory_barrier_needed=yes
+  else
+    case $host_cpu in
+      i386)
+        AC_MSG_RESULT([none])
+        glib_memory_barrier_needed=no
+        ;;
+      i?86)
+        AC_MSG_RESULT([i486])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_I486, 1,
+			   [i486 atomic implementation])
+        glib_memory_barrier_needed=no
+        ;;
+      sparc*)
+        SPARCV9_WARNING="Try to rerun configure with CFLAGS='-mcpu=v9',
+			 when you are using a sparc with v9 instruction set (most
+			 sparcs nowadays). This will make the code for atomic
+			 operations much faster. The resulting code will not run
+			 on very old sparcs though."
+
+        AC_LINK_IFELSE([[
+          main ()
+          {
+            int tmp1, tmp2, tmp3;
+            __asm__ __volatile__("casx [%2], %0, %1"
+                                 : "=&r" (tmp1), "=&r" (tmp2) : "r" (&tmp3));
+          }]],
+          AC_MSG_RESULT([sparcv9])
+          AC_DEFINE_UNQUOTED(G_ATOMIC_SPARCV9, 1,
+			     [sparcv9 atomic implementation]),
+          AC_MSG_RESULT([no])
+          AC_MSG_WARN([[$SPARCV9_WARNING]]))
+        glib_memory_barrier_needed=yes
+        ;;
+      alpha*)
+        AC_MSG_RESULT([alpha])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_ALPHA, 1,
+			   [alpha atomic implementation])
+        glib_memory_barrier_needed=yes
+        ;;
+      x86_64)
+        AC_MSG_RESULT([x86_64])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_X86_64, 1,
+			   [x86_64 atomic implementation])
+        glib_memory_barrier_needed=no
+       ;;
+      powerpc*)
+        AC_MSG_RESULT([powerpc])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_POWERPC, 1,
+			   [powerpc atomic implementation])
+        glib_memory_barrier_needed=yes
+        AC_MSG_CHECKING([whether asm supports numbered local labels])
+        AC_TRY_COMPILE(
+		       ,[
+		       __asm__ __volatile__ ("1:       nop\n"
+			       "         bne-    1b")
+		       ],[
+		       AC_DEFINE_UNQUOTED(ASM_NUMERIC_LABELS, 1, [define if asm blocks can use numeric local labels])
+		       AC_MSG_RESULT([yes])
+		       ],[
+		       AC_MSG_RESULT([no])
+		       ])
+        ;;
+      ia64)
+        AC_MSG_RESULT([ia64])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_IA64, 1,
+			   [ia64 atomic implementation])
+        glib_memory_barrier_needed=yes
+        ;;
+      s390|s390x)
+        AC_MSG_RESULT([s390])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_S390, 1,
+			   [s390 atomic implementation])
+        glib_memory_barrier_needed=no
+        ;;
+      arm*)
+        AC_MSG_RESULT([arm])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
+			   [arm atomic implementation])
+        glib_memory_barrier_needed=no
+        ;;
+      crisv32*|etraxfs*)
+        AC_MSG_RESULT([crisv32])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_CRISV32, 1,
+			   [crisv32 atomic implementation])
+        glib_memory_barrier_needed=no
+        ;;
+      cris*|etrax*)
+        AC_MSG_RESULT([cris])
+        AC_DEFINE_UNQUOTED(G_ATOMIC_CRIS, 1,
+			   [cris atomic implementation])
+        glib_memory_barrier_needed=no
+        ;;
+      *)
+        AC_MSG_RESULT([none])
+        glib_memory_barrier_needed=yes
+        ;;
+    esac
+  fi
 else
   if test $glib_native_win32 = yes; then
     # For Windows but not using gcc. No barriers needed then either.
     glib_memory_barrier_needed=no
   fi
 fi
+
+AM_CONDITIONAL(HAVE_GCC_BUILTINS_FOR_ATOMIC_OPERATIONS,
+	       [test $glib_cv_gcc_has_builtin_atomic_operations = yes])
+
+dnl ************************
+dnl ** Check for futex(2) **
+dnl ************************
+AC_MSG_CHECKING([for futex(2) system call])
+AC_COMPILE_IFELSE([ 
+#include <linux/futex.h>
+#include <syscall.h>
+#include <unistd.h>
+
+int
+main (void)
+{
+  /* it's not like this actually runs or anything... */
+  syscall (SYS_futex, NULL, FUTEX_WAKE, FUTEX_WAIT);
+  return 0;
+}
+],
+[
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_FUTEX, [test "$have_futex" = "yes"],
+            [we have the futex(2) system call])
+],
+[
+  AC_MSG_RESULT(no)
+])
 
 dnl ****************************************
 dnl *** GLib POLL* compatibility defines ***
@@ -3046,6 +3112,10 @@ _______EOF
 #define GUINT_TO_LE(val)	((guint) GUINT${gintbits}_TO_LE (val))
 #define GINT_TO_BE(val)		((gint) GINT${gintbits}_TO_BE (val))
 #define GUINT_TO_BE(val)	((guint) GUINT${gintbits}_TO_BE (val))
+#define GSIZE_TO_LE(val)	((gsize) GUINT${gsizebits}_TO_LE (val))
+#define GSSIZE_TO_LE(val)	((gssize) GINT${gsizebits}_TO_LE (val))
+#define GSIZE_TO_BE(val)	((gsize) GUINT${gsizebits}_TO_BE (val))
+#define GSSIZE_TO_BE(val)	((gssize) GINT${gsizebits}_TO_BE (val))
 #define G_BYTE_ORDER $g_byte_order
 
 #define GLIB_SYSDEF_POLLIN =$g_pollin
@@ -3245,6 +3315,7 @@ esac
 
 gintbits=`expr $ac_cv_sizeof_int \* 8`
 glongbits=`expr $ac_cv_sizeof_long \* 8`
+gsizebits=`expr $ac_cv_sizeof_size_t \* 8`
 
 case $ac_cv_sizeof_void_p in
 $ac_cv_sizeof_int)
@@ -3447,7 +3518,6 @@ Makefile
 build/Makefile
 build/win32/Makefile
 build/win32/dirent/Makefile
-build/win32/vs8/Makefile
 build/win32/vs9/Makefile
 glib/Makefile
 glib/libcharset/Makefile
@@ -3461,6 +3531,7 @@ gobject/Makefile
 gobject/glib-mkenums
 gobject/tests/Makefile
 gthread/Makefile
+gthread/tests/Makefile
 gio/Makefile
 gio/xdgmime/Makefile
 gio/inotify/Makefile
@@ -3506,6 +3577,7 @@ if false; then
     gobject/gobject.rc
     gthread/makefile.msc
     gthread/gthread.rc
+    gio/gio.rc
     tests/makefile.msc
   ])
 fi

@@ -606,6 +606,22 @@ struct _GTypeQuery
  */
 #define G_TYPE_INSTANCE_GET_PRIVATE(instance, g_type, c_type)   ((c_type*) g_type_instance_get_private ((GTypeInstance*) (instance), (g_type)))
 
+/**
+ * G_TYPE_CLASS_GET_PRIVATE:
+ * @klass: the class of a type deriving from @private_type.
+ * @g_type: the type identifying which private data to retrieve.
+ * @c_type: The C type for the private structure.
+ * 
+ * Gets the private class structure for a particular type.
+ * The private structure must have been registered in the
+ * get_type() function with g_type_add_class_private().
+ * 
+ * This macro should only be used in type implementations.
+ * 
+ * Since: 2.24
+ * Returns: a pointer to the private data structure.
+ */
+#define G_TYPE_CLASS_GET_PRIVATE(klass, g_type, c_type)   ((c_type*) g_type_class_get_private ((GTypeClass*) (klass), (g_type)))
 
 /**
  * GTypeDebugFlags:
@@ -1218,6 +1234,11 @@ void     g_type_class_add_private       (gpointer                    g_class,
 gpointer g_type_instance_get_private    (GTypeInstance              *instance,
                                          GType                       private_type);
 
+void      g_type_add_class_private      (GType    		     class_type,
+					 gsize    		     private_size);
+gpointer  g_type_class_get_private      (GTypeClass 		    *klass,
+					 GType			     private_type);
+
 
 /* --- GType boilerplate --- */
 /**
@@ -1243,7 +1264,7 @@ gpointer g_type_instance_get_private    (GTypeInstance              *instance,
  * @_C_: Custom code that gets inserted in the *_get_type() function.
  * 
  * A convenience macro for type implementations.  
- * Similar to G_DEFINE_TYPE(), but allows to insert custom code into the 
+ * Similar to G_DEFINE_TYPE(), but allows you to insert custom code into the 
  * *_get_type() function, e.g. interface implementations via G_IMPLEMENT_INTERFACE().
  * See G_DEFINE_TYPE_EXTENDED() for an example.
  * 
@@ -1273,7 +1294,7 @@ gpointer g_type_instance_get_private    (GTypeInstance              *instance,
  * @_C_: Custom code that gets inserted in the @type_name_get_type() function.
  * 
  * A convenience macro for type implementations.
- * Similar to G_DEFINE_TYPE_WITH_CODE(), but defines an abstract type and allows to 
+ * Similar to G_DEFINE_TYPE_WITH_CODE(), but defines an abstract type and allows you to 
  * insert custom code into the *_get_type() function, e.g. interface implementations 
  * via G_IMPLEMENT_INTERFACE(). See G_DEFINE_TYPE_EXTENDED() for an example.
  * 
@@ -1345,6 +1366,44 @@ gpointer g_type_instance_get_private    (GTypeInstance              *instance,
 #define G_DEFINE_TYPE_EXTENDED(TN, t_n, T_P, _f_, _C_)	    _G_DEFINE_TYPE_EXTENDED_BEGIN (TN, t_n, T_P, _f_) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
 
 /**
+ * G_DEFINE_INTERFACE:
+ * @TN: The name of the new type, in Camel case.
+ * @t_n: The name of the new type, in lowercase, with words separated by '_'.
+ * @T_P: The #GType of the prerequisite type for the interface, or 0
+ * (%G_TYPE_INVALID) for no prerequisite type.
+ *
+ * A convenience macro for #GTypeInterface definitions, which declares
+ * a default vtable initialization function and defines a *_get_type()
+ * function.
+ *
+ * The macro expects the interface initialization function to have the
+ * name <literal>t_n ## _default_init</literal>, and the interface
+ * structure to have the name <literal>TN ## Interface</literal>.
+ *
+ * Since: 2.24
+ */
+#define G_DEFINE_INTERFACE(TN, t_n, T_P)		    G_DEFINE_INTERFACE_WITH_CODE(TN, t_n, T_P, ;)
+
+/**
+ * G_DEFINE_INTERFACE_WITH_CODE:
+ * @TN: The name of the new type, in Camel case.
+ * @t_n: The name of the new type, in lowercase, with words separated by '_'.
+ * @T_P: The #GType of the prerequisite type for the interface, or 0
+ * (%G_TYPE_INVALID) for no prerequisite type.
+ * @_C_: Custom code that gets inserted in the *_get_type() function.
+ *
+ * A convenience macro for #GTypeInterface definitions. Similar to
+ * G_DEFINE_INTERFACE(), but allows you to insert custom code into the
+ * *_get_type() function, e.g. additional interface implementations
+ * via G_IMPLEMENT_INTERFACE(), or additional prerequisite types. See
+ * G_DEFINE_TYPE_EXTENDED() for a similar example using
+ * G_DEFINE_TYPE_WITH_CODE().
+ *
+ * Since: 2.24
+ */
+#define G_DEFINE_INTERFACE_WITH_CODE(TN, t_n, T_P, _C_)     _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TN, t_n, T_P) {_C_;} _G_DEFINE_INTERFACE_EXTENDED_END()
+
+/**
  * G_IMPLEMENT_INTERFACE:
  * @TYPE_IFACE: The #GType of the interface to add
  * @iface_init: The interface init function
@@ -1399,6 +1458,34 @@ type_name##_get_type (void) \
   return g_define_type_id__volatile;	\
 } /* closes type_name##_get_type() */
 
+#define _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TypeName, type_name, TYPE_PREREQ) \
+\
+static void     type_name##_default_init        (TypeName##Interface *klass); \
+\
+GType \
+type_name##_get_type (void) \
+{ \
+  static volatile gsize g_define_type_id__volatile = 0; \
+  if (g_once_init_enter (&g_define_type_id__volatile))  \
+    { \
+      GType g_define_type_id = \
+        g_type_register_static_simple (G_TYPE_INTERFACE, \
+                                       g_intern_static_string (#TypeName), \
+                                       sizeof (TypeName##Interface), \
+                                       (GClassInitFunc)type_name##_default_init, \
+                                       0, \
+                                       (GInstanceInitFunc)NULL, \
+                                       (GTypeFlags) 0); \
+      if (TYPE_PREREQ) \
+        g_type_interface_add_prerequisite (g_define_type_id, TYPE_PREREQ); \
+      { /* custom code follows */
+#define _G_DEFINE_INTERFACE_EXTENDED_END()	\
+        /* following custom code */		\
+      }						\
+      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id); \
+    }						\
+  return g_define_type_id__volatile;			\
+} /* closes type_name##_get_type() */
 
 /* --- protected (for fundamental type implementations) --- */
 GTypePlugin*	 g_type_get_plugin		(GType		     type);
@@ -1497,7 +1584,7 @@ G_GNUC_INTERNAL void    g_signal_init           (void); /* sync with gsignal.c *
   GValue *__val = (GValue*) vl; GType __t = gt; gboolean __r; \
   if (!__val) \
     __r = FALSE; \
-  if (__val->g_type == __t) \
+  else if (__val->g_type == __t)		\
     __r = TRUE; \
   else \
     __r = g_type_check_value_holds (__val, __t); \

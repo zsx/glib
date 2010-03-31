@@ -23,6 +23,13 @@
  */
 
 #include "config.h"
+#ifdef HAVE_SPLICE
+#define _GNU_SOURCE
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#endif
 #include <string.h>
 #include <sys/types.h>
 #ifdef HAVE_PWD_H
@@ -31,9 +38,9 @@
 #include "gfile.h"
 #include "gvfs.h"
 #include "gioscheduler.h"
-#include "glocalfile.h"
 #include "gsimpleasyncresult.h"
 #include "gfileattribute-priv.h"
+#include "gfiledescriptorbased.h"
 #include "gpollfilemonitor.h"
 #include "gappinfo.h"
 #include "gfileinputstream.h"
@@ -121,10 +128,6 @@
  * for HTTP Etag headers, which are a very similar concept.
  * </para>
  **/
-
-static void g_file_base_init (gpointer g_class);
-static void g_file_class_init (gpointer g_class,
-			       gpointer class_data);
 
 static void               g_file_real_query_info_async            (GFile                  *file,
 								   const char             *attributes,
@@ -266,43 +269,12 @@ static gboolean           g_file_real_copy_finish                 (GFile        
 								   GAsyncResult           *res,
 								   GError                **error);
 
-GType
-g_file_get_type (void)
-{
-  static volatile gsize g_define_type_id__volatile = 0;
-
-  if (g_once_init_enter (&g_define_type_id__volatile))
-    {
-      const GTypeInfo file_info =
-      {
-        sizeof (GFileIface), /* class_size */
-	g_file_base_init,   /* base_init */
-	NULL,		/* base_finalize */
-	g_file_class_init,
-	NULL,		/* class_finalize */
-	NULL,		/* class_data */
-	0,
-	0,              /* n_preallocs */
-	NULL
-      };
-      GType g_define_type_id =
-	g_type_register_static (G_TYPE_INTERFACE, I_("GFile"),
-				&file_info, 0);
-
-      g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_OBJECT);
-
-      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id);
-    }
-
-  return g_define_type_id__volatile;
-}
+typedef GFileIface GFileInterface;
+G_DEFINE_INTERFACE (GFile, g_file, G_TYPE_OBJECT)
 
 static void
-g_file_class_init (gpointer g_class,
-		   gpointer class_data)
+g_file_default_init (GFileIface *iface)
 {
-  GFileIface *iface = g_class;
-
   iface->enumerate_children_async = g_file_real_enumerate_children_async;
   iface->enumerate_children_finish = g_file_real_enumerate_children_finish;
   iface->set_display_name_async = g_file_real_set_display_name_async;
@@ -332,11 +304,6 @@ g_file_class_init (gpointer g_class,
   iface->set_attributes_from_info = g_file_real_set_attributes_from_info;
   iface->copy_async = g_file_real_copy_async;
   iface->copy_finish = g_file_real_copy_finish;
-}
-
-static void
-g_file_base_init (gpointer g_class)
-{
 }
 
 
@@ -651,6 +618,49 @@ g_file_get_parent (GFile *file)
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->get_parent) (file);
+}
+
+/**
+ * g_file_has_parent:
+ * @file: input #GFile
+ * @parent: the parent to check for, or %NULL
+ *
+ * Checks if @file has a parent, and optionally, if it is @parent.
+ *
+ * If @parent is %NULL then this function returns %TRUE if @file has any
+ * parent at all.  If @parent is non-%NULL then %TRUE is only returned
+ * if @file is a child of @parent.
+ *
+ * Returns: %TRUE if @file is a child of @parent (or any parent in the
+ *          case that @parent is %NULL).
+ *
+ * Since: 2.24
+ **/
+gboolean
+g_file_has_parent (GFile *file,
+                   GFile *parent)
+{
+  GFile *actual_parent;
+  gboolean result;
+
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (parent == NULL || G_IS_FILE (parent), FALSE);
+
+  actual_parent = g_file_get_parent (file);
+
+  if (actual_parent != NULL)
+    {
+      if (parent != NULL)
+        result = g_file_equal (parent, actual_parent);
+      else
+        result = TRUE;
+
+      g_object_unref (actual_parent);
+    }
+  else
+    result = FALSE;
+
+  return result;
 }
 
 /**
@@ -2118,7 +2128,7 @@ g_file_replace_finish (GFile         *file,
       if (g_simple_async_result_propagate_error (simple, error))
 	return NULL;
     }
-  
+
   iface = G_FILE_GET_IFACE (file);
   return (* iface->replace_finish) (file, res, error);
 }
@@ -2626,7 +2636,6 @@ g_file_copy_attributes (GFile           *source,
   return res;
 }
 
-/* Closes the streams */
 static gboolean
 copy_stream_with_progress (GInputStream           *in,
 			   GOutputStream          *out,
@@ -2712,25 +2721,134 @@ copy_stream_with_progress (GInputStream           *in,
 	progress_callback (current_size, total_size, progress_callback_data);
     }
 
-  if (!res)
-    error = NULL; /* Ignore further errors */
-
   /* Make sure we send full copied size */
   if (progress_callback)
     progress_callback (current_size, total_size, progress_callback_data);
-  
-  /* Don't care about errors in source here */
-  g_input_stream_close (in, cancellable, NULL);
 
-  /* But write errors on close are bad! */
-  if (!g_output_stream_close (out, cancellable, error))
-    res = FALSE;
-
-  g_object_unref (in);
-  g_object_unref (out);
-      
   return res;
 }
+
+#ifdef HAVE_SPLICE
+
+static gboolean
+do_splice (int     fd_in,
+	   loff_t *off_in,
+           int     fd_out,
+	   loff_t *off_out,
+           size_t  len,
+           long   *bytes_transferd,
+           GError **error)
+{
+  long result;
+
+retry:
+  result = splice (fd_in, off_in, fd_out, off_out, len, SPLICE_F_MORE);
+
+  if (result == -1)
+    {
+      int errsv = errno;
+
+      if (errsv == EINTR)
+        goto retry;
+      else if (errsv == ENOSYS || errsv == EINVAL)
+        g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                             _("Splice not supported"));
+      else
+        g_set_error (error, G_IO_ERROR,
+                     g_io_error_from_errno (errsv),
+                     _("Error splicing file: %s"),
+                     g_strerror (errsv));
+
+      return FALSE;
+    }
+
+  *bytes_transferd = result;
+  return TRUE;
+}
+
+static gboolean
+splice_stream_with_progress (GInputStream           *in,
+                             GOutputStream          *out,
+                             GCancellable           *cancellable,
+                             GFileProgressCallback   progress_callback,
+                             gpointer                progress_callback_data,
+                             GError                **error)
+{
+  int buffer[2];
+  gboolean res;
+  goffset total_size;
+  loff_t offset_in;
+  loff_t offset_out;
+  int fd_in, fd_out;
+
+  fd_in = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (in));
+  fd_out = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (out));
+
+  if (pipe (buffer) != 0)
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           "Pipe creation failed");
+      return FALSE;
+    }
+
+  total_size = -1;
+  /* avoid performance impact of querying total size when it's not needed */
+  if (progress_callback)
+    {
+      struct stat sbuf;
+
+      if (fstat (fd_in, &sbuf) == 0)
+        total_size = sbuf.st_size;
+    }
+
+  if (total_size == -1)
+    total_size = 0;
+
+  offset_in = offset_out = 0;
+  res = FALSE;
+  while (TRUE)
+    {
+      long n_read;
+      long n_written;
+
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+        break;
+
+      if (!do_splice (fd_in, &offset_in, buffer[1], NULL, 1024*64, &n_read, error))
+        break;
+
+      if (n_read == 0)
+        {
+          res = TRUE;
+          break;
+        }
+
+      while (n_read > 0)
+        {
+          if (g_cancellable_set_error_if_cancelled (cancellable, error))
+            goto out;
+
+          if (!do_splice (buffer[0], NULL, fd_out, &offset_out, n_read, &n_written, error))
+            goto out;
+
+          n_read -= n_written;
+        }
+
+      if (progress_callback)
+        progress_callback (offset_in, total_size, progress_callback_data);
+    }
+
+  /* Make sure we send full copied size */
+  if (progress_callback)
+    progress_callback (offset_in, total_size, progress_callback_data);
+
+ out:
+  close (buffer[0]);
+  close (buffer[1]);
+
+  return res;
+}
+#endif
 
 static gboolean
 file_copy_fallback (GFile                  *source,
@@ -2745,6 +2863,10 @@ file_copy_fallback (GFile                  *source,
   GOutputStream *out;
   GFileInfo *info;
   const char *target;
+  gboolean result;
+#ifdef HAVE_SPLICE
+  gboolean fallback = TRUE;
+#endif
 
   /* need to know the file type */
   info = g_file_query_info (source,
@@ -2812,13 +2934,45 @@ file_copy_fallback (GFile                  *source,
       return FALSE;
     }
 
-  if (!copy_stream_with_progress (in, out, source, cancellable,
-				  progress_callback, progress_callback_data,
-				  error))
+#ifdef HAVE_SPLICE
+  if (G_IS_FILE_DESCRIPTOR_BASED (in) && G_IS_FILE_DESCRIPTOR_BASED (out))
+    {
+      GError *splice_err = NULL;
+
+      result = splice_stream_with_progress (in, out, cancellable,
+                                            progress_callback, progress_callback_data,
+                                            &splice_err);
+
+      if (result || !g_error_matches (splice_err, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+        {
+          fallback = FALSE;
+          if (!result)
+            g_propagate_error (error, splice_err);
+        }
+      else
+        g_clear_error (&splice_err);
+    }
+
+  if (fallback)
+#endif
+    result = copy_stream_with_progress (in, out, source, cancellable,
+		                        progress_callback, progress_callback_data,
+		                        error);
+
+  /* Don't care about errors in source here */
+  g_input_stream_close (in, cancellable, NULL);
+
+  /* But write errors on close are bad! */
+  if (!g_output_stream_close (out, cancellable, result ? error : NULL))
+    result = FALSE;
+
+  g_object_unref (in);
+  g_object_unref (out);
+
+  if (result == FALSE)
     return FALSE;
 
  copied_file:
-
   /* Ignore errors here. Failure to copy metadata is not a hard error */
   g_file_copy_attributes (source, destination,
 			  flags, cancellable, NULL);
@@ -5956,11 +6110,14 @@ g_file_query_default_handler (GFile                  *file,
   char *path;
   
   uri_scheme = g_file_get_uri_scheme (file);
-  appinfo = g_app_info_get_default_for_uri_scheme (uri_scheme);
-  g_free (uri_scheme);
+  if (uri_scheme && uri_scheme[0] != '\0')
+    {
+      appinfo = g_app_info_get_default_for_uri_scheme (uri_scheme);
+      g_free (uri_scheme);
 
-  if (appinfo != NULL)
-    return appinfo;
+      if (appinfo != NULL)
+        return appinfo;
+    }
 
   info = g_file_query_info (file,
 			    G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,

@@ -6,3 +6,5 @@ gobject-query
 gobjectalias.h
 gobjectaliasdef.c
 testgobject
+libgobject-gdb.py
+makefile.msc

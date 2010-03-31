@@ -78,6 +78,7 @@ typedef struct _GAppLaunchContextPrivate GAppLaunchContextPrivate;
  * @can_delete: Checks if a #GAppInfo can be deleted. Since 2.20
  * @do_delete: Deletes a #GAppInfo. Since 2.20
  * @get_commandline: Gets the commandline for the #GAppInfo. Since 2.20
+ * @get_display_name: Gets the display name for the #GAppInfo. Since 2.24
  *
  * Application Information interface, for operating system portability.
  */
@@ -126,6 +127,7 @@ struct _GAppInfoIface
   gboolean     (* can_delete)                   (GAppInfo           *appinfo);
   gboolean     (* do_delete)                    (GAppInfo           *appinfo);
   const char * (* get_commandline)              (GAppInfo           *appinfo);
+  const char * (* get_display_name)             (GAppInfo           *appinfo);
 };
 
 GType       g_app_info_get_type                     (void) G_GNUC_CONST;
@@ -138,6 +140,7 @@ gboolean    g_app_info_equal                        (GAppInfo             *appin
 						     GAppInfo             *appinfo2);
 const char *g_app_info_get_id                       (GAppInfo             *appinfo);
 const char *g_app_info_get_name                     (GAppInfo             *appinfo);
+const char *g_app_info_get_display_name             (GAppInfo             *appinfo);
 const char *g_app_info_get_description              (GAppInfo             *appinfo);
 const char *g_app_info_get_executable               (GAppInfo             *appinfo);
 const char *g_app_info_get_commandline              (GAppInfo             *appinfo);

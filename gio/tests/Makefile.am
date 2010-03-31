@@ -23,6 +23,7 @@ TEST_PROGS +=	 		\
 	readwrite		\
 	g-file 			\
 	g-file-info 		\
+	converter-stream	\
 	data-input-stream 	\
 	data-output-stream 	\
 	g-icon			\
@@ -33,10 +34,17 @@ TEST_PROGS +=	 		\
 	srvtarget		\
 	contexts
 
-SAMPLE_PROGS = resolver socket-server socket-client echo-server httpd send-data
+SAMPLE_PROGS = 			\
+	resolver		\
+	socket-server		\
+	socket-client		\
+	echo-server		\
+	httpd			\
+	send-data		\
+	filter-cat
 
 if OS_UNIX
-TEST_PROGS += live-g-file unix-streams desktop-app-info
+TEST_PROGS += live-g-file unix-streams desktop-app-info unix-fd
 endif
 
 memory_input_stream_SOURCES	  = memory-input-stream.c
@@ -54,11 +62,17 @@ readwrite_LDADD	  = $(progs_ldadd)
 g_file_info_SOURCES	= g-file-info.c
 g_file_info_LDADD	= $(progs_ldadd)
 
+converter_stream_SOURCES	= converter-stream.c
+converter_stream_LDADD		= $(progs_ldadd)
+
 data_input_stream_SOURCES	= data-input-stream.c
 data_input_stream_LDADD		= $(progs_ldadd)
 
 data_output_stream_SOURCES	= data-output-stream.c
 data_output_stream_LDADD	= $(progs_ldadd)
+
+filter_cat_SOURCES	= filter-cat.c
+filter_cat_LDADD	= $(progs_ldadd)
 
 g_icon_SOURCES	= g-icon.c
 g_icon_LDADD	= $(progs_ldadd)
@@ -75,6 +89,9 @@ desktop_app_info_LDADD	  = $(progs_ldadd)
 unix_streams_SOURCES	  = unix-streams.c
 unix_streams_LDADD	  = $(progs_ldadd) \
 	$(top_builddir)/gthread/libgthread-2.0.la
+
+unix_fd_SOURCES	  = unix-fd.c
+unix_fd_LDADD	  = $(progs_ldadd)
 
 simple_async_result_SOURCES	= simple-async-result.c
 simple_async_result_LDADD	= $(progs_ldadd)

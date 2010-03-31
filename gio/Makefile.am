@@ -41,6 +41,10 @@ TESTS = abicheck.sh pltcheck.sh
 endif
 endif
 
+if HAVE_THREADS
+THREAD_FLAGS=-DG_THREADS_MANDATORY
+endif
+
 AM_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"GLib-GIO\"			\
 	-I$(top_builddir)				\
@@ -48,6 +52,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/glib				\
 	-I$(top_srcdir)/gmodule				\
 	$(GLIB_DEBUG_FLAGS)				\
+	$(THREAD_FLAGS)					\
 	-DG_DISABLE_DEPRECATED				\
 	-DGIO_COMPILATION				\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	
@@ -131,6 +136,7 @@ platform_libadd += libasyncns/libasyncns.la xdgmime/libxdgmime.la
 platform_deps += libasyncns/libasyncns.la xdgmime/libxdgmime.la
 unix_sources = \
 	gunixconnection.c	\
+	gunixfdlist.c		\
 	gunixfdmessage.c	\
 	gunixmount.c		\
 	gunixmount.h		\
@@ -151,8 +157,10 @@ unix_sources = \
 giounixincludedir=$(includedir)/gio-unix-2.0/gio
 giounixinclude_HEADERS = \
 	gdesktopappinfo.h	\
+	gfiledescriptorbased.h  \
 	gunixconnection.h	\
 	gunixmounts.h 		\
+	gunixfdlist.h		\
 	gunixfdmessage.h	\
 	gunixinputstream.h 	\
 	gunixoutputstream.h 	\
@@ -187,6 +195,10 @@ libgio_2_0_la_SOURCES =		\
 	gcancellable.c 		\
 	gcontenttype.c 		\
 	gcontenttypeprivate.h 	\
+	gcharsetconverter.c	\
+	gconverter.c		\
+	gconverterinputstream.c	\
+	gconverteroutputstream.c	\
 	gdatainputstream.c 	\
 	gdataoutputstream.c 	\
 	gdrive.c 		\
@@ -199,6 +211,8 @@ libgio_2_0_la_SOURCES =		\
 	gfile.c 		\
 	gfileattribute.c 	\
 	gfileattribute-priv.h 	\
+	gfiledescriptorbased.h  \
+	gfiledescriptorbased.c  \
 	gfileenumerator.c 	\
 	gfileicon.c 		\
 	gfileinfo.c 		\
@@ -261,6 +275,8 @@ libgio_2_0_la_SOURCES =		\
 	gvfs.c 			\
 	gvolume.c 		\
 	gvolumemonitor.c 	\
+	gzlibcompressor.c	\
+	gzlibdecompressor.c	\
 	gmountprivate.h 	\
 	gioenumtypes.h		\
 	gioenumtypes.c		\
@@ -280,6 +296,7 @@ libgio_2_0_la_LIBADD = \
 	$(top_builddir)/gobject/libgobject-2.0.la 	\
 	$(top_builddir)/gmodule/libgmodule-2.0.la 	\
 	$(platform_libadd) 				\
+	$(ZLIB_LIBS)					\
 	$(SELINUX_LIBS) 				\
 	$(GLIB_LIBS) 					\
 	$(XATTR_LIBS) 					\
@@ -292,6 +309,9 @@ endif
 if OS_WIN32_AND_DLL_COMPILATION
 export_symbols = -export-symbols gio.def
 gio_def = gio.def
+
+gio_win32_res = gio-win32-res.o
+gio_win32_res_ldflag = -Wl,$(gio_win32_res)
 
 install-def-file:
 	$(INSTALL) gio.def $(DESTDIR)$(libdir)/gio-2.0.def
@@ -311,10 +331,14 @@ install-data-local: install-ms-lib install-def-file
 uninstall-local: uninstall-ms-lib uninstall-def-file
 
 libgio_2_0_la_LDFLAGS = \
+	$(gio_win32_res_ldflag) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	-export-dynamic $(no_undefined) $(export_symbols)
 
-libgio_2_0_la_DEPENDENCIES = $(gio_def) $(platform_deps)
+libgio_2_0_la_DEPENDENCIES = $(gio_win32_res) $(gio_def) $(platform_deps)
+
+gio-win32-res.o: gio.rc
+	$(WINDRES) gio.rc $@
 
 gio_headers =			\
 	gappinfo.h 		\
@@ -324,6 +348,10 @@ gio_headers =			\
 	gbufferedoutputstream.h \
 	gcancellable.h 		\
 	gcontenttype.h 		\
+	gcharsetconverter.h	\
+	gconverter.h		\
+	gconverterinputstream.h	\
+	gconverteroutputstream.h	\
 	gdatainputstream.h 	\
 	gdataoutputstream.h 	\
 	gdrive.h 		\
@@ -381,6 +409,8 @@ gio_headers =			\
 	gvfs.h 			\
 	gvolume.h 		\
 	gvolumemonitor.h 	\
+	gzlibcompressor.h	\
+	gzlibdecompressor.h	\
 	$(NULL)
 
 gioincludedir=$(includedir)/glib-2.0/gio/
@@ -407,7 +437,11 @@ EXTRA_DIST += 			\
 	makegioalias.pl		\
 	abicheck.sh		\
 	pltcheck.sh		\
+	gio.rc.in		\
 	$(NULL)
+
+BUILT_EXTRA_DIST = 		\
+	gio.rc
 
 CLEANFILES = 			\
 	$(marshal_sources)	\
@@ -425,6 +459,30 @@ gioenumtypes.c: $(gio_headers) gioenumtypes.c.template
 
 gio-2.0.lib: libgio-2.0.la gio.def
 	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libgio-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:gio.def -out:$@
+
+bin_PROGRAMS = gio-querymodules
+gio_querymodules_SOURCES = gio-querymodules.c
+gio_querymodules_LDADD	 = \
+	$(top_builddir)/glib/libglib-2.0.la		\
+	$(top_builddir)/gobject/libgobject-2.0.la	\
+	$(top_builddir)/gmodule/libgmodule-2.0.la	\
+	libgio-2.0.la					\
+	$(NULL)
+
+dist-hook: $(BUILT_EXTRA_DIST) ../build/win32/vs9/gio.vcproj
+	files='$(BUILT_EXTRA_DIST)'; \
+	for f in $$files; do \
+	  if test -f $$f; then d=.; else d=$(srcdir); fi; \
+	  cp $$d/$$f $(distdir) || exit 1; done
+
+../build/win32/vs9/gio.vcproj: $(top_srcdir)/build/win32/vs9/gio.vcprojin
+	for F in $(libgio_2_0_la_SOURCES); do \
+		case $$F in \
+		*.c) echo '   <File RelativePath="..\..\..\gio\'$$F'" />' \
+		     ;; \
+		esac; \
+	done >libgio.sourcefiles
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/gio.vcprojin >$@
 
 if HAVE_GLIB_RUNTIME_LIBDIR
 install-data-hook:
