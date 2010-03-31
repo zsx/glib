@@ -533,7 +533,7 @@ g_logv (const gchar   *log_domain,
 #ifdef G_OS_WIN32
 	      gchar *locale_msg = g_locale_from_utf8 (fatal_msg_buf, -1, NULL, NULL, NULL);
 	      
-	      MessageBox (NULL, locale_msg, NULL,
+	      MessageBoxA (NULL, locale_msg, NULL,
 			  MB_ICONERROR|MB_SETFOREGROUND);
 	      if (IsDebuggerPresent () && !(test_level & G_LOG_FLAG_RECURSION))
 		G_BREAKPOINT ();

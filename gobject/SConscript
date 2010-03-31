@@ -1,14 +1,15 @@
 # vim: ft=python expandtab
+from site_init import *
 Import('env')
 
-env_gobject = env.Clone()
+env_gobject = env.Clone(PARENT_ENV = env)
 env_gobject['PDB'] = 'libgobject.pdb'
 
-env_gobject['CPPDEFINES']=['HAVE_CONFIG_H',
+env_gobject.Append(CPPDEFINES=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '\\\"GLib-GObject\\\"'),
                                 'G_DISABLE_DEPRECATED',
                                 'GOBJECT_COMPILATION',
-                                'G_DISABLE_CONST_RETURNS'] + env_gobject['DEBUG_CPPDEFINES']
+                                'G_DISABLE_CONST_RETURNS'] + env_gobject['DEBUG_CPPDEFINES'])
 env_gobject.Append(CPPPATH=['#', '#glib'])
 env_gobject.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
 
@@ -16,12 +17,15 @@ env_gobject.Append(CFLAGS=env_gobject['DEBUG_CFLAGS'])
 env_gobject['DOT_IN_SUBS']['@PERL_PATH@'] = env_gobject['PERL']
 glib_mkenums = env_gobject.DotIn('glib-mkenums', 'glib-mkenums.in')
 env_gobject.Depends(glib_mkenums, 'SConscript')
+env_gobject.Command('glib-mkenums.bat', 'glib-mkenums', '''echo %s %s\\bin\\glib-mkenums.pl > $TARGET''' % (env_gobject['PERL'], env_gobject['PREFIX']))
 
-Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-mkenums'))
+InstallRun('$PREFIX/bin', 'glib-mkenums', env_gobject)
+InstallRun('$PREFIX/bin', 'glib-mkenums.bat', env_gobject)
+InstallRunAs('$PREFIX/bin/glib-mkenums.pl', 'glib-mkenums', env_gobject)
 
 #glib-genmarshal
-env_gobject_genmarshal = env_gobject.Clone(PDB = 'glib-genmarshal.pdb')
-Alias('install', env_gobject.Install('$PREFIX/bin', 'glib-genmarshal.exe'))
+env_gobject_genmarshal = env_gobject.Clone(PDB = 'glib-genmarshal.pdb', PARENT_ENV = env_gobject)
+InstallRun('$PREFIX/bin', 'glib-genmarshal.exe', env_gobject)
 
 def dot_strings(target, source, env):
     t = file(str(target[0]), 'w')
@@ -44,7 +48,9 @@ dot_strings_processor = env_gobject_genmarshal.Builder(action= dot_strings, src_
 env_gobject_genmarshal.Append(BUILDERS={'DotStrings': dot_strings_processor})
 
 env_gobject_genmarshal.DotStrings('gmarshal.strings', 'gmarshal.list')
-genmarshal = env_gobject_genmarshal.Program('glib-genmarshal.c', LIBS='libglib-2.0', LIBPATH='#glib')
+env_gobject_genmarshal.Append(LIBS="libglib-2.0")
+env_gobject_genmarshal.Append(LIBPATH="#glib")
+genmarshal = env_gobject_genmarshal.Program('glib-genmarshal.c')
 env_gobject_genmarshal.Depends(genmarshal, 'gmarshal.strings')
 env_gobject_genmarshal.Depends(genmarshal, '#glib/libglib-2.0.lib')
 env_gobject_genmarshal.AddPostAction(genmarshal, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
@@ -93,7 +99,7 @@ gobject_SOURCES = Split("\
 	gvaluetypes.c")
 BUILT_gobject_SOURCES = Split('gobjectaliasdef.c')
 
-env_gobject.AppendENVPath('PATH', ['#', '#glib', '#win32/libintl-proxy']) 
+env_gobject.PrependENVPath('PATH', ['#', '#glib', '#win32/libintl-proxy']) 
 env_gobject.Command('gmarshal.c', 'gmarshal.list', 
         '"gobject\\glib-genmarshal" --nostdinc --prefix=g_cclosure_marshal $SOURCE --body >> $TARGET')
 env_gobject.Depends('gmarshal.c', genmarshal)
@@ -107,16 +113,16 @@ env_gobject.Depends('gmarshal.h', genmarshal)
 
 env_gobject.DotIn('gobject.rc', 'gobject.rc.in')
 env_gobject.RES('gobject.rc')
+env_gobject.Append(LIBS=['libintl-proxy',
+                         'libglib-2.0',
+                         'user32', 
+                         'advapi32', 
+                         'shell32', 
+                         'ole32'],
+                         LIBPATH=['$PREFIX/lib', '#glib', '#win32/libintl-proxy'])
 gobject_dll=env_gobject.SharedLibrary(['libgobject-2.0' + env_gobject['LIB_SUFFIX'] + env_gobject['SHLIBSUFFIX'],
                                             'libgobject-2.0.lib'],
-                                           gobject_SOURCES + BUILT_gobject_SOURCES + ['gobject.def', 'gobject.res'], 
-                                           LIBS=['libintl-proxy',
-                                                 'libglib-2.0',
-                                                 'user32', 
-                                                 'advapi32', 
-                                                 'shell32', 
-                                                 'ole32'],
-                                           LIBPATH=['$PREFIX/lib', '#glib', '#win32/libintl-proxy'])
+                                           gobject_SOURCES + BUILT_gobject_SOURCES + ['gobject.def', 'gobject.res'])
 env_gobject.Depends('gsignal.obj', 'gmarshal.c') #gsignal.c include this file, itself is not listed on source files though
 env_gobject.Depends(gobject_dll, gobject_HEADERS)
 env_gobject.Depends(gobject_dll, genmarshal)
@@ -128,12 +134,14 @@ if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
 SConscript(subdirs, exports='env_gobject')
 
-Alias('insall', env_gobject.Install('$PREFIX/bin', 'glib-genmarshal.exe'))
+InstallRun('$PREFIX/bin', 'glib-genmarshal.exe', env_gobject)
 
-Alias('install', env_gobject.Install('$PREFIX/include/glib-2.0/gobject', gobject_HEADERS))
-Alias('install', env_gobject.Install('$PREFIX/bin', 'libgobject-2.0' + env_gobject['LIB_SUFFIX'] + '.dll'))
-Alias('install', env_gobject.Install('$PREFIX/lib', 'libgobject-2.0.lib'))
-Alias('install', env_gobject.InstallAs('$PREFIX/lib/gobject-2.0.lib', 'libgobject-2.0.lib'))
+InstallDev('$PREFIX/include/glib-2.0/gobject', gobject_HEADERS, env_gobject)
+InstallRun('$PREFIX/bin', 'libgobject-2.0' + env_gobject['LIB_SUFFIX'] + '.dll', env_gobject)
+InstallDev('$PREFIX/lib', 'libgobject-2.0.lib', env_gobject)
+InstallDevAs('$PREFIX/lib/gobject-2.0.lib', 'libgobject-2.0.lib', env_gobject)
 
 if env['DEBUG'] == 1:
-    Alias('install', env_gobject.Install('$PREFIX/pdb', 'libgobject.pdb'))
+    InstallDev('$PREFIX/pdb', 'libgobject.pdb', env_gobject)
+
+DumpInstalledFiles(env_gobject)

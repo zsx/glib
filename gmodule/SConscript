@@ -1,11 +1,12 @@
 # vim: ft=python expandtab
+from site_init import *
 Import('env')
 
-env_gmodule = env.Clone(PDB = 'libgmodule-2.0.pdb')
+env_gmodule = env.Clone(PDB = 'libgmodule-2.0.pdb', PARENT_ENV = env)
 
-env_gmodule['CPPDEFINES']=['HAVE_CONFIG_H',
+env_gmodule.Append(CPPDEFINES=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', r'\"GModule\"'),
-                                'G_DISABLE_DEPRECATED'] + env_gmodule['DEBUG_CPPDEFINES']
+                                'G_DISABLE_DEPRECATED'] + env_gmodule['DEBUG_CPPDEFINES'])
 env_gmodule.Append(CPPPATH=['#', '#glib', '#gmodule'])
 
 env_gmodule['DOT_SYMBOLS_FLAGS'] = ''
@@ -22,17 +23,18 @@ env_gmodule.DotIn('gmoduleconf.h', 'gmoduleconf.h.win32')
 env_gmodule.DotIn('gmodule.rc', 'gmodule.rc.in')
 env_gmodule.RES('gmodule.rc')
 
+env_gmodule.Append(LIBS=['libglib-2.0'],
+                   LIBPATH=['$PREFIX/lib', '#glib'])
 gmodule_dll=env_gmodule.SharedLibrary(['libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + env_gmodule['SHLIBSUFFIX'],
                                     'libgmodule-2.0.lib'],
-                                   gmodule_SOURCES + ['gmodule.def', 'gmodule.res'], 
-                                   LIBS=['libglib-2.0'],
-                                   LIBPATH=['$PREFIX/lib', '#glib'])
+                                   gmodule_SOURCES + ['gmodule.def', 'gmodule.res'])
 
 env_gmodule.Depends(gmodule_dll, gmodule_HEADERS)
 env_gmodule.AddPostAction(gmodule_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
-Alias('install', env_gmodule.Install('$PREFIX/include/glib-2.0', gmodule_HEADERS))
-Alias('install', env_gmodule.Install('$PREFIX/bin', 'libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + '.dll'))
-Alias('install', env_gmodule.Install('$PREFIX/lib', 'libgmodule-2.0.lib'))
-Alias('install', env_gmodule.InstallAs('$PREFIX/lib/gmodule-2.0.lib', 'libgmodule-2.0.lib'))
-Alias('install', env_gmodule.Install('$PREFIX/pdb', 'libgmodule-2.0.pdb'))
+InstallRun('$PREFIX/bin', 'libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + '.dll', env_gmodule)
+InstallDev('$PREFIX/include/glib-2.0', gmodule_HEADERS, env_gmodule)
+InstallDev('$PREFIX/lib', 'libgmodule-2.0.lib', env_gmodule)
+InstallDev('$PREFIX/pdb', 'libgmodule-2.0.pdb', env_gmodule)
+InstallDevAs('$PREFIX/lib/gmodule-2.0.lib', 'libgmodule-2.0.lib', env_gmodule)
+#DumpInstalledFiles(env_gmodule)

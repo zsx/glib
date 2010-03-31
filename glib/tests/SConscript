@@ -25,4 +25,4 @@ for i in tests:
 
 for x in tests:
     if x not in ['']:
-        env_glib_test.AlwaysBuild(env_glib_test.Alias('test', [], os.path.join('glib', 'glib', 'tests', x + '.exe')))
+        env_glib_test.AlwaysBuild(env_glib_test.Alias('test', [], os.path.join('glib', 'tests', x + '.exe')))

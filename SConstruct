@@ -1,11 +1,12 @@
 # vim: ft=python expandtab
 import os
-from site_init import GBuilder, GInitialize
+from site_init import *
 
 opts = Variables()
 opts.Add(PathVariable('PREFIX', 'Installation prefix', os.path.expanduser('~/FOSS'), PathVariable.PathIsDirCreate))
 opts.Add(BoolVariable('DEBUG', 'Build with Debugging information', 0))
 opts.Add(PathVariable('PERL', 'Path to the executable perl', r'C:\Perl\bin\perl.exe', PathVariable.PathIsFile))
+opts.Add(BoolVariable('WITH_OSMSVCRT', 'Link with the os supplied msvcrt.dll instead of the one supplied by the compiler (msvcr90.dll, for instance)', 0))
 
 env = Environment(variables = opts,
                   ENV=os.environ, tools = ['default', GBuilder])
@@ -16,6 +17,8 @@ GLIB_INTERFACE_AGE=1
 GLIB_BINARY_AGE=GLIB_MINOR_VERSION * 100 + GLIB_MICRO_VERSION
 GLIB_VERSION="%d.%d.%d" % (GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION)
 
+env['PACKAGE_NAME'] = 'glib'
+env['PACKAGE_VERSION'] = GLIB_VERSION
 env['DOT_IN_SUBS'] = {'@PACKAGE_VERSION@': GLIB_VERSION,
 		      '@VERSION@': GLIB_VERSION,
                       '@GLIB_MAJOR_VERSION@': str(GLIB_MAJOR_VERSION),
@@ -51,18 +54,22 @@ pcs = ('glib-2.0.pc',
 
 for pc in pcs:
     env.DotIn(pc, pc + '.in')
-    env.Alias('install', env.Install('$PREFIX/lib/pkgconfig', pc))
+InstallDev('$PREFIX/lib/pkgconfig', pcs, env)
 
 env.DotIn('config.h', 'config.h.win32.in')
 env.DotIn('glibconfig.h', 'glibconfig.h.win32.in')
 env.DotIn('glib-gettextize', 'glib-gettextize.in')
 
-env.Alias('install', env.Install('$PREFIX/lib/glib-2.0/include', 'glibconfig.h'))
-env.Alias('install', env.Install('$PREFIX/bin', 'glib-gettextize'))
+InstallDev('$PREFIX/lib/glib-2.0/include', 'glibconfig.h', env)
+InstallDev('$PREFIX/bin', 'glib-gettextize', env)
 
 env.AppendENVPath('PATH', '#glib;#win32/libintl-proxy')
 
 GInitialize(env)
+
+if env['WITH_OSMSVCRT']:
+    env['LIB_SUFFIX'] = '-0'
+    env.Append(CPPDEFINES=['MSVCRT_COMPAT_STAT', 'MSVCRT_COMPAT_IO'])
 
 subdirs = ['glib/SConscript',
            'gmodule/SConscript',
@@ -74,3 +81,4 @@ if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
 
 SConscript(subdirs, exports=['env'])
+DumpInstalledFiles(env)
