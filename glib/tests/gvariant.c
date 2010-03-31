@@ -2143,7 +2143,7 @@ static void
 serialise_tree (TreeInstance       *tree,
                 GVariantSerialised *serialised)
 {
-  GVariantSerialised empty = {  };
+  GVariantSerialised empty;
 
   *serialised = empty;
   tree_filler (serialised, tree);
