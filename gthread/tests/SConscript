@@ -1,0 +1,15 @@
+# vim: ft=python expandtab
+import os
+Import('env_gthread')
+
+env_gthread_test = env_gthread.Clone()
+env_gthread_test.Append(CFLAGS=env_gthread['DEBUG_CFLAGS'])
+env_gthread_test['CPPDEFINES'] = env_gthread['DEBUG_CPPDEFINES'] 
+env_gthread_test.Append(CPPPATH=['#', '#glib'])
+env_gthread_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0'])
+env_gthread_test.Append(LIBPATH=['#glib', '#gthread'])
+
+tests = ["1bit-mutex"]
+for i in tests:
+    e = env_gthread_test.Clone(PDB = i + '.pdb')
+    e.Program(i, i + '.c')

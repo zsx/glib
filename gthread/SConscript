@@ -28,4 +28,6 @@ InstallRun('$PREFIX/bin', 'libgthread-2.0' + env_gthread['LIB_SUFFIX'] + '.dll',
 InstallDev('$PREFIX/lib', 'libgthread-2.0.lib', env_gthread)
 InstallDev('$PREFIX/pdb', 'libgthread-2.0.pdb', env_gthread)
 InstallDevAs('$PREFIX/lib/gthread-2.0.lib', 'libgthread-2.0.lib', env_gthread)
-DumpInstalledFiles(env_gthread)
+#DumpInstalledFiles(env_gthread)
+if ARGUMENTS.get('build_test', 0):
+    SConscript('tests/SConscript', exports = 'env_gthread')

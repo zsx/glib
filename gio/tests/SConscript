@@ -14,6 +14,7 @@ tests = ["memory-input-stream",
          "readwrite",
          "g-file",
          "g-file-info",
+	 "converter-stream",
          "data-input-stream",
          "data-output-stream",
          "g-icon",
@@ -24,7 +25,14 @@ tests = ["memory-input-stream",
          "srvtarget",
          "contexts"]
 
-sample_progs = Split("resolver socket-server socket-client echo-server httpd send-data")
+sample_progs = Split("\
+	resolver		\
+	socket-server		\
+	socket-client		\
+	echo-server		\
+	httpd			\
+	send-data		\
+	filter-cat")
 for i in tests + sample_progs:
     e = env_gio_test.Clone(PDB = i + '.pdb')
     e.Program(i, i + '.c')

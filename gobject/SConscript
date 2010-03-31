@@ -7,6 +7,7 @@ env_gobject['PDB'] = 'libgobject.pdb'
 
 env_gobject.Append(CPPDEFINES=['HAVE_CONFIG_H',
                                 ('G_LOG_DOMAN', '\\\"GLib-GObject\\\"'),
+                                'G_THREADS_MANDATORY',
                                 'G_DISABLE_DEPRECATED',
                                 'GOBJECT_COMPILATION',
                                 'G_DISABLE_CONST_RETURNS'] + env_gobject['DEBUG_CPPDEFINES'])
@@ -82,6 +83,7 @@ gobject_HEADERS = Split("\
 	gmarshal.h")
 
 gobject_SOURCES = Split("\
+	gatomicarray.c		\
 	gboxed.c		\
 	gclosure.c		\
 	genums.c		\
@@ -121,8 +123,8 @@ env_gobject.Append(LIBS=['libintl-proxy',
                          'ole32'],
                          LIBPATH=['$PREFIX/lib', '#glib', '#win32/libintl-proxy'])
 gobject_dll=env_gobject.SharedLibrary(['libgobject-2.0' + env_gobject['LIB_SUFFIX'] + env_gobject['SHLIBSUFFIX'],
-                                            'libgobject-2.0.lib'],
-                                           gobject_SOURCES + BUILT_gobject_SOURCES + ['gobject.def', 'gobject.res'])
+                                       'libgobject-2.0.lib'], 
+                                       gobject_SOURCES + BUILT_gobject_SOURCES + ['gobject.def', 'gobject.res', '#gthread/libgthread-2.0.lib'])
 env_gobject.Depends('gsignal.obj', 'gmarshal.c') #gsignal.c include this file, itself is not listed on source files though
 env_gobject.Depends(gobject_dll, gobject_HEADERS)
 env_gobject.Depends(gobject_dll, genmarshal)

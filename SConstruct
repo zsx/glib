@@ -11,7 +11,7 @@ opts.Add(BoolVariable('WITH_OSMSVCRT', 'Link with the os supplied msvcrt.dll ins
 env = Environment(variables = opts,
                   ENV=os.environ, tools = ['default', GBuilder])
 GLIB_MAJOR_VERSION=2
-GLIB_MINOR_VERSION=22
+GLIB_MINOR_VERSION=24
 GLIB_MICRO_VERSION=1
 GLIB_INTERFACE_AGE=1
 GLIB_BINARY_AGE=GLIB_MINOR_VERSION * 100 + GLIB_MICRO_VERSION
