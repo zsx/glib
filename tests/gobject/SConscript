@@ -23,6 +23,8 @@ tests = Split("deftype					\
                ifaceinherit				\
                ifaceproperties				\
                override				\
+	       performance				\
+               performance-threaded			\
                singleton				\
                references")
 env_test_gobject.Command('testmarshal.c', 'testmarshal.list', '''

@@ -11,7 +11,10 @@ env_test.Append(CPPPATH=['#', '#glib', '#gmodule'])
 env_test.Append(LIBS=['libglib-2.0', 'libgthread-2.0', 'libgmodule-2.0', 'user32'])
 env_test.Append(LIBPATH=['#glib', '#gthread', '#gmodule'])
 
-tests = ["atomic-test",
+tests = ["scannerapi",
+         "testglib",
+         "testingbase64"] + \
+        ["atomic-test",
          "base64-test",
          "bit-test",
          #"cxx-test.C",

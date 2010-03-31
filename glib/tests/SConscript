@@ -18,7 +18,10 @@ tests = ["testing",
          "string",
          "markup-subparser",
          "array-test",
-         "hostutils"]
+         "hostutils",
+         "gvariant",
+         "mem-overflow"
+         ]
 for i in tests:
     e = env_glib_test.Clone(PDB = i + '.pdb')
     e.Program(i, i + '.c')

@@ -44,6 +44,7 @@ glibsubinclude_HEADERS =  Split(" \
 	gatomic.h	\
 	gbacktrace.h	\
 	gbase64.h	\
+	gbitlock.h	\
 	gbookmarkfile.h \
 	gcache.h	\
 	gchecksum.h	\
@@ -96,6 +97,8 @@ glibsubinclude_HEADERS =  Split(" \
 	gunicode.h	\
 	gurifuncs.h 		\
 	gutils.h	\
+	gvarianttype.h	\
+	gvariant.h	\
 	gwin32.h	\
 	gprintf.h") + gregex_h
 
@@ -105,7 +108,9 @@ libglib_SOURCES = Split("	\
 	gatomic.c		\
 	gbacktrace.c		\
 	gbase64.c		\
+	gbitlock.c		\
 	gbookmarkfile.c 	\
+	gbuffer.c		\
 	gcache.c		\
 	gchecksum.c		\
 	gcompletion.c		\
@@ -155,6 +160,12 @@ libglib_SOURCES = Split("	\
 	gunidecomp.c		\
 	gurifuncs.c 		\
 	gutils.c		\
+	gvariant.c		\
+	gvariant-core.c		\
+	gvariant-parser.c	\
+	gvariant-serialiser.c	\
+	gvarianttypeinfo.c	\
+	gvarianttype.c		\
 	gprintf.c") + gregex_c
 
 EXTRA_libglib_SOURCES = Split("\
