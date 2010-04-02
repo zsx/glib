@@ -885,8 +885,10 @@ test_file_functions (void)
   strcpy (template, "foobar");
   fd = g_mkstemp (template);
   if (g_test_verbose() && fd != -1)
+  {
     g_print ("g_mkstemp works even if template doesn't end in XXXXXX\n");
-  close (fd);
+	close (fd);
+  }
   strcpy (template, "fooXXXXXX");
   fd = g_mkstemp (template);
   if (fd == -1)
@@ -919,9 +921,11 @@ test_file_functions (void)
       if (fd != -1)
         g_print ("g_file_open_tmp works even if template contains '%s'\n", G_DIR_SEPARATOR_S);
       else
+	  {
         g_print ("g_file_open_tmp correctly returns error: %s\n", error->message);
+		close (fd);
+	  }
     }
-  close (fd);
   g_clear_error (&error);
 
 #ifdef G_OS_WIN32
@@ -932,9 +936,11 @@ test_file_functions (void)
       if (fd != -1)
         g_print ("g_file_open_tmp works even if template contains '/'\n");
       else
+	  {
         g_print ("g_file_open_tmp correctly returns error: %s\n", error->message);
+		close (fd);
+	  }
     }
-  close (fd);
   g_clear_error (&error);
 #endif
 
@@ -943,15 +949,18 @@ test_file_functions (void)
   if (fd == -1)
     g_error ("g_file_open_tmp didn't work for template '%s': %s\n", template, error->message);
   else if (g_test_verbose())
+  {
     g_print ("g_file_open_tmp for template '%s' used name '%s'\n", template, name_used);
-  close (fd);
+	close (fd);
+  }
   g_clear_error (&error);
   remove (name_used);
 
   fd = g_file_open_tmp (NULL, &name_used, &error);
   if (fd == -1)
     g_error ("g_file_open_tmp didn't work for a NULL template: %s\n", error->message);
-  close (fd);
+  else
+	close (fd);
   g_clear_error (&error);
   remove (name_used);
 }
