@@ -2144,6 +2144,7 @@ serialise_tree (TreeInstance       *tree,
                 GVariantSerialised *serialised)
 {
   GVariantSerialised empty;
+  memset(&empty, 0, sizeof(empty));
 
   *serialised = empty;
   tree_filler (serialised, tree);
