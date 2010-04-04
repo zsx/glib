@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GthreadDev' Language='1033' Version='@VERSION@'>
+      <Package Id='557a30e0-fbfa-4a91-84bc-7dd5b9baed4a' Description='Gthread devlopement package'
+                Comments='This is a windows installer for gthread library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='dd239610-6ede-4ac7-8b3c-8fede8c7eb23'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='1211d5cf-2151-4590-b6a3-7056c28aa7ea'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='95531881-f9a4-475f-a58c-902ab0c7a6de'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

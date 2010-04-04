@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GioRun' Language='1033' Version='@VERSION@'>
+      <Package Id='e300a64c-12fa-42a8-b7eb-f93b3557b33d' Description='Gio runtime package'
+                Comments='This is a windows installer for gio library runtime files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='dlls' Name='bin'>
+			  <Component Id='dlls' Guid='e5ec335a-f3fe-49ed-9c98-1fb81753914c'>
+                                  @EXES@
+				  @DLLS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

@@ -32,9 +32,22 @@ gmodule_dll=env_gmodule.SharedLibrary(['libgmodule-2.0' + env_gmodule['LIB_SUFFI
 env_gmodule.Depends(gmodule_dll, gmodule_HEADERS)
 env_gmodule.AddPostAction(gmodule_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
+env_gmodule['DOT_IN_SUBS']['@VERSION@'] = env['PACKAGE_VERSION']
 InstallRun('$PREFIX/bin', 'libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + '.dll', env_gmodule)
+env_gmodule['DOT_IN_SUBS']['@DLLS@'] = generate_file_element( 'libgmodule-2.0' + env_gmodule['LIB_SUFFIX'] + '.dll', 'bin', env_gmodule)
 InstallDev('$PREFIX/include/glib-2.0', gmodule_HEADERS, env_gmodule)
+env_gmodule['DOT_IN_SUBS']['@HEADERS@'] = generate_file_element(gmodule_HEADERS, 'include/glib-2.0', env_gmodule)
 InstallDev('$PREFIX/lib', 'libgmodule-2.0.lib', env_gmodule)
-InstallDev('$PREFIX/pdb', 'libgmodule-2.0.pdb', env_gmodule)
 InstallDevAs('$PREFIX/lib/gmodule-2.0.lib', 'libgmodule-2.0.lib', env_gmodule)
+env_gmodule['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgmodule-2.0.lib', 'gmodule-2.0.lib'], 'lib', env_gmodule)
 #DumpInstalledFiles(env_gmodule)
+if env_gmodule['DEBUG']:
+    InstallDev('$PREFIX/pdb', 'libgmodule-2.0.pdb', env_gmodule)
+env_gmodule['DOT_IN_SUBS']['@PDBS@'] = generate_file_element(env_gmodule['PDB'], 'pdb', env_gmodule)
+env_gmodule['DOT_IN_SUBS']['@PCS@'] = generate_file_element(['gmodule-2.0.pc', 'gmodule-export-2.0.pc', 'gmodule-no-export-2.0.pc'], 'lib/pkgconfig', env_gmodule)
+
+env_gmodule.DotIn('gmodulerun.wxs', 'gmodulerun.wxs.in')
+env_gmodule.DotIn('gmoduledev.wxs', 'gmoduledev.wxs.in')
+env_gmodule.Depends(['gmodulerun.wxs', 'gmoduledev.wxs'], 'SConscript')
+InstallDev('$PREFIX/wxs', 'gmodulerun.wxs', env_gmodule)
+InstallDev('$PREFIX/wxs', 'gmoduledev.wxs', env_gmodule)

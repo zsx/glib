@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GobjectRun' Language='1033' Version='@VERSION@'>
+      <Package Id='13f5306d-e20c-4582-960d-eea575787e9f' Description='Gobject runtime package'
+                Comments='This is a windows installer for gobject library runtime files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='dlls' Name='bin'>
+			  <Component Id='dlls' Guid='0fbec136-f869-4fbf-ba48-de9da4f906bf'>
+                                  @EXES@
+				  @DLLS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

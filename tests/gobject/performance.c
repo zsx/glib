@@ -101,7 +101,7 @@ run_test (PerformanceTest *test)
       test->finish (test, data);
 
       elapsed = g_timer_elapsed (timer, NULL);
-      if (i == 0)
+      if (i == 0 || min_elapsed == 0 && elapsed != 0)
 	min_elapsed = elapsed;
       else
 	min_elapsed = MIN (min_elapsed, elapsed);
@@ -128,7 +128,7 @@ run_test (PerformanceTest *test)
       test->finish (test, data);
       elapsed = g_timer_elapsed (timer, NULL);
 
-      if (i == 0)
+      if (i == 0 || min_elapsed == 0 && elapsed != 0)
 	min_elapsed = elapsed;
       else
 	min_elapsed = MIN (min_elapsed, elapsed);

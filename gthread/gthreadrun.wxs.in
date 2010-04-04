@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GthreadRun' Language='1033' Version='@VERSION@'>
+      <Package Id='6eb5a88f-1f78-47ff-89d2-1aa4e31c11c4' Description='Gthread runtime package'
+                Comments='This is a windows installer for gthread library runtime files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='dlls' Name='bin'>
+			  <Component Id='dlls' Guid='966a27e2-0b3e-46e7-a3b9-bc6c4417a140'>
+				  @EXES@
+				  @DLLS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

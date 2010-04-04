@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='WinIconvRun' Language='1033' Version='@VERSION@'>
+      <Package Id='b39a61c5-e816-47a7-b791-9d621437610b' Description='Winiconv runtime package'
+                Comments='This is a windows installer for win_iconv library runtime files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='dlls' Name='bin'>
+			  <Component Id='dlls' Guid='bb8a90c6-fbfb-4bea-828f-0cfe964d5d98'>
+				  @EXES@
+				  @DLLS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

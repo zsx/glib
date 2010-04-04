@@ -1,0 +1,28 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='IntlDev' Language='1033' Version='@VERSION@'>
+      <Package Id='de7f19df-d745-4132-b582-848930a5a59a' Description='Intl devlopement package'
+                Comments='This is a windows installer for intl library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                          <Directory Id='glib_2.0' Name='glib-2.0'>
+                                  <Component Id='headers' Guid='a1fde460-798c-4378-ad5f-9e611325ed8d'>
+                                      @HEADERS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='95183b7f-cc34-414b-aaeb-7d2a40acb4db'>
+				  @LIBS@
+			  </Component>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='e55ae5ce-c04a-4719-ad67-9998c062d930'>
+				  @PDBS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

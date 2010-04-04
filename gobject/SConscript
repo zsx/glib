@@ -136,14 +136,29 @@ if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
 SConscript(subdirs, exports='env_gobject')
 
+env_gobject['DOT_IN_SUBS']['@VERSION@'] = env['PACKAGE_VERSION']
 InstallRun('$PREFIX/bin', 'glib-genmarshal.exe', env_gobject)
+env_gobject['DOT_IN_SUBS']['@EXES@'] = generate_file_element(['glib-genmarshal.exe', 'glib-mkenums', 'glib-mkenums.bat', 'glib-mkenums.pl'],  'bin', env_gobject)
 
 InstallDev('$PREFIX/include/glib-2.0/gobject', gobject_HEADERS, env_gobject)
+env_gobject['DOT_IN_SUBS']['@HEADERS@'] = generate_file_element(gobject_HEADERS, 'include/glib-2.0/gobject', env_gobject)
+
 InstallRun('$PREFIX/bin', 'libgobject-2.0' + env_gobject['LIB_SUFFIX'] + '.dll', env_gobject)
+env_gobject['DOT_IN_SUBS']['@DLLS@'] = generate_file_element('libgobject-2.0' + env_gobject['LIB_SUFFIX'] + '.dll', 'bin', env_gobject)
+
 InstallDev('$PREFIX/lib', 'libgobject-2.0.lib', env_gobject)
 InstallDevAs('$PREFIX/lib/gobject-2.0.lib', 'libgobject-2.0.lib', env_gobject)
+env_gobject['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgobject-2.0.lib', 'gobject-2.0.lib'], 'lib', env_gobject)
 
 if env['DEBUG'] == 1:
     InstallDev('$PREFIX/pdb', 'libgobject.pdb', env_gobject)
+env_gobject['DOT_IN_SUBS']['@PDBS@'] = generate_file_element(env_gobject['PDB'], 'pdb', env_gobject)
+
+env_gobject['DOT_IN_SUBS']['@PCS@'] = generate_file_element('gobject-2.0.pc', 'lib/pkgconfig', env_gobject)
 
 DumpInstalledFiles(env_gobject)
+env_gobject.DotIn('gobjectrun.wxs', 'gobjectrun.wxs.in')
+env_gobject.DotIn('gobjectdev.wxs', 'gobjectdev.wxs.in')
+env_gobject.Depends(['gobjectrun.wxs', 'gobjectdev.wxs'], 'SConscript')
+InstallDev('$PREFIX/wxs', 'gobjectrun.wxs', env_gobject)
+InstallDev('$PREFIX/wxs', 'gobjectdev.wxs', env_gobject)
