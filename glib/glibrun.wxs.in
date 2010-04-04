@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GlibRun' Language='1033' Version='@VERSION@'>
+      <Package Id='897b0c69-0317-4c7c-aa1f-d1e2284be68b' Description='Glib runtime package'
+                Comments='This is a windows installer for glib library runtime files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='dlls' Name='bin'>
+			  <Component Id='dlls' Guid='daa30c08-db7d-4138-b784-5b19a018c954'>
+				  @EXES@
+				  @DLLS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

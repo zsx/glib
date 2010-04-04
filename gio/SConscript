@@ -235,14 +235,33 @@ env_gio.Depends(gio_dll, ['#glib/libglib-2.0.lib',
                               ])
 env_gio.AddPostAction(gio_dll, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
+env_gio['DOT_IN_SUBS']['@VERSION@'] = env['PACKAGE_VERSION']
 InstallRun('$PREFIX/bin', 'libgio-2.0' + env_gio['LIB_SUFFIX'] + '.dll', env_gio)
+env_gio['DOT_IN_SUBS']['@DLLS@'] = generate_file_element('libgio-2.0' + env_gio['LIB_SUFFIX'] + '.dll', 'bin', env_gio)
 InstallDev('$PREFIX/include/glib-2.0/gio', gio_HEADERS + ['gioenumtypes.h'], env_gio)
+env_gio['DOT_IN_SUBS']['@HEADERS@'] = generate_file_element(gio_HEADERS + ['gioenumtypes.h'], 'include/glib-2.0/gio', env_gio)
 InstallDev('$PREFIX/lib', 'libgio-2.0.lib', env_gio)
-InstallDev('$PREFIX/pdb', 'libgio-2.0.pdb', env_gio)
 InstallDevAs('$PREFIX/lib/gio-2.0.lib', 'libgio-2.0.lib', env_gio)
+env_gio['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgio-2.0.lib', 'gio-2.0.lib'], 'lib', env_gio)
+if env_gio['DEBUG']:
+    InstallDev('$PREFIX/pdb', 'libgio-2.0.pdb', env_gio)
+
+env_gio['DOT_IN_SUBS']['@PCS@'] = generate_file_element('gio-2.0.pc', 'lib/pkgconfig', env_gio)
 
 env_gio_querymodules=env_gio.Clone(PDB='gio-querymodules.pdb')
-env_gio_querymodules.Program('gio-querymodules', ['gio-querymodules.c', '#glib/libglib-2.0.lib', '#gobject/libgobject-2.0.lib', '#gmodule/libgmodule-2.0.lib', 'libgio-2.0.lib'])
+gio_query = env_gio_querymodules.Program('gio-querymodules', ['gio-querymodules.c', '#glib/libglib-2.0.lib', '#gobject/libgobject-2.0.lib', '#gmodule/libgmodule-2.0.lib', 'libgio-2.0.lib'])
+env_gio.AddPostAction(gio_query, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
+
 InstallRun('$PREFIX/bin', 'gio-querymodules.exe', env_gio)
+env_gio['DOT_IN_SUBS']['@EXES@'] = generate_file_element('gio-querymodules.exe', 'bin', env_gio)
+
 if env_gio_querymodules['DEBUG']:
     InstallDev('$PREFIX/pdb', env_gio_querymodules['PDB'], env_gio)
+
+env_gio['DOT_IN_SUBS']['@PDBS@'] = generate_file_element([env_gio['PDB'], env_gio_querymodules['PDB']], 'pdb', env_gio)
+
+env_gio.DotIn('giorun.wxs', 'giorun.wxs.in')
+env_gio.DotIn('giodev.wxs', 'giodev.wxs.in')
+env_gio.Depends(['giorun.wxs', 'giodev.wxs'], 'SConscript')
+InstallDev('$PREFIX/wxs', 'giorun.wxs', env_gio)
+InstallDev('$PREFIX/wxs', 'giodev.wxs', env_gio)

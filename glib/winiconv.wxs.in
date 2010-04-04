@@ -1,0 +1,39 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='WinIconvDev' Language='1033' Version='@VERSION@'>
+      <Package Id='824f09f4-b677-4fe8-a545-e00e2b3323dc' Description='Glib devlopement package'
+                Comments='This is a windows installer for win_iconv library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                      <Directory Id='glib_2.0' Name='glib-2.0'>
+						  <Component Id='headers' Guid='c668b6d6-012c-44a3-981d-db745456bf70'>
+							  @HEADERS@
+						  </Component>
+                          <Directory Id='glib' Name='glib'>
+			  <Component Id='subheaders' Guid='18ac4446-88b7-4f8d-8f1d-864d9a7d94b8'>
+				  @SUBHEADERS@
+			  </Component>
+                          </Directory>
+                      </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='7dcfbb87-2015-4f3c-ba76-fe1a17fd1766'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='3cd3bad7-5269-4db2-9829-16f7848aa036'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='77186d72-ce70-4f07-83dc-4e167405857c'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

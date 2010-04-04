@@ -15,3 +15,17 @@ InstallRun('$PREFIX/bin', 'intl.dll', env_libintl_proxy)
 InstallDev('$PREFIX/include/glib-2.0', 'libintl.h', env_libintl_proxy)
 InstallDev('$PREFIX/lib', 'libintl-proxy.lib', env_libintl_proxy)
 InstallDevAs('$PREFIX/lib/intl-proxy.lib', 'libintl-proxy.lib', env_libintl_proxy)
+if env_libintl_proxy['DEBUG']:
+    InstallDev('$PREFIX/pdb', env_libintl_proxy['PDB'], env_libintl_proxy)
+
+env_libintl_proxy['DOT_IN_SUBS'] = {'@VERSION@': '0.0.1',
+                                    '@DLLS@': generate_file_element(['libintl-proxy' + env_libintl_proxy['LIB_SUFFIX'] + '.dll', 'intl.dll'], 'bin', env_libintl_proxy),
+                                    '@HEADERS@': generate_file_element('libintl.h', 'include/glib-2.0', env_libintl_proxy),
+                                    '@LIBS@': generate_file_element(['libintl-proxy.lib', 'intl-proxy.lib'], 'lib', env_libintl_proxy),
+                                    '@PDBS@': generate_file_element('libintl-proxy.pdb', 'pdb', env_libintl_proxy)
+                                    }
+env_libintl_proxy.DotIn('intlrun.wxs', 'intlrun.wxs.in')
+env_libintl_proxy.DotIn('intldev.wxs', 'intldev.wxs.in')
+env_libintl_proxy.Depends(['intlrun.wxs', 'intldev.wxs'], 'SConscript')
+InstallDev('$PREFIX/wxs', 'intlrun.wxs', env_libintl_proxy)
+InstallDev('$PREFIX/wxs', 'intldev.wxs', env_libintl_proxy)

@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GioDev' Language='1033' Version='@VERSION@'>
+      <Package Id='18cda429-31c0-4e5b-a323-dd3798e1454a' Description='Gio devlopement package'
+                Comments='This is a windows installer for gio library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                      <Directory Id='glib_2.0' Name='glib-2.0'>
+                          <Directory Id='gio' Name='gio'>
+			  <Component Id='headers' Guid='f76f5e0e-468a-4ee3-95b2-53719dbd35af'>
+				  @HEADERS@
+			  </Component>
+                          </Directory>
+                      </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='58d37543-1084-4885-b15f-b8df1c7c5800'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='ae487bea-a173-43f7-a0eb-d2725cf81bd2'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='fcf5236b-1a06-49ff-a0df-a237e7e07bab'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

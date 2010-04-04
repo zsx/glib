@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='WinIconvDev' Language='1033' Version='@VERSION@'>
+      <Package Id='824f09f4-b677-4fe8-a545-e00e2b3323dc' Description='Glib devlopement package'
+                Comments='This is a windows installer for win_iconv library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                          <Component Id='headers' Guid='c668b6d6-012c-44a3-981d-db745456bf70'>
+                              @HEADERS@
+                          </Component>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='7dcfbb87-2015-4f3c-ba76-fe1a17fd1766'>
+				  @LIBS@
+			  </Component>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='77186d72-ce70-4f07-83dc-4e167405857c'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

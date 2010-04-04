@@ -1,0 +1,35 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GobjectDev' Language='1033' Version='@VERSION@'>
+      <Package Id='4cfaa170-115f-435b-a1fa-f9227b620339' Description='Gobject devlopement package'
+                Comments='This is a windows installer for gobject library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                      <Directory Id='glib_2.0' Name='glib-2.0'>
+                          <Directory Id='gobject' Name='gobject'>
+			  <Component Id='headers' Guid='703b4bb5-7065-4460-978a-3aa7f353598d'>
+				  @HEADERS@
+			  </Component>
+                          </Directory>
+                      </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='35288d1d-f92b-41c8-94da-2ba90b6b1c39'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='8d4496dd-c847-44c7-8f98-e09ab1bf7293'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='8088c6da-ca12-410f-83f8-65b586d8a0c4'>
+				  @PDBS@
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

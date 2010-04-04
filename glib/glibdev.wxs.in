@@ -1,0 +1,39 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GlibDev' Language='1033' Version='@VERSION@'>
+      <Package Id='1080da90-4b47-45cf-828f-3ba5702a4828' Description='Glib devlopement package'
+                Comments='This is a windows installer for glib library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                      <Directory Id='glib_2.0' Name='glib-2.0'>
+						  <Component Id='headers' Guid='a146c972-153a-45c1-b6ea-c46abf655943'>
+							  @HEADERS@
+						  </Component>
+                          <Directory Id='glib' Name='glib'>
+			  <Component Id='subheaders' Guid='f556b7b0-7ecd-4fab-a6da-2a8675b2e970'>
+				  @SUBHEADERS@
+			  </Component>
+                          </Directory>
+                      </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='8abf2579-b66e-48bd-85b5-182980bb54da'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='a6cb0937-a6ad-4b9b-909f-4e8649f8e87a'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='cf46889a-184d-4233-87d9-322ef98e28ae'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>

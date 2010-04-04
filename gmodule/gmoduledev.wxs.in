@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Module Id='GmoduleDev' Language='1033' Version='@VERSION@'>
+      <Package Id='6043be92-d0ad-4104-a3b2-ad34999fe24f' Description='Gmodule devlopement package'
+                Comments='This is a windows installer for gmodule library devlopment files'
+                Manufacturer='Gnome4Win' InstallerVersion='200' />
+ 
+      <Directory Id='TARGETDIR' Name='SourceDir'>
+		  <Directory Id='include' Name='include'>
+                      <Directory Id='glib_2.0' Name='glib-2.0'>
+                          <Component Id='headers' Guid='46836718-7e87-4d37-a029-1182007c29aa'>
+                              @HEADERS@
+                          </Component>
+                      </Directory>
+		  </Directory>
+		  <Directory Id='lib' Name='lib'>
+			  <Component Id='libs' Guid='5a57cd7d-3586-4d19-885f-36febc2164fe'>
+				  @LIBS@
+			  </Component>
+                          <Directory Id='pkgconfig' Name='pkgconfig'>
+                                  <Component Id='pcs' Guid='6b995492-3822-45f5-8abf-80403b06e9eb'>
+                                          @PCS@
+                                  </Component>
+                          </Directory>
+		  </Directory>
+		  <Directory Id='pdb' Name='pdb'>
+			  <Component Id='pdbs' Guid='86bb2bbf-6294-4c4a-b1ba-2dbc806f3cce'>
+				  @PDBS@
+				  <Condition>NOT FILEEXISTS</Condition>
+			  </Component>
+		  </Directory>
+      </Directory>
+   </Module>
+</Wix>
