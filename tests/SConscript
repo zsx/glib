@@ -77,7 +77,7 @@ for x in tests:
                  'mapping-test', 
                  'module-test', 
                  'child-test', 
-                 #'spawn-test'
+                 #'spawn-test' #need to run in the 'tests' directory, so disable it right now
                  ]:
         env_test.AlwaysBuild(env_test.Alias('test', [], os.path.join('tests', x + '.exe')))
 
