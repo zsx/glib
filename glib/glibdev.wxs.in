@@ -22,9 +22,11 @@
 			  <Component Id='libs' Guid='8abf2579-b66e-48bd-85b5-182980bb54da'>
 				  @LIBS@
 			  </Component>
-                          <Directory Id='glib_2.0' Name='glib-2.0'>
-                              <Directory Id='include' Name='include' Guid='a9418a50-fb35-4597-b025-9a2dcf7f6b54'>
-                                  @LIBHEADERS@
+                          <Directory Id='libglib_2.0' Name='glib-2.0'>
+                              <Directory Id='libinclude' Name='include'>
+                                  <Component Id='glibconfig.h' Guid='a9418a50-fb35-4597-b025-9a2dcf7f6b54'>
+                                      @LIBHEADERS@
+                                  </Component>
                               </Directory>
                           </Directory>
                           <Directory Id='pkgconfig' Name='pkgconfig'>
