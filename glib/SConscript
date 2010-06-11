@@ -7,8 +7,9 @@ env_glib['PDB'] = 'libglib-2.0.pdb'
 
 # win_iconv
 env_glib_win_iconv = env_glib.Clone(PDB = 'libiconv.pdb', PARENT_ENV = env_glib)
-env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
+win_iconv = env_glib_win_iconv.SharedLibrary(['libiconv' + env_glib_win_iconv['LIB_SUFFIX'],
                                         'libiconv.lib'], ['win_iconv.c', 'win_iconv.def'], CPPDEFINES=['MAKE_DLL', 'USE_LIBICONV_DLL'])
+env_glib_win_iconv.AddPostAction(win_iconv, 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2')
 
 env_glib_win_iconv['DOT_IN_SUBS']['@VERSION@'] = env['PACKAGE_VERSION']
 InstallRun('$PREFIX/bin', 'libiconv'+env_glib_win_iconv['LIB_SUFFIX'] + env_glib_win_iconv['SHLIBSUFFIX'], env_glib_win_iconv)
