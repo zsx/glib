@@ -61,6 +61,8 @@ env.DotIn('glibconfig.h', 'glibconfig.h.win32.in')
 env.DotIn('glib-gettextize', 'glib-gettextize.in')
 
 InstallDev('$PREFIX/lib/glib-2.0/include', 'glibconfig.h', env)
+env['DOT_IN_SUBS']['@LIBHEADERS@'] = generate_file_element('glibconfig.h', 'lib/glib-2.0/include', env)
+
 InstallDev('$PREFIX/bin', 'glib-gettextize', env)
 
 env.AppendENVPath('PATH', '#glib;#win32/libintl-proxy')
@@ -81,4 +83,4 @@ if ARGUMENTS.get('build_test', 0):
     subdirs += ['tests/SConscript']
 
 SConscript(subdirs, exports=['env'])
-DumpInstalledFiles(env)
+#DumpInstalledFiles(env)
