@@ -246,7 +246,7 @@ env_gio['DOT_IN_SUBS']['@LIBS@'] = generate_file_element(['libgio-2.0.lib', 'gio
 if env_gio['DEBUG']:
     InstallDev('$PREFIX/pdb', 'libgio-2.0.pdb', env_gio)
 
-env_gio['DOT_IN_SUBS']['@PCS@'] = generate_file_element('gio-2.0.pc', 'lib/pkgconfig', env_gio)
+env_gio['DOT_IN_SUBS']['@PCS@'] = generate_file_element(['gio-2.0.pc', 'gio-unix-2.0.pc'], 'lib/pkgconfig', env_gio)
 
 env_gio_querymodules=env_gio.Clone(PDB='gio-querymodules.pdb')
 gio_query = env_gio_querymodules.Program('gio-querymodules', ['gio-querymodules.c', '#glib/libglib-2.0.lib', '#gobject/libgobject-2.0.lib', '#gmodule/libgmodule-2.0.lib', 'libgio-2.0.lib'])
