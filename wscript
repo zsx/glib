@@ -257,7 +257,19 @@ def configure(cfg):
 		cfg.check_cfg(package='zlib')
 	except ConfigurationError:
 		cfg.check_cc(function_name='inflate', lib='z', header_name='zlib.h', uselib_store='ZLIB')
-	
+	if not cfg.options.mem_pools:	
+		cfg.define('DISABLE_MEM_POOLS', 1)
+	if cfg.options.gc_friendly:
+		cfg.define('ENABLE_GC_FRIENDLY_DEFAULT', 1)
+	for x in 'dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h \
+sys/time.h sys/times.h sys/wait.h unistd.h values.h \
+sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
+sys/vfs.h sys/mount.h sys/vmount.h sys/statfs.h sys/statvfs.h \
+mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h \
+sys/uio.h\
+stddef.h stdlib.h string.h \
+'.split():
+		cfg.check_cc(header_name=x, mandatory=False)
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
