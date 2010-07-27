@@ -2,6 +2,8 @@
 # encoding: utf-8
 import re
 from waflib.Context import STDOUT, STDERR
+from waflib.Configure import conf, ConfigurationError
+from waflib.TaskGen import feature, before
 
 glib_major_version = 2
 glib_minor_version = 25
@@ -11,7 +13,6 @@ VERSION = '%d.%d.%d.' % (glib_major_version, glib_minor_version, glib_micro_vers
 APPNAME = 'glib'
 
 STDC_CODE1='''
-/* end confdefs.h.  */
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -20,12 +21,32 @@ STDC_CODE1='''
 int
 main ()
 {
-
-  %s;
   return 0;
 }
 '''
-STDC_CODE2='''
+
+STDC_SUNOS_4_X='''
+#include <string.h>
+
+int
+main ()
+{
+  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+  memchr(NULL, 0, 0);
+  return 0;
+}
+'''
+
+STDC_ISC_2_0_2='''
+#include <stdlib.h>
+int
+main(){
+  /* ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI. */
+  free(NULL);
+  return 0;
+}
+'''
+STDC_IRIX_4_0_5='''
 #include <ctype.h>
 #include <stdlib.h>
 #if ((' ' & 0x0FF) == 0x020)
@@ -51,6 +72,135 @@ main ()
   return 0;
 }
 '''
+
+ALLOCA_CODE='''
+#ifdef __GNUC__
+# define alloca __builtin_alloca
+#else
+# ifdef _MSC_VER
+#  include <malloc.h>
+#  define alloca _alloca
+# else
+#  ifdef HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   ifdef _AIX
+ #pragma alloca
+#   else
+#    ifndef alloca /* predefined by HP cc +Olibcalls */
+char *alloca ();
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+
+int
+main ()
+{
+	char *p = (char *) alloca (1);
+	if (p) return 0;
+	return 0;
+}
+'''
+
+GNU_2_1_CODE='''
+#include <features.h>
+#ifdef __GNU_LIBRARY__
+ #if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1) || (__GLIBC__ > 2)
+  #error "Not glibc 2.1"
+ #endif
+#endif
+
+int main()
+{
+	return 0;
+}
+'''
+
+@feature('test_stdc_headers')
+@before('process_source')
+def test_stdc_headers(self):
+	def write_test_file(task):
+		task.outputs[0].write(task.generator.code)
+
+	bld = self.bld
+	bld(rule=write_test_file, target='stdc_code.c', code=STDC_CODE1) 
+	bld(rule=write_test_file, target='stdc_sunos.c', code=STDC_SUNOS_4_X)
+	bld(rule=write_test_file, target='stdc_isc.c', code=STDC_ISC_2_0_2)
+	bld(rule=write_test_file, target='stdc_irix.c', code=STDC_IRIX_4_0_5)
+	bld(features='cprogram', sources='stdc_code.c', target='test_stdc') 
+	bld(features='cprogram', sources='stdc_sunos.c', target='test_sunos') 
+	bld(features='cprogram', sources='stdc_irix.c', target='test_irix') 
+	bld(features='cprogram', sources='stdc_isc.c', target='test_isc') 
+
+@conf
+def check_stdc_headers(self):
+	self.check(compile_filename=[],
+		msg = 'Checking for ANSI header files',
+		features = 'test_stdc_headers')
+	self.define('STDC_HEADERS', 1)
+	return True
+
+@conf
+def check_libiconv(self, iconv):
+	if iconv == 'maybe':
+		found_iconv = False
+		if self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', mandatory=False, uselib_store='ICONV'):
+			found_iconv = True
+		elif self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', mandatory=False, defines=['USE_LIBICONV_GNU'], uselib_store='ICONV'):
+			found_iconv = True
+		elif self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', mandatory=False, defines='USE_LIBICONV_NATIVE', uselib_store='ICONV'):
+			found_iconv = True
+		if not found_iconv:
+			self.fatal('No iconv() implementation found in C library or libiconv')
+	elif iconv == 'no':
+		self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', uselib_store='ICONV')
+	elif iconv in ('yes', 'gnu'):
+		self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', defines=['USE_LIBICONV_GNU'], uselib_store='ICONV')
+	elif iconv == 'native':
+		self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', defines='USE_LIBICONV_NATIVE', uselib_store='ICONV')
+	else:
+		self.fatal('Unknown parameter to --with-libiconv')
+
+@conf
+def check_allca(self):
+	# The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
+	# for constant arguments.  Useless!
+	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H')
+
+	if not self.check_cc(fragment=ALLOCA_CODE, msg='checking for alloca', define_name='HAVE_ALLOCA'):
+		# The SVR3 libPW and SVR4 libucb both contain incompatible functions
+		# that cause trouble.  Some versions do not even contain alloca or
+		# contain a buggy version.  If you still want to use their alloca,
+		# use ar to extract alloca.o from them instead of compiling alloca.c.
+		# ALLOCA=\${LIBOBJDIR}alloca.$ac_objext
+		#self.define('C_ALLOCA', 1)
+		raise NotImplemented 
+	try:
+		self.check_cc(fragment='#if ! defined CRAY || defined CRAY2\n#error "CRAY"\n#endif\nint main(){ return 0;}', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
+	except ConfigurationError:
+		#Not Cray
+		return True
+	else:
+		raise NotImplemented
+		''' 
+		for func in ('_getb67', 'GETB67', 'getb67'):
+			if self.check_cc(function_name=func):
+				self.define('CRAY_STACKSEG_END', func)
+				break	
+		else:
+			return False
+		'''
+@conf
+def is_gnu_library_2_1(self):
+	try:
+		self.check_cc(fragment=GNU_2_1_CODE, msg="checking whether glibc 2.1", errmsg='No')
+	except ConfigurationError:
+		return False
+	else:	
+		return True
+	
 def options(opt):
 	glib_debug_default = 'minimum' 
 	if glib_minor_version % 2:
@@ -67,6 +217,7 @@ def options(opt):
 	cfg.add_option('--with-runtime-libdir', metavar='RELPATH', action='store', default='', dest='runtime_libdir', help="Install runtime libraries relative to libdir") 
 	cfg.add_option('--with-threads', metavar='none/posix/dce/win32', action='store', default='', dest='want_threads', help="specify a thread implementation to use") 
 	cfg.add_option('--with-libiconv', metavar='no/yes/maybe/gnu/native', action='store', default='maybe', dest='libiconv', help="use the libiconv library") 
+	cfg.add_option('--enable-iconv-cache', action='store_true', default=None, dest='iconv_cache', help="cache iconv descriptors") 
 	opt.tool_options('compiler_c')
 
 def configure(cfg):
@@ -81,38 +232,32 @@ def configure(cfg):
 	if cfg.get_dest_binfmt == 'pe':
 		cfg.options.libiconv = 'native'
 	else:
-		if cfg.options.libiconv == 'maybe':
-			found_iconv = False
-			if cfg.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', mandatory=False, uselib_store='ICONV'):
-				found_iconv = True
-			elif cfg.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', mandatory=False, defines=['USE_LIBICONV_GNU'], uselib_store='ICONV'):
-				found_iconv = True
-			elif cfg.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', mandatory=False, defines='USE_LIBICONV_NATIVE', uselib_store='ICONV'):
-				found_iconv = True
-			if not found_iconv:
-				cfg.fatal('No iconv() implementation found in C library or libiconv')
-		elif cfg.options.libiconv == 'no':
-			cfg.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', uselib_store='ICONV')
-		elif cfg.options.libiconv in ('yes', 'gnu'):
-			cfg.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', defines=['USE_LIBICONV_GNU'], uselib_store='ICONV')
-		elif cfg.options.libiconv == 'native':
-			cfg.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', defines='USE_LIBICONV_NATIVE', uselib_store='ICONV')
+		cfg.check_libiconv(cfg.options.libiconv)
 
 	# DU4 native cc currently needs -std1 for ANSI mode (instead of K&R)
 	if not cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', msg='checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI', mandatory=False):
-		if not cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='checking for -std1 for ansi library types', okmsg='-std1', uselib_store='ANSI', mandatory=False):
-			conf.warn("No ANSI protypes found in library (-std1 didn't work)")
+		cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='checking for -std1 for ansi library types', okmsg='-std1', errmsg="No ANSI protypes found in library (-std1 didn't work)", uselib_store='ANSI', mandatory=False)
+
 	# NeXTStep cc seems to need this
 	if not cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', msg='checking for extra flags for posix compliance', okmsg='None', uselib_store='POSIX', mandatory=False):
 		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='checking for -std1 for ansi library types', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
 	
 	cfg.check_cc(function_name='vprintf', header_name=['stdarg.h', 'stdio.h'])
-	cfg.check_cc(fragment='#include <alloca.h>\nint main(void){ alloca(0); return 0;}', msg='checking for alloca')
-
-	if cfg.check_cc(fragment=STDC_CODE1 % '', msg='checking for ANSI C header files', mandatory=False):
-		# SunOS 4.x string.h does not declare mem*, contrary to ANSI.
-		if cfg.check_cc(fragment='#include <string.h>\n' + STDC_CODE1 % 'memchr(NULL, 0, 0)', mandatory=False):
-		
+	cfg.check_allca()
+	cfg.check_stdc_headers()
+	if cfg.options.iconv_cache == None:
+		if cfg.is_gnu_library_2_1():
+			cfg.options.iconv_cache = False
+		else:
+			cfg.options.iconv_cache = True
+	if cfg.options.iconv_cache:
+		cfg.define('NEED_ICONV_CACHE', 1)
+	
+	try:
+		cfg.check_cfg(package='zlib')
+	except ConfigurationError:
+		cfg.check_cc(function_name='inflate', lib='z', header_name='zlib.h', uselib_store='ZLIB')
+	
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
