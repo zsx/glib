@@ -219,7 +219,7 @@ def options(opt):
 	cfg.add_option('--with-runtime-libdir', metavar='RELPATH', action='store', default='', dest='runtime_libdir', help="Install runtime libraries relative to libdir") 
 	cfg.add_option('--with-threads', metavar='none/posix/dce/win32', action='store', default='', dest='want_threads', help="specify a thread implementation to use") 
 	cfg.add_option('--with-libiconv', metavar='no/yes/maybe/gnu/native', action='store', default='maybe', dest='libiconv', help="use the libiconv library") 
-	cfg.add_option('--enable-iconv-cache', action='store_true', default=None, dest='iconv_cache', help="cache iconv descriptors") 
+	cfg.add_option('--enable-iconv-cache', action='store_true', default=None, dest='iconv_cache', help="cache iconv descriptors [default: auto]") 
 	opt.tool_options('compiler_c')
 
 def configure(cfg):
@@ -248,11 +248,9 @@ def configure(cfg):
 	cfg.check_cc(function_name='vprintf', header_name=['stdarg.h', 'stdio.h'])
 	cfg.check_allca()
 	cfg.check_stdc_headers()
-	if cfg.options.iconv_cache == None:
-		if cfg.is_gnu_library_2_1():
-			cfg.options.iconv_cache = False
-		else:
-			cfg.options.iconv_cache = True
+
+	if cfg.options.iconv_cache == None and cfg.get_dest_binfmt() != 'pe' and not cfg.is_gnu_library_2_1():
+		cfg.options.iconv_cache = True
 	if cfg.options.iconv_cache:
 		cfg.define('NEED_ICONV_CACHE', 1)
 	
@@ -260,6 +258,7 @@ def configure(cfg):
 		cfg.check_cfg(package='zlib')
 	except ConfigurationError:
 		cfg.check_cc(function_name='inflate', lib='z', header_name='zlib.h', uselib_store='ZLIB')
+
 	if not cfg.options.mem_pools:	
 		cfg.define('DISABLE_MEM_POOLS', 1)
 	if cfg.options.gc_friendly:
@@ -273,6 +272,7 @@ sys/uio.h\
 stddef.h stdlib.h string.h \
 '.split():
 		cfg.check_cc(header_name=x, mandatory=False)
+	
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
