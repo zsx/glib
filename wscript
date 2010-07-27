@@ -167,7 +167,7 @@ def check_libiconv(self, iconv):
 def check_allca(self):
 	# The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 	# for constant arguments.  Useless!
-	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H')
+	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H', mandatory=False)
 
 	if not self.check_cc(fragment=ALLOCA_CODE, msg='checking for alloca', define_name='HAVE_ALLOCA'):
 		# The SVR3 libPW and SVR4 libucb both contain incompatible functions
@@ -176,14 +176,14 @@ def check_allca(self):
 		# use ar to extract alloca.o from them instead of compiling alloca.c.
 		# ALLOCA=\${LIBOBJDIR}alloca.$ac_objext
 		#self.define('C_ALLOCA', 1)
-		raise NotImplemented 
+		raise Exception('NotImplemented')
 	try:
-		self.check_cc(fragment='#if ! defined CRAY || defined CRAY2\n#error "CRAY"\n#endif\nint main(){ return 0;}', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
+		self.check_cc(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\nint main(){ return 0;}', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
 	except ConfigurationError:
 		#Not Cray
-		return True
+		pass
 	else:
-		raise NotImplemented
+		raise Exception('NotImplemented')
 		''' 
 		for func in ('_getb67', 'GETB67', 'getb67'):
 			if self.check_cc(function_name=func):
@@ -229,7 +229,7 @@ def configure(cfg):
 	cfg.check_python_version(minver=(2, 4))
 	
 	#iconv detection
-	if cfg.get_dest_binfmt == 'pe':
+	if cfg.get_dest_binfmt() == 'pe':
 		cfg.options.libiconv = 'native'
 	else:
 		cfg.check_libiconv(cfg.options.libiconv)
@@ -240,7 +240,7 @@ def configure(cfg):
 
 	# NeXTStep cc seems to need this
 	if not cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', msg='checking for extra flags for posix compliance', okmsg='None', uselib_store='POSIX', mandatory=False):
-		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='checking for -std1 for ansi library types', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
+		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='checking for -posix for posix compliance', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
 	
 	cfg.check_cc(function_name='vprintf', header_name=['stdarg.h', 'stdio.h'])
 	cfg.check_allca()
