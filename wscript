@@ -110,6 +110,8 @@ GNU_2_1_CODE='''
  #if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1) || (__GLIBC__ > 2)
   #error "Not glibc 2.1"
  #endif
+#else
+  #error "Not a glibc library"
 #endif
 
 int main()
@@ -235,8 +237,9 @@ def configure(cfg):
 		cfg.check_libiconv(cfg.options.libiconv)
 
 	# DU4 native cc currently needs -std1 for ANSI mode (instead of K&R)
-	if not cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', msg='checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI', mandatory=False):
-		cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='checking for -std1 for ansi library types', okmsg='-std1', errmsg="No ANSI protypes found in library (-std1 didn't work)", uselib_store='ANSI', mandatory=False)
+	if not cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', msg='checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI', mandatory=False):
+		if not cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', msg='checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI', mandatory=False):
+			cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='checking for -std1 for ansi library types', okmsg='-std1', errmsg="No ANSI protypes found in library (-std1 didn't work)", uselib_store='ANSI', mandatory=False)
 
 	# NeXTStep cc seems to need this
 	if not cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', msg='checking for extra flags for posix compliance', okmsg='None', uselib_store='POSIX', mandatory=False):
