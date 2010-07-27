@@ -4,6 +4,7 @@ import re
 from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
+from waflib import Utils
 
 glib_major_version = 2
 glib_minor_version = 25
@@ -129,7 +130,42 @@ def test_stdc_headers(self):
 	#ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
 	bld(rule=write_find_symbols, target='stdc_isc.c', code='#include <stdlib.h>', symbol='free')
 
-	bld(features='cprogram', sources='stdc_isc.c', target='test_isc') 
+	bld(features='cprogram', sources='stdc_isc.c', target='test_isc')
+
+@feature('cpp_headers')
+@before('process_source')
+def cpp_headers(self):
+	def write_and_preprocess(task):
+		task.outputs[0].write(task.generator.code)
+		bld = task.generator.bld
+		if bld.env.CC_NAME == 'msvc':
+			cpp = bld.env['CC'] + ['/E']
+		else:
+			cpp = bld.env['CC'] + ['-E']
+
+		if bld.exec_command(cpp + [task.outputs[0].abspath()]):
+			bld.fatal("Not found")
+
+	self.bld(rule=write_and_preprocess, code = self.code, target='tmp.c')
+
+@conf
+def check_header(self, h, **kw):
+	if isinstance(h, str):
+		code = '#include <%s>' % h
+	else:
+		code = '\n'.join(map(lambda x: '#include <%s>' % x, h))
+
+	if 'msg' not in kw:
+		kw['msg'] = 'checking for ' + h
+	if 'okmsg' not in kw:
+		kw['okmsg'] = 'yes'
+	if 'errmsg' not in kw:
+		kw['errmsg'] = 'not found'
+	if 'define_name' not in kw:
+		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
+
+	self.check(compile_filename = [], features='cpp_headers', code = code, **kw)
+	self.define(kw['define_name'], 1)
 
 @conf
 def check_stdc_headers(self):
@@ -251,7 +287,7 @@ def configure(cfg):
 	
 	try:
 		cfg.check_cfg(package='zlib')
-	except ConfigurationError:
+	except :
 		cfg.check_cc(function_name='inflate', lib='z', header_name='zlib.h', uselib_store='ZLIB')
 
 	if not cfg.options.mem_pools:	
@@ -263,10 +299,13 @@ sys/time.h sys/times.h sys/wait.h unistd.h values.h \
 sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
 sys/vfs.h sys/mount.h sys/vmount.h sys/statfs.h sys/statvfs.h \
 mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h \
-sys/uio.h\
+sys/uio.h \
 stddef.h stdlib.h string.h \
 '.split():
+		cfg.check_header(x, mandatory=False)
+		'''
 		cfg.check_cc(header_name=x, mandatory=False)
+		'''
 	
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
