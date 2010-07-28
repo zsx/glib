@@ -143,8 +143,7 @@ def cpp_headers(self):
 		else:
 			cpp = bld.env['CC'] + ['-E']
 
-		if bld.exec_command(cpp + [task.outputs[0].abspath()]):
-			bld.fatal("Not found")
+		bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT)
 
 	self.bld(rule=write_and_preprocess, code = self.code, target='tmp.c')
 
