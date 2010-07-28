@@ -296,18 +296,15 @@ def configure(cfg):
 
 	if cfg.options.iconv_cache == None and cfg.get_dest_binfmt() != 'pe' and not cfg.is_gnu_library_2_1():
 		cfg.options.iconv_cache = True
-	if cfg.options.iconv_cache:
-		cfg.define('NEED_ICONV_CACHE', 1)
+	cfg.define_cond('NEED_ICONV_CACHE', cfg.options.iconv_cache)
 	
 	try:
 		cfg.check_cfg(package='zlib')
 	except :
 		cfg.check_cc(function_name='inflate', lib='z', header_name='zlib.h', uselib_store='ZLIB')
 
-	if not cfg.options.mem_pools:	
-		cfg.define('DISABLE_MEM_POOLS', 1)
-	if cfg.options.gc_friendly:
-		cfg.define('ENABLE_GC_FRIENDLY_DEFAULT', 1)
+	cfg.define_cond('DISABLE_MEM_POOLS', not cfg.options.mem_pools)
+	cfg.define_cond('ENABLE_GC_FRIENDLY_DEFAULT', cfg.options.gc_friendly)
 	for x in 'dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h \
 sys/time.h sys/times.h sys/wait.h unistd.h values.h \
 sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
