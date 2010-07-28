@@ -114,7 +114,7 @@ def test_stdc_headers(self):
 		else:
 			cpp = bld.env['CC'] + ['-E']
 
-		if bld.cmd_and_log(cpp + [task.outputs[0].abspath()]).find(task.generator.symbol) < 0:
+		if bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT).find(task.generator.symbol) < 0:
 			bld.fatal("symbols %r is not found" % task.generator.symbol)
 
 	bld = self.bld
