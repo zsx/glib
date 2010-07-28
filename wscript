@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import re
+import re, sys
 from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
@@ -135,22 +135,17 @@ def test_stdc_headers(self):
 @conf
 def check_cpp(self, **kw):
 	'''
-	write kw['code'] to tmp.c and process it with c preprocessor
+	write kw['fragment'] to tmp.c and process it with c preprocessor
 	define kw['define_name'] if no exceptions
 	'''
-	def write_and_preprocess(task):
-		task.outputs[0].write(task.generator.code)
-		bld = task.generator.bld
-		if bld.env.CC_NAME == 'msvc':
-			cpp = bld.env['CC'] + ['/E']
-		else:
-			cpp = bld.env['CC'] + ['-E']
-
-		bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT)
-	for x in ('rule', 'compile_filename', 'features', 'target'):
+	for x in ('rule', 'features', 'target'):
 		if x in kw:
 			del kw[x]
-	self.check(rule = write_and_preprocess, compile_filename = [], features=[], target = 'tmp.c', **kw)
+	if sys.platform == 'win32':
+		nul = 'NUL'
+	else:
+		nul = '/dev/null'
+	self.check_cc(rule = '${CC} -E ${SRC} >' + nul, target=[], features=[], **kw)
 	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
 
 @conf
@@ -165,7 +160,7 @@ def check_header(self, h, **kw):
 		kw['msg'] = 'checking for ' + h
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
-	self.check_cpp(code = code, **kw)
+	self.check_cpp(fragment = code, **kw)
 
 @conf
 def check_stdc_headers(self):
@@ -213,7 +208,7 @@ def check_allca(self):
 		#self.define('C_ALLOCA', 1)
 		raise
 	try:
-		self.check_cpp(code='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
+		self.check_cpp(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
 	except ConfigurationError:
 		#Not Cray
 		pass
