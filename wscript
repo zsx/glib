@@ -132,9 +132,8 @@ def test_stdc_headers(self):
 
 	bld(features='cprogram', sources='stdc_isc.c', target='test_isc')
 
-@feature('cpp_headers')
-@before('process_source')
-def cpp_headers(self):
+@conf
+def check_header(self, h, **kw):
 	def write_and_preprocess(task):
 		task.outputs[0].write(task.generator.code)
 		bld = task.generator.bld
@@ -145,10 +144,6 @@ def cpp_headers(self):
 
 		bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT)
 
-	self.bld(rule=write_and_preprocess, code = self.code, target='tmp.c')
-
-@conf
-def check_header(self, h, **kw):
 	if isinstance(h, str):
 		code = '#include <%s>' % h
 	else:
@@ -156,15 +151,11 @@ def check_header(self, h, **kw):
 
 	if 'msg' not in kw:
 		kw['msg'] = 'checking for ' + h
-	if 'okmsg' not in kw:
-		kw['okmsg'] = 'yes'
-	if 'errmsg' not in kw:
-		kw['errmsg'] = 'not found'
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
 
-	self.check(compile_filename = [], features='cpp_headers', code = code, **kw)
-	self.define(kw['define_name'], 1)
+	self.check(rule = write_and_preprocess, compile_filename = [], features=[], code = code, target = 'tmp.c', **kw)
+	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
 
 @conf
 def check_stdc_headers(self):
