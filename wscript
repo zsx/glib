@@ -145,7 +145,7 @@ def check_cpp(self, **kw):
 		nul = 'NUL'
 	else:
 		nul = '/dev/null'
-	self.check_cc(rule = '${CC} -E ${SRC} >' + nul, target=[], features=[], **kw)
+	self.check_cc(rule = '"${CC}" -E ${SRC} >' + nul, target=[], features=[], **kw)
 	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
 
 @conf
@@ -158,6 +158,8 @@ def check_header(self, h, **kw):
 
 	if 'msg' not in kw:
 		kw['msg'] = 'checking for ' + h
+	if 'errmsg' not in kw:
+		kw['errmsg'] = 'not found'
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
 	self.check_cpp(fragment = code, **kw)
