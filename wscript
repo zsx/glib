@@ -100,53 +100,25 @@ int main()
 }
 '''
 
-@feature('test_stdc_headers')
-@before('process_source')
-def test_stdc_headers(self):
-	def write_test_file(task):
-		task.outputs[0].write(task.generator.code)
-
-	def write_find_symbols(task):
-		task.outputs[0].write(task.generator.code)
-		bld = task.generator.bld
-		if bld.env.CC_NAME == 'msvc':
-			cpp = bld.env['CC'] + ['/E']
-		else:
-			cpp = bld.env['CC'] + ['-E']
-
-		if bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT).find(task.generator.symbol) < 0:
-			bld.fatal("symbols %r is not found" % task.generator.symbol)
-
-	bld = self.bld
-	
-	bld(rule=write_test_file, target='stdc_code.c', code=STDC_CODE1) 
-	bld(rule=write_test_file, target='stdc_irix.c', code=STDC_IRIX_4_0_5)
-
-	bld(features='cprogram', sources='stdc_code.c', target='test_stdc') 
-
-	#SunOS 4.x string.h does not declare mem*, contrary to ANSI.
-	bld(rule=write_find_symbols, target='stdc_sunos.c', code='#include <string.h>', symbol='memchr')
-
-	#ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
-	bld(rule=write_find_symbols, target='stdc_isc.c', code='#include <stdlib.h>', symbol='free')
-
-	bld(features='cprogram', sources='stdc_isc.c', target='test_isc')
-
 @conf
 def check_cpp(self, **kw):
 	'''
-	write kw['fragment'] to tmp.c and process it with c preprocessor
+	preprocess code in kw['fragment']
 	define kw['define_name'] if no exceptions
 	'''
-	for x in ('rule', 'features', 'target'):
-		if x in kw:
-			del kw[x]
 	if sys.platform == 'win32':
 		nul = 'NUL'
 	else:
 		nul = '/dev/null'
-	self.check_cc(rule = '"${CC}" -E ${SRC} >' + nul, target=[], features=[], **kw)
-	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
+	try:
+		for x in ('rule', 'features', 'target'):
+			if x in kw:
+				del kw[x]
+		self.check_cc(rule = '"${CC}" -E ${SRC} >' + nul, target=[], features=[], **kw)
+	except :
+		if 'define_name' in kw:
+			self.undefine(kw['define_name'])
+		raise
 
 @conf
 def check_header(self, h, **kw):
@@ -163,14 +135,51 @@ def check_header(self, h, **kw):
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
 	self.check_cpp(fragment = code, **kw)
+	
 
 @conf
 def check_stdc_headers(self):
-	self.check(compile_filename=[],
-		msg = 'Checking for ANSI header files',
-		features = 'test_stdc_headers')
-	self.define('STDC_HEADERS', 1)
-	return True
+	def test_stdc_headers(tk):
+		def write_test_file(task):
+			task.outputs[0].write(task.generator.code)
+
+		def write_find_symbols(task):
+			task.outputs[0].write(task.generator.code)
+			bld = task.generator.bld
+			if bld.env.CC_NAME == 'msvc':
+				cpp = bld.env['CC'] + ['/E']
+			else:
+				cpp = bld.env['CC'] + ['-E']
+
+			if bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT).find(task.generator.symbol) < 0:
+				bld.fatal("symbols %r is not found" % task.generator.symbol)
+
+		bld = tk.generator.bld
+		
+		bld(rule=write_test_file, target='stdc_code.c', code=STDC_CODE1) 
+		bld(rule=write_test_file, target='stdc_irix.c', code=STDC_IRIX_4_0_5)
+
+		bld(features='cprogram', sources='stdc_code.c', target='test_stdc') 
+
+		#SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+		bld(rule=write_find_symbols, target='stdc_sunos.c', code='#include <string.h>', symbol='memchr')
+
+		#ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
+		bld(rule=write_find_symbols, target='stdc_isc.c', code='#include <stdlib.h>', symbol='free')
+
+		bld(features='cprogram', sources='stdc_isc.c', target='test_isc')
+
+	try:
+		self.check(compile_filename=[],
+			target = [],
+			features = [],
+			rule = test_stdc_headers,
+			msg = 'Checking for ANSI header files',
+			fragment='',
+			define_name='STDC_HEADERS')
+	except:
+		self.undefine('STDC_HEADERS')
+		raise
 
 @conf
 def check_libiconv(self, iconv):
