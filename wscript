@@ -133,7 +133,11 @@ def test_stdc_headers(self):
 	bld(features='cprogram', sources='stdc_isc.c', target='test_isc')
 
 @conf
-def check_header(self, h, **kw):
+def check_cpp(self, **kw):
+	'''
+	write kw['code'] to tmp.c and process it with c preprocessor
+	define kw['define_name'] if no exceptions
+	'''
 	def write_and_preprocess(task):
 		task.outputs[0].write(task.generator.code)
 		bld = task.generator.bld
@@ -143,6 +147,14 @@ def check_header(self, h, **kw):
 			cpp = bld.env['CC'] + ['-E']
 
 		bld.cmd_and_log(cpp + [task.outputs[0].abspath()], quiet=STDOUT)
+	for x in ('rule', 'compile_filename', 'features', 'target'):
+		if x in kw:
+			del kw[x]
+	self.check(rule = write_and_preprocess, compile_filename = [], features=[], target = 'tmp.c', **kw)
+	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
+
+@conf
+def check_header(self, h, **kw):
 
 	if isinstance(h, str):
 		code = '#include <%s>' % h
@@ -153,9 +165,7 @@ def check_header(self, h, **kw):
 		kw['msg'] = 'checking for ' + h
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
-
-	self.check(rule = write_and_preprocess, compile_filename = [], features=[], code = code, target = 'tmp.c', **kw)
-	self.define(kw['define_name'], 1) #check doesn't define 'define_name', when it compiles by a rule
+	self.check_cpp(code = code, **kw)
 
 @conf
 def check_stdc_headers(self):
@@ -192,16 +202,18 @@ def check_allca(self):
 	# for constant arguments.  Useless!
 	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H', mandatory=False)
 
-	if not self.check_cc(fragment=ALLOCA_CODE, msg='checking for alloca', define_name='HAVE_ALLOCA'):
+	try:
+		self.check_cc(fragment=ALLOCA_CODE, msg='checking for alloca', define_name='HAVE_ALLOCA')
+	except ConfigurationError:
 		# The SVR3 libPW and SVR4 libucb both contain incompatible functions
 		# that cause trouble.  Some versions do not even contain alloca or
 		# contain a buggy version.  If you still want to use their alloca,
 		# use ar to extract alloca.o from them instead of compiling alloca.c.
 		# ALLOCA=\${LIBOBJDIR}alloca.$ac_objext
 		#self.define('C_ALLOCA', 1)
-		raise Exception('NotImplemented')
+		raise
 	try:
-		self.check_cc(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\nint main(){ return 0;}', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
+		self.check_cpp(code='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
 	except ConfigurationError:
 		#Not Cray
 		pass
