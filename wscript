@@ -200,10 +200,27 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	if self.options.cross_compile:
 		self.compute_sizeof(t, lo, hi, **kw)
 	else:
-		for x in ('fragment', 'execute', 'msg', 'errmsg', 'define_name', 'define_ret', 'quote'):
-			if x in kw:
-				del kw[x]
-		self.check_cc(fragment='#include <stdio.h>\n int main() {printf("%%d", sizeof(%s));return 0;}' % t, execute=True, msg='Checking for sizeof ' + t, errmsg='Unknown', define_name=define_name, define_ret=True, quote=False, **kw)
+		kw.update({'fragment':'#include <stdio.h>\n int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
+			   'execute':True, 
+                           'errmsg':'Unknown', 
+                           'define_name':define_name, 
+                           'define_ret':True, 
+                           'quote':False})
+		self.validate_c(kw)
+		self.start_msg('Checking for sizeof ' + t)
+		ret = None
+		try:
+			ret = self.run_c_code(**kw)
+		except:
+			self.undefine(define_name)
+			self.end_msg('Unknown', 'YELLOW')
+			raise
+			if 'mandatory' not in kw or kw['mandatory']:
+				self.fatal("can't determine size of " + t) 
+		else:
+			kw['success'] = ret
+			self.end_msg(ret)
+			self.post_check(**kw)
 
 @conf
 def compute_sizeof(self, t, lo=1, hi=17, **kw):
