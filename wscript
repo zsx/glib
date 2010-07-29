@@ -100,6 +100,29 @@ int main()
 }
 '''
 
+GMEM_CODE='''
+#include <stdlib.h>
+int
+main()
+{
+    void* (*my_calloc_p)  (size_t, size_t) = calloc;
+    void* (*my_malloc_p)  (size_t)         = malloc;
+    void  (*my_free_p)    (void*)          = free;
+    void* (*my_realloc_p) (void*, size_t)  = realloc;
+    my_calloc_p = 0;
+    my_malloc_p = 0;
+    my_free_p = 0;
+    my_realloc_p = 0;
+    return 0;
+}
+'''
+STACK_GROWS_CODE='''
+volatile int *a = 0, *b = 0;
+void foo (void);
+int main () { volatile int y = 7; a = &y; foo (); return b > a; }
+void foo (void) { volatile int x = 5; b = &x; }
+'''
+
 @conf
 def check_cpp(self, **kw):
 	'''
@@ -129,7 +152,7 @@ def check_header(self, h, **kw):
 		code = '\n'.join(map(lambda x: '#include <%s>' % x, h))
 
 	if 'msg' not in kw:
-		kw['msg'] = 'checking for ' + h
+		kw['msg'] = 'checking for %r' % h
 	if 'errmsg' not in kw:
 		kw['errmsg'] = 'not found'
 	if 'define_name' not in kw:
@@ -243,6 +266,12 @@ def is_gnu_library_2_1(self):
 		return False
 	else:	
 		return True
+@conf
+def check_const(self):
+	try:
+		self.check_cc(fragment='int main() {const int a=1; return 0;}', msg='Checking whether compiler supports const', errmsg='No', define_name='HAVE_CONST')
+	except:
+		self.undefine('HAVE_CONST')
 	
 def options(opt):
 	glib_debug_default = 'minimum' 
@@ -307,18 +336,31 @@ def configure(cfg):
 
 	cfg.define_cond('DISABLE_MEM_POOLS', not cfg.options.mem_pools)
 	cfg.define_cond('ENABLE_GC_FRIENDLY_DEFAULT', cfg.options.gc_friendly)
+	cfg.check_header(['Carbon/Carbon.h', 'CoreServices/CoreServices.h'], define_name='HAVE_CARBON', uselib_store='CARBON', mandatory=False)
 	for x in 'dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h \
-sys/time.h sys/times.h sys/wait.h unistd.h values.h \
-sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
-sys/vfs.h sys/mount.h sys/vmount.h sys/statfs.h sys/statvfs.h \
-mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h \
-sys/uio.h \
-stddef.h stdlib.h string.h \
-'.split():
+	sys/time.h sys/times.h sys/wait.h unistd.h values.h \
+	sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
+	sys/vfs.h sys/mount.h sys/vmount.h sys/statfs.h sys/statvfs.h \
+	mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h \
+	sys/uio.h \
+	stddef.h stdlib.h string.h \
+	'.split():
 		cfg.check_header(x, mandatory=False)
 		'''
 		cfg.check_cc(header_name=x, mandatory=False)
 		'''
+	for x in 'mmap posix_memalign memalign valloc fsync pipe2 \
+	atexit on_exit timegm gmtime_r \
+	'.split():
+		cfg.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), mandatory=False)
+	cfg.check_const()
+	cfg.check_cc(fragment=GMEM_CODE, define_name='SANE_MALLOC_PROTOS', msg='Checking whether malloc() and friends prototypes are gmem.h compatible', errmsg='No', mandatory=False)
+	try:
+		cfg.check_cc(fragment=STACK_GROWS_CODE, msg='Checking for growing stack pointer', errmsg='No', execute=True)
+	except:
+		glib_stack_grows=False
+	else:
+		glib_stack_grows=True
 	
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
