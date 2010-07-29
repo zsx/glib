@@ -123,6 +123,31 @@ int main () { volatile int y = 7; a = &y; foo (); return b > a; }
 void foo (void) { volatile int x = 5; b = &x; }
 '''
 
+G_CAN_INLINE_CODE='''
+#if defined (G_HAVE_INLINE) && defined (__GNUC__) && defined (__STRICT_ANSI__)
+#  undef inline
+#  define inline __inline__
+#elif !defined (G_HAVE_INLINE)
+#  undef inline
+#  if defined (G_HAVE___INLINE__)
+#    define inline __inline__
+#  elif defined (G_HAVE___INLINE)
+#    define inline __inline
+#  endif
+#endif
+
+int glib_test_func2 (int);
+
+static inline int
+glib_test_func1 (void) {
+  return glib_test_func2 (1);
+}
+
+int
+main (void) {
+  int i = 1;
+}
+'''
 @conf
 def check_cpp(self, **kw):
 	'''
@@ -362,6 +387,10 @@ def configure(cfg):
 	else:
 		glib_stack_grows=True
 	
+	for i in ('__inline', '__inline__', 'inline'):
+		cfg.check_cc(fragment='%s int foo(){return 0;}\nint main(){return foo();}' % i, msg='Checking for ' + i, errmsg='No', define_name='G_HAVE_' + i.upper(), mandatory=False)
+	cfg.check_cc(fragment=G_CAN_INLINE_CODE, msg='Checking whether inline functions in headers work', errmsg='No')
+
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
