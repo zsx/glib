@@ -148,6 +148,100 @@ main (void) {
   int i = 1;
 }
 '''
+
+COMPUTE_INT_CODE='''
+int
+main ()
+{
+	static int test_array [1 - 2 * !(%s)];
+	test_array [0] = 0 ;
+	return 0;
+}
+'''
+
+INCLUDES_DEFAULT='''
+#include <stdio.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#ifdef STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#ifdef HAVE_STRING_H
+# if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#ifdef HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+'''
+
+@conf
+def compute_sizeof(self, t, lo=0, hi=17, **kw):
+	self.start_msg('Checking for sizeof ' + t)
+	define_name = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
+	if lo > hi:
+		self.undefine(define_name)
+		self.end_msg('Unknown', 'YELLOW')
+		self.fatal('lo(%d) must be smaller than hi(%d)' % (lo, hi))
+	while lo < hi:
+		cur = (lo + hi)//2
+		#print ('lo = %d, hi = %d, cur = %d' % (lo, hi, cur))
+		if cur == lo:
+			break
+		try:
+			# The cast to long int works around a bug in the HP C Compiler
+			# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+			# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+			# This bug is HP SR number 8606223364.
+			#print ('compiling (%s)' %  cur)
+			kw.update({'fragment': COMPUTE_INT_CODE % ('(long int) sizeof(%s) >= %s' % (t, cur))})
+			if 'headers' in kw:
+				kw['fragment'] = kw['headers'] + kw['fragment']
+			#self.check_cc(**kw)
+			#print ('kw=\n%s' %  kw)
+			self.validate_c(kw)
+			#print ('kw=\n%s' %  kw)
+			self.run_c_code(**kw)
+		except:
+			#print ('cur(%d) is too high, set it as high' %  cur)
+			hi = cur
+			cur = (lo + hi)//2
+		else:
+			#print ('cur(%d) is too low, set it as lo' %  cur)
+			lo = cur
+	else:
+		if lo > hi:
+			self.undefine(define_name)
+			self.end_msg('Unknown', 'YELLOW')
+			self.fatal("Unexpected: lo (%d) > hi (%d)" % (lo, hi)) 
+	if lo:
+		self.define(define_name, lo)
+		self.end_msg(str(lo))
+	else:
+			self.undefine(define_name)
+			self.end_msg('Unknown', 'YELLOW')
+			self.fatal("0 sized") 
+	
 @conf
 def check_cpp(self, **kw):
 	'''
@@ -396,7 +490,13 @@ def configure(cfg):
 		#define STMT_TEST STMT_START { i = 0; } STMT_END
 		int main(void) { int i = 1; STMT_TEST; return i; }''',
 		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
-
+	cfg.compute_sizeof('char')
+	cfg.compute_sizeof('short')
+	cfg.compute_sizeof('int')
+	cfg.compute_sizeof('long')
+	cfg.compute_sizeof('void *')
+	cfg.compute_sizeof('long long')
+	cfg.compute_sizeof('__int64', headers=INCLUDES_DEFAULT)
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
