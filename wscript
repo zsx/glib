@@ -238,8 +238,9 @@ def compute_sizeof(self, t, lo=0, hi=17, **kw):
 		self.define(define_name, lo)
 		self.end_msg(str(lo))
 	else:
-			self.undefine(define_name)
-			self.end_msg('Unknown', 'YELLOW')
+		self.undefine(define_name)
+		self.end_msg('Unknown', 'YELLOW')
+		if 'mandatory' not in kw or kw['mandatory']:
 			self.fatal("0 sized") 
 	
 @conf
