@@ -390,6 +390,12 @@ def configure(cfg):
 	for i in ('__inline', '__inline__', 'inline'):
 		cfg.check_cc(fragment='%s int foo(){return 0;}\nint main(){return foo();}' % i, msg='Checking for ' + i, errmsg='No', define_name='G_HAVE_' + i.upper(), mandatory=False)
 	cfg.check_cc(fragment=G_CAN_INLINE_CODE, msg='Checking whether inline functions in headers work', errmsg='No')
+	cfg.check_cc(fragment='''
+		#define STMT_START do
+		#define STMT_END while(0)
+		#define STMT_TEST STMT_START { i = 0; } STMT_END
+		int main(void) { int i = 1; STMT_TEST; return i; }''',
+		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
