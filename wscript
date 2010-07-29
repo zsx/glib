@@ -194,6 +194,16 @@ INCLUDES_DEFAULT='''
 # include <unistd.h>
 #endif
 '''
+@conf
+def check_sizeof(self, t, lo = 1, hi=17, **kw):
+	define_name = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
+	if self.options.cross_compile:
+		self.compute_sizeof(t, lo, hi, **kw)
+	else:
+		for x in ('fragment', 'execute', 'msg', 'errmsg', 'define_name', 'define_ret', 'quote'):
+			if x in kw:
+				del kw[x]
+		self.check_cc(fragment='#include <stdio.h>\n int main() {printf("%%d", sizeof(%s));return 0;}' % t, execute=True, msg='Checking for sizeof ' + t, errmsg='Unknown', define_name=define_name, define_ret=True, quote=False, **kw)
 
 @conf
 def compute_sizeof(self, t, lo=1, hi=17, **kw):
@@ -409,6 +419,7 @@ def options(opt):
 	bld = opt.parser.get_option_group('-p')
 
 	bld.add_option('--debug', action='store', default=glib_debug_default, dest='debug', metavar='yes/no/minimum', help='turn on debugging [default: %s]' % glib_debug_default)
+	bld.add_option('--cross-compile', action='store_true', default=False, dest='cross_compile', help='cross compile')
 	cfg.add_option('--enable-gc-friendly', action='store_true', default=False, dest='gc_friendly', help='turn on garbage collector friendliness') 
 	cfg.add_option('--disable-mem-pools', action='store_false', default=True, dest='mem_pools', help='disable all glib memory pools') 
 	cfg.add_option('--disable-threads', action='store_false', default=True, dest='threads', help='Disable basic thread support (will override --with-threads)') 
@@ -499,13 +510,13 @@ def configure(cfg):
 		#define STMT_TEST STMT_START { i = 0; } STMT_END
 		int main(void) { int i = 1; STMT_TEST; return i; }''',
 		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
-	cfg.compute_sizeof('char')
-	cfg.compute_sizeof('short')
-	cfg.compute_sizeof('int')
-	cfg.compute_sizeof('long')
-	cfg.compute_sizeof('void *')
-	cfg.compute_sizeof('long long')
-	cfg.compute_sizeof('__int64', headers=INCLUDES_DEFAULT)
+	cfg.check_sizeof('char')
+	cfg.check_sizeof('short')
+	cfg.check_sizeof('int')
+	cfg.check_sizeof('long')
+	cfg.check_sizeof('void *')
+	cfg.check_sizeof('long long')
+	#cfg.check_sizeof('__int64', headers=INCLUDES_DEFAULT)
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
