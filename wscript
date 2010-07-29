@@ -196,7 +196,16 @@ INCLUDES_DEFAULT='''
 '''
 
 @conf
-def compute_sizeof(self, t, lo=0, hi=17, **kw):
+def compute_sizeof(self, t, lo=1, hi=17, **kw):
+	def try_to_compile(kw):
+		if 'headers' in kw:
+			kw['fragment'] = kw['headers'] + kw['fragment']
+		#self.check_cc(**kw)
+		#print ('kw=\n%s' %  kw)
+		self.validate_c(kw)
+		#print ('kw=\n%s' %  kw)
+		self.run_c_code(**kw)
+
 	self.start_msg('Checking for sizeof ' + t)
 	define_name = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
 	if lo > hi:
@@ -215,13 +224,7 @@ def compute_sizeof(self, t, lo=0, hi=17, **kw):
 			# This bug is HP SR number 8606223364.
 			#print ('compiling (%s)' %  cur)
 			kw.update({'fragment': COMPUTE_INT_CODE % ('(long int) sizeof(%s) >= %s' % (t, cur))})
-			if 'headers' in kw:
-				kw['fragment'] = kw['headers'] + kw['fragment']
-			#self.check_cc(**kw)
-			#print ('kw=\n%s' %  kw)
-			self.validate_c(kw)
-			#print ('kw=\n%s' %  kw)
-			self.run_c_code(**kw)
+			try_to_compile(kw)
 		except:
 			#print ('cur(%d) is too high, set it as high' %  cur)
 			hi = cur
@@ -234,14 +237,19 @@ def compute_sizeof(self, t, lo=0, hi=17, **kw):
 			self.undefine(define_name)
 			self.end_msg('Unknown', 'YELLOW')
 			self.fatal("Unexpected: lo (%d) > hi (%d)" % (lo, hi)) 
-	if lo:
-		self.define(define_name, lo)
-		self.end_msg(str(lo))
-	else:
+	#sizeof(t) should be 'lo', if it succeeded
+	#try one more time to make sure
+	try:
+		kw.update({'fragment': COMPUTE_INT_CODE % ('(long int) sizeof(%s) == %s' % (t, lo))})
+		try_to_compile(kw)
+	except:
 		self.undefine(define_name)
 		self.end_msg('Unknown', 'YELLOW')
 		if 'mandatory' not in kw or kw['mandatory']:
-			self.fatal("0 sized") 
+			self.fatal("can't compute size of " + t) 
+	else:
+		self.define(define_name, lo)
+		self.end_msg(str(lo))
 	
 @conf
 def check_cpp(self, **kw):
