@@ -222,17 +222,19 @@ def check_allca(self):
 		self.check_cpp(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
 	except ConfigurationError:
 		#Not Cray
-		pass
+		self.undefine('CRAY_STACKSEG_END')
 	else:
-		raise Exception('NotImplemented')
-		''' 
+		# FIXME, untested
 		for func in ('_getb67', 'GETB67', 'getb67'):
-			if self.check_cc(function_name=func):
+			try:
+				self.check_cc(function_name=func)
 				self.define('CRAY_STACKSEG_END', func)
 				break	
+			except:
+				pass
 		else:
-			return False
-		'''
+			self.fatal("None of _getb67, GETB67 or getb67 found on Cray")
+
 @conf
 def is_gnu_library_2_1(self):
 	try:
