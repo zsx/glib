@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
+
 import re, sys
 from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
+
+out = 'debug'
 
 glib_major_version = 2
 glib_minor_version = 25
@@ -157,6 +160,16 @@ main ()
 	test_array [0] = 0 ;
 	return 0;
 }
+
+'''
+STRUCT_MEMBER_CODE='''
+int
+main()
+{
+static struct %s ac_aggr;
+if (ac_aggr.%s)
+  return 0;
+}
 '''
 
 INCLUDES_DEFAULT='''
@@ -194,13 +207,29 @@ INCLUDES_DEFAULT='''
 # include <unistd.h>
 #endif
 '''
+
+INCLUDE_STAT='''
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#ifdef HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifdef HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif
+'''
+
 @conf
 def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	define_name = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
 	if self.options.cross_compile:
 		self.compute_sizeof(t, lo, hi, **kw)
 	else:
-		kw.update({'fragment':'#include <stdio.h>\n int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
+		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + 'int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
 			   'execute':True, 
                            'errmsg':'Unknown', 
                            'define_name':define_name, 
@@ -225,8 +254,6 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 @conf
 def compute_sizeof(self, t, lo=1, hi=17, **kw):
 	def try_to_compile(kw):
-		if 'headers' in kw:
-			kw['fragment'] = kw['headers'] + kw['fragment']
 		#self.check_cc(**kw)
 		#print ('kw=\n%s' %  kw)
 		self.validate_c(kw)
@@ -267,7 +294,7 @@ def compute_sizeof(self, t, lo=1, hi=17, **kw):
 	#sizeof(t) should be 'lo', if it succeeded
 	#try one more time to make sure
 	try:
-		kw.update({'fragment': COMPUTE_INT_CODE % ('(long int) sizeof(%s) == %s' % (t, lo))})
+		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('(long int) sizeof(%s) == %s' % (t, lo))})
 		try_to_compile(kw)
 	except:
 		self.undefine(define_name)
@@ -313,7 +340,6 @@ def check_header(self, h, **kw):
 	if 'define_name' not in kw:
 		kw['define_name'] = 'HAVE_%s' % Utils.quote_define_name(h)
 	self.check_cpp(fragment = code, **kw)
-	
 
 @conf
 def check_stdc_headers(self):
@@ -358,6 +384,26 @@ def check_stdc_headers(self):
 	except:
 		self.undefine('STDC_HEADERS')
 		raise
+@conf
+def check_member(self, m, **kw):
+	self.start_msg('Checking for struct member ' + m)
+	dot = m.find('.')
+	kw['fragment'] = kw.get('headers', INCLUDES_DEFAULT) + STRUCT_MEMBER_CODE % (m[:dot], m[dot + 1:])
+	kw['define_name'] = 'HAVE_STRUCT_' + m.replace('.', '_').upper()
+	self.validate_c(kw)
+	ret = None
+	try:
+		ret = self.run_c_code(**kw)
+	except:
+		self.undefine(kw['define_name'])
+		self.end_msg('None', 'YELLOW')
+		raise
+		if 'mandatory' not in kw or kw['mandatory']:
+			self.fatal(t + "doesn't exist") 
+	else:
+		kw['success'] = ret
+		self.end_msg('yes')
+		self.post_check(**kw)
 
 @conf
 def check_libiconv(self, iconv):
@@ -500,6 +546,7 @@ def configure(cfg):
 	mntent.h sys/mnttab.h sys/vfstab.h sys/mntctl.h sys/sysctl.h fstab.h \
 	sys/uio.h \
 	stddef.h stdlib.h string.h \
+	sys/stat.h \
 	'.split():
 		cfg.check_header(x, mandatory=False)
 		'''
@@ -527,13 +574,16 @@ def configure(cfg):
 		#define STMT_TEST STMT_START { i = 0; } STMT_END
 		int main(void) { int i = 1; STMT_TEST; return i; }''',
 		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
-	cfg.check_sizeof('char')
-	cfg.check_sizeof('short')
-	cfg.check_sizeof('int')
-	cfg.check_sizeof('long')
-	cfg.check_sizeof('void *')
-	cfg.check_sizeof('long long')
-	#cfg.check_sizeof('__int64', headers=INCLUDES_DEFAULT)
+
+	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
+		cfg.check_sizeof(x, mandatory = False)
+
+	for x in 'stat.st_mtimensec stat.st_mtim.tv_nsec stat.st_atimensec stat.st_atim.tv_nsec stat.st_ctimensec stat.st_ctim.tv_nsec'.split(' '):
+		cfg.check_member(x, mandatory = False)
+	for x in 'stat.st_blksize stat.st_blocks statfs.f_fstypename statfs.f_bavail'.split():
+		cfg.check_member(x, headers = INCLUDE_STAT, mandatory = False)
+	
+
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
 	print ("options = ", cfg.options)
