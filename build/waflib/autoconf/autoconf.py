@@ -67,7 +67,6 @@ def check_member(self, m, **kw):
 	except:
 		self.undefine(kw['define_name'])
 		self.end_msg('None', 'YELLOW')
-		raise
 		if 'mandatory' not in kw or kw['mandatory']:
 			self.fatal(t + "doesn't exist") 
 	else:
