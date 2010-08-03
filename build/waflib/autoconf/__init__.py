@@ -3,3 +3,5 @@
 	
 from autoconf import *
 from sizeof import *
+from stdc_headers import *
+from alloca import *
