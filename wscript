@@ -80,6 +80,17 @@ INCLUDE_STAT='''
 #endif
 '''
 
+SIZE_T_CODE='''#if defined(_AIX) && !defined(__GNUC__)
+#pragma options langlvl=stdc89
+#endif
+#include <stddef.h>
+int main ()
+{
+  size_t s = 1;
+  unsigned %s *size_int = &s;
+  return (int)*size_int;
+}'''
+
 def options(opt):
 	glib_debug_default = 'minimum' 
 	if glib_minor_version % 2:
@@ -182,14 +193,45 @@ def configure(cfg):
 		int main(void) { int i = 1; STMT_TEST; return i; }''',
 		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
 
+	size_length = {}
 	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
-		cfg.check_sizeof(x, mandatory = False)
+		size_length[x] = cfg.check_sizeof(x, mandatory = False)
 
 	for x in 'stat.st_mtimensec stat.st_mtim.tv_nsec stat.st_atimensec stat.st_atim.tv_nsec stat.st_ctimensec stat.st_ctim.tv_nsec'.split(' '):
 		cfg.check_member(x, mandatory = False)
 	for x in 'stat.st_blksize stat.st_blocks statfs.f_fstypename statfs.f_bavail'.split():
 		cfg.check_member(x, headers = INCLUDE_STAT, mandatory = False)
 	
+	try:
+		cfg.check_cc(fragment='#include <langinfo.h>\nint main () { char* cs = nl_langinfo(CODESET); return 0; }', define_name='HAVE_LANGINFO_CODESET', msg='checking for nl_langinfo and CODESET')
+	except ConfigurationError:
+		cfg.undefine('HAVE_LANGINFO_CODESET')
+	try:
+		cfg.check_cc(function_name = 'setlocale', fragment='int setlocale();\n int main(){void *p = (void*)setlocale; return 0;}')
+	except ConfigurationError:
+		cfg.undefine('HAVE_SETLOCALE')
+	
+	cfg.start_msg('checking for appropriate definition for size_t')
+	size_t = cfg.check_sizeof('size_t')
+	glib_size_type = None
+	for t in ('short', 'int', 'long', 'long long', '__int64'): 
+		if size_length[t] == size_t:
+			glib_size_type = t
+			break
+	if glib_size_type == None:
+		cfg.fatal('No type matching size_t in size')
+
+	# If int/long are the same size, we see which one produces
+	# warnings when used in the location as size_t. (This matters
+	# on AIX with xlc)
+	if size_length['int'] == size_length['long'] and glib_size_type == 'int':
+		try:
+			cfg.check_cc(fragment=SIZE_T_CODE % 'int')
+			glib_size_type = 'int'
+		except ConfigurationError:
+			cfg.check_cc(fragment=SIZE_T_CODE % 'long')
+			glib_size_type = 'long'
+	cfg.end_msg(glib_size_type)
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
