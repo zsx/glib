@@ -17,7 +17,7 @@ main ()
 def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	define_name = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
 	if self.options.cross_compile:
-		self.compute_sizeof(t, lo, hi, **kw)
+		return self.compute_sizeof(t, lo, hi, **kw)
 	else:
 		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + 'int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
 			   'execute':True, 
@@ -40,6 +40,7 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 			kw['success'] = ret
 			self.end_msg(ret)
 			self.post_check(**kw)
+		return int(ret)
 
 @conf
 def compute_sizeof(self, t, lo=1, hi=17, **kw):
@@ -94,3 +95,4 @@ def compute_sizeof(self, t, lo=1, hi=17, **kw):
 	else:
 		self.define(define_name, lo)
 		self.end_msg(str(lo))
+		return lo
