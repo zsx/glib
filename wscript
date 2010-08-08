@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import re, sys
+import re, sys, os
 from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
+#from build.waflib import *
 
 out = 'debug'
 
@@ -91,6 +92,19 @@ int main ()
   return (int)*size_int;
 }'''
 
+@conf
+def check_funcs(self, funcs, **kw):
+	for x in Utils.to_list(funcs):
+		self.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), **kw)
+
+@conf
+def check_funcs_can_fail(self, funcs, **kw):
+	for x in Utils.to_list(funcs):
+		try:
+			self.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), **kw)
+		except ConfigurationError:
+			pass
+
 def options(opt):
 	glib_debug_default = 'minimum' 
 	if glib_minor_version % 2:
@@ -170,10 +184,8 @@ def configure(cfg):
 		'''
 		cfg.check_cc(header_name=x, mandatory=False)
 		'''
-	for x in 'mmap posix_memalign memalign valloc fsync pipe2 \
-	atexit on_exit timegm gmtime_r \
-	'.split():
-		cfg.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), mandatory=False)
+	cfg.check_funcs_can_fail('mmap posix_memalign memalign valloc fsync pipe2')
+	cfg.check_funcs_can_fail('atexit on_exit timegm gmtime_r')
 	cfg.check_const()
 	cfg.check_cc(fragment=GMEM_CODE, define_name='SANE_MALLOC_PROTOS', msg='Checking whether malloc() and friends prototypes are gmem.h compatible', errmsg='No', mandatory=False)
 	try:
@@ -207,7 +219,7 @@ def configure(cfg):
 	except ConfigurationError:
 		cfg.undefine('HAVE_LANGINFO_CODESET')
 	try:
-		cfg.check_cc(function_name = 'setlocale', fragment='int setlocale();\n int main(){void *p = (void*)setlocale; return 0;}')
+		cfg.check_funcs('setlocale')
 	except ConfigurationError:
 		cfg.undefine('HAVE_SETLOCALE')
 	
@@ -232,6 +244,16 @@ def configure(cfg):
 			cfg.check_cc(fragment=SIZE_T_CODE % 'long')
 			glib_size_type = 'long'
 	cfg.end_msg(glib_size_type)
+
+	# Check for some functions
+	cfg.check_funcs_can_fail('lstat strerror strsignal memmove vsnprintf stpcpy strcasecmp strncasecmp poll getcwd vasprintf setenv unsetenv getc_unlocked readlink symlink fdwalk memmem')
+	cfg.check_funcs_can_fail('chown lchmod lchown fchmod fchown link statvfs statfs utimes getgrgid getpwuid')
+	cfg.check_funcs_can_fail('getmntent_r setmntent endmntent hasmntopt getmntinfo')
+	# Check for high-resolution sleep functions
+	cfg.check_funcs_can_fail('nanosleep nsleep')
+	cfg.check_funcs_can_fail('splice')
+	cfg.check_header('crt_externs.h', mandatory=False)
+	cfg.check_funcs_can_fail('_NSGetEnviron')
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
