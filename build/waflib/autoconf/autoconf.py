@@ -6,7 +6,7 @@ from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
-from defaults import INCLUDES_DEFAULT
+from autoconf.defaults import INCLUDES_DEFAULT
 
 STRUCT_MEMBER_CODE='''
 int
