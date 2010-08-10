@@ -31,6 +31,7 @@ from autoconf.sizeof import check_sizeof
 from autoconf.alloca import check_alloca
 from autoconf.stdc_headers import check_stdc_headers
 from autoconf.autoconf import *
+from misc import *
 '''
 from waflib import check_alloca #doesn't work, why?
 '''
