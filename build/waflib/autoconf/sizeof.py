@@ -2,7 +2,9 @@
 # encoding: utf-8
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
-from defaults import INCLUDES_DEFAULT
+from .defaults import INCLUDES_DEFAULT
+
+__all__ = ['check_sizeof']
 
 COMPUTE_INT_CODE='''
 int

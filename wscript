@@ -1,14 +1,41 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+top = '.'
+out = 'debug'
+
 import re, sys, os
 from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
 #from build.waflib import *
+sys.path.insert(0, os.path.join('build', 'waflib'))
+#sys.path.insert(0, 'build')
+if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
+	#FIXME: Untested
+	import __builtin__
 
-out = 'debug'
+	bimport = __builtin__.__import__
+	dots = re.compile(r'^(\.+)(.*)')
+	def import2(name, globals={}, locals={}, fromlist=[], level=-1):
+		mo = dots.match(name) #relative import
+		if mo:
+			name = mo.group(2)
+			if len(mo.group(1)) > 1:
+				level = len(mo.group(1)) - 1
+		return bimport(name, globals, locals, fromlist, level)
+	__builtin__.__import__ = import2
+
+from autoconf.sizeof import check_sizeof
+from autoconf.alloca import check_alloca
+from autoconf.stdc_headers import check_stdc_headers
+from autoconf.autoconf import *
+'''
+from waflib import check_alloca #doesn't work, why?
+'''
+if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
+	__builtin__.__import__ = bimport
 
 glib_major_version = 2
 glib_minor_version = 25
@@ -127,7 +154,6 @@ def options(opt):
 
 def configure(cfg):
 	cfg.check_tool('compiler_c')
-	cfg.check_tool('__init__', tooldir=os.path.dirname(root_path) + '/build/waflib')
 	cfg.check_large_file()
 	cfg.check_cfg(atleast_pkgconfig_version='0.16')
 	cfg.find_program('perl', var='PERL')
@@ -156,7 +182,7 @@ def configure(cfg):
 		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='checking for -posix for posix compliance', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
 	
 	cfg.check_cc(function_name='vprintf', header_name=['stdarg.h', 'stdio.h'])
-	cfg.check_allca()
+	cfg.check_alloca()
 	cfg.check_stdc_headers()
 
 	if cfg.options.iconv_cache == None and cfg.get_dest_binfmt() != 'pe' and not cfg.is_gnu_library_2_1():

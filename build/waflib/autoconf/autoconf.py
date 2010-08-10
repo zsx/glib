@@ -2,12 +2,11 @@
 # encoding: utf-8
 
 import re, sys
-from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
-from defaults import INCLUDES_DEFAULT
+from .defaults import INCLUDES_DEFAULT
 
 STRUCT_MEMBER_CODE='''
 int

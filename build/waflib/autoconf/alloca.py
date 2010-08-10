@@ -4,6 +4,8 @@
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 
+__all__ = ['check_alloca']
+
 ALLOCA_CODE='''
 #ifdef __GNUC__
 # define alloca __builtin_alloca
@@ -36,7 +38,7 @@ main ()
 '''
 
 @conf
-def check_allca(self):
+def check_alloca(self):
 	# The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 	# for constant arguments.  Useless!
 	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H', mandatory=False)
