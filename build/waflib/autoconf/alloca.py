@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from waflib.Configure import conf, ConfigurationError
+from waflib.Configure import conf
+from waflib.Errors import ConfigurationError
 
 ALLOCA_CODE='''
 #ifdef __GNUC__

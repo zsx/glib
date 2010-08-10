@@ -2,7 +2,8 @@
 # encoding: utf-8
 
 from waflib.Context import STDOUT, STDERR
-from waflib.Configure import conf, ConfigurationError
+from waflib.Configure import conf
+from waflib.Errors import ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
 

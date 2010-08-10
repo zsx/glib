@@ -127,7 +127,7 @@ def options(opt):
 
 def configure(cfg):
 	cfg.check_tool('compiler_c')
-	cfg.check_tool('__init__', tooldir='build/waflib')
+	cfg.check_tool('__init__', tooldir=os.path.dirname(root_path) + '/build/waflib')
 	cfg.check_large_file()
 	cfg.check_cfg(atleast_pkgconfig_version='0.16')
 	cfg.find_program('perl', var='PERL')

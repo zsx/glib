@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from autoconf.autoconf import *
-from autoconf.sizeof import *
-from autoconf.stdc_headers import *
-from autoconf.alloca import *
+#from autoconf.autoconf import *
+#from sizeof import *
+#from stdc_headers import *
+#from alloca import *
+
+__all__ = ['autoconf', 'sizeof', 'stdc_headers', 'alloca']

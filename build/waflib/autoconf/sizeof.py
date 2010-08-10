@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from waflib.Configure import conf, ConfigurationError
-from autoconf.defaults import INCLUDES_DEFAULT
+from waflib.Configure import conf
+from waflib.Errors import ConfigurationError
+from defaults import INCLUDES_DEFAULT
 
 COMPUTE_INT_CODE='''
 int
