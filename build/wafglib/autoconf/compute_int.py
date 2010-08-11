@@ -4,6 +4,8 @@ from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from .defaults import INCLUDES_DEFAULT
 
+__all__ = ['compute_int']
+
 COMPUTE_INT_CODE='''
 int
 main ()
@@ -59,7 +61,7 @@ def compute_int(self, e, lo=-1, hi=1024, **kw):
 		if 'define_name' in kw:
 			if 'define_ret' in kw and kw['define_ret']:
 				if 'quote' in kw and kw['quote']:
-					self.define(kw['define_name'], '"%d"' % lo)
+					self.define(kw['define_name'], str(lo))
 				else:
 					self.define(kw['define_name'], lo)
 			else:
