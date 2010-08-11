@@ -17,19 +17,74 @@ main ()
 '''
 
 @conf
-def compute_int(self, e, lo=-1, hi=1024, **kw):
+def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 	def try_to_compile(kw):
 		#self.check_cc(**kw)
 		#print ('kw=\n%s' %  kw)
 		self.validate_c(kw)
 		#print ('kw=\n%s' %  kw)
 		self.run_c_code(**kw)
+	def confirm(e, val, kw):
+		try:
+			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s == %s' % (e, val))})
+			try_to_compile(kw)
+		except:
+			if 'define_name' in kw:
+				self.undefine(kw['define_name'])
+			self.end_msg(kw['errmsg'], 'YELLOW')
+			if 'mandatory' not in kw or kw['mandatory']:
+				self.fatal("can't compute '%s'" % e) 
+		else:
+			if 'define_name' in kw:
+				if 'define_ret' in kw and kw['define_ret']:
+					if 'quote' in kw and kw['quote']:
+						self.define(kw['define_name'], str(lo))
+					else:
+						self.define(kw['define_name'], lo)
+				else:
+					self.define(kw['define_name'], 1)
+			self.end_msg(str(val))
+			return val
 
 	if 'msg' not in kw:
 		kw['msg'] = 'Checking for value of ' + e
 	if 'errmsg' not in kw:
 		kw['errmsg'] = 'Unknown'
 	self.start_msg(kw['msg'])
+	
+	if guess != None:
+		try:
+			return confirm(e, guess, kw)
+		except:
+			pass
+		if guess > 0:
+			ghi = 2 * guess
+			glo = guess//2
+		elif guess < 0:
+			ghi = guess//2
+			glo = guess * 2
+		else:
+			ghi = 8 #an arbitrary choice
+			glo = -8
+
+		try:
+			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s >= %s' % (e, glo))})
+			try_to_compile(kw)
+		except:
+			pass
+		else:
+			if glo > lo:
+				lo = glo
+		
+		try:
+			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s <= %s' % (e, ghi))})
+			try_to_compile(kw)
+		except:
+			pass
+		else:
+			if ghi < hi:
+				hi = ghi
+
 	while lo < hi:
 		cur = (lo + hi)//2
 		#print ('lo = %d, hi = %d, cur = %d' % (lo, hi, cur))
@@ -48,23 +103,4 @@ def compute_int(self, e, lo=-1, hi=1024, **kw):
 			lo = cur
 	#e should be 'lo', if it succeeded
 	#try one more time to make sure
-	try:
-		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s == %s' % (e, lo))})
-		try_to_compile(kw)
-	except:
-		if 'define_name' in kw:
-			self.undefine(kw['define_name'])
-		self.end_msg(kw['errmsg'], 'YELLOW')
-		if 'mandatory' not in kw or kw['mandatory']:
-			self.fatal("can't compute '%s'" % e) 
-	else:
-		if 'define_name' in kw:
-			if 'define_ret' in kw and kw['define_ret']:
-				if 'quote' in kw and kw['quote']:
-					self.define(kw['define_name'], str(lo))
-				else:
-					self.define(kw['define_name'], lo)
-			else:
-				self.define(kw['define_name'], 1)
-		self.end_msg(str(lo))
-		return lo
+	return confirm(e, lo, kw)

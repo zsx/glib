@@ -14,6 +14,8 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	if self.options.cross_compile:
 		return self.compute_sizeof(t, lo, hi, **kw)
 	else:
+		if 'guess' in kw:
+			del kw['guess']
 		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + 'int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
 			   'execute':True, 
                            'errmsg':'Unknown', 

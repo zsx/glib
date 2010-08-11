@@ -121,11 +121,15 @@ def check_funcs(self, funcs, **kw):
 
 @conf
 def check_funcs_can_fail(self, funcs, **kw):
+	kw['mandatory'] = False
 	for x in Utils.to_list(funcs):
-		try:
-			self.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), **kw)
-		except ConfigurationError:
-			pass
+		self.check_cc(function_name = x, fragment='int %s();\n int main(){void *p = (void*)%s; return 0;}' % (x, x), **kw)
+
+@conf
+def check_headers_can_fail(self, headers, **kw):
+	kw['mandatory'] = False
+	for x in Utils.to_list(headers):
+		self.check_header(x, **kw)
 
 def options(opt):
 	glib_debug_default = 'minimum' 
@@ -279,14 +283,20 @@ def configure(cfg):
 		glib_inet_includes = "#include <winsock2.h>"
 	else:
 		glib_inet_includes="#include <sys/types.h>\n#include <sys/socket.h>"
-	cfg.compute_int('AF_INET', headers=glib_inet_includes)
-	cfg.compute_int('AF_INET6', headers=glib_inet_includes)
+	cfg.compute_int('AF_INET', headers=glib_inet_includes, guess=2)
+	cfg.compute_int('AF_INET6', headers=glib_inet_includes, guess=10)
 	# winsock defines this even though it doesn't support it
-	cfg.compute_int('AF_UNIX', headers=glib_inet_includes)
+	cfg.compute_int('AF_UNIX', headers=glib_inet_includes, guess=1)
 
-	cfg.compute_int('MSG_PEEK', headers=glib_inet_includes)
-	cfg.compute_int('MSG_OOB', headers=glib_inet_includes)
-	cfg.compute_int('MSG_DONTROUTE', headers=glib_inet_includes)
+	cfg.compute_int('MSG_PEEK', headers=glib_inet_includes, guess=2)
+	cfg.compute_int('MSG_OOB', headers=glib_inet_includes, guess=1)
+	cfg.compute_int('MSG_DONTROUTE', headers=glib_inet_includes, guess=4)
+	cfg.check_funcs_can_fail('getprotobyname_r endservent')
+	cfg.check_headers_can_fail('netdb.h wspiapi.h')
+	
+	#Non win32 native
+	cfg.check_funcs_can_fail('strndup setresuid setreuid')
+	cfg.check_headers_can_fail('sys/prctl.h arpa/nameser_compat.h')
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
