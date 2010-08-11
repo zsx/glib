@@ -275,6 +275,18 @@ def configure(cfg):
 	cfg.check_funcs_can_fail('splice')
 	cfg.check_header('crt_externs.h', mandatory=False)
 	cfg.check_funcs_can_fail('_NSGetEnviron')
+	if cfg.get_dest_binfmt() == 'pe':
+		glib_inet_includes = "#include <winsock2.h>"
+	else:
+		glib_inet_includes="#include <sys/types.h>\n#include <sys/socket.h>"
+	cfg.compute_int('AF_INET', headers=glib_inet_includes)
+	cfg.compute_int('AF_INET6', headers=glib_inet_includes)
+	# winsock defines this even though it doesn't support it
+	cfg.compute_int('AF_UNIX', headers=glib_inet_includes)
+
+	cfg.compute_int('MSG_PEEK', headers=glib_inet_includes)
+	cfg.compute_int('MSG_OOB', headers=glib_inet_includes)
+	cfg.compute_int('MSG_DONTROUTE', headers=glib_inet_includes)
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
