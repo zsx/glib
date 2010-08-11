@@ -10,7 +10,7 @@ from waflib.Configure import conf, ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
 #from build.waflib import *
-sys.path.insert(0, os.path.join('build', 'waflib'))
+sys.path.insert(0, 'build')
 #sys.path.insert(0, 'build')
 if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
 	#FIXME: Untested
@@ -27,14 +27,8 @@ if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for pyt
 		return bimport(name, globals, locals, fromlist, level)
 	__builtin__.__import__ = import2
 
-from autoconf.sizeof import check_sizeof
-from autoconf.alloca import check_alloca
-from autoconf.stdc_headers import check_stdc_headers
-from autoconf.autoconf import *
-from misc import *
-'''
-from waflib import check_alloca #doesn't work, why?
-'''
+from wafglib import *
+
 if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
 	__builtin__.__import__ = bimport
 

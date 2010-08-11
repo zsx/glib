@@ -8,6 +8,8 @@ from waflib.TaskGen import feature, before
 from waflib import Utils
 from .defaults import INCLUDES_DEFAULT
 
+__all__ = ['check_cpp', 'check_member', 'check_header', 'check_const']
+
 STRUCT_MEMBER_CODE='''
 int
 main()

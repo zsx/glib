@@ -4,6 +4,8 @@
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 
+__all__ = ['check_stdc_headers']
+
 STDC_CODE1='''
 #include <stdlib.h>
 #include <stdarg.h>
