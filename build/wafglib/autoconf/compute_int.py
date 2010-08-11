@@ -17,35 +17,29 @@ main ()
 '''
 
 @conf
-def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
-	def try_to_compile(kw):
-		#self.check_cc(**kw)
-		#print ('kw=\n%s' %  kw)
-		self.validate_c(kw)
-		#print ('kw=\n%s' %  kw)
-		self.run_c_code(**kw)
-	def confirm(e, val, kw):
-		try:
-			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s == %s' % (e, val))})
-			try_to_compile(kw)
-		except:
-			if 'define_name' in kw:
-				self.undefine(kw['define_name'])
-			self.end_msg(kw['errmsg'], 'YELLOW')
-			if 'mandatory' not in kw or kw['mandatory']:
-				self.fatal("can't compute '%s'" % e) 
-		else:
-			if 'define_name' in kw:
-				if 'define_ret' in kw and kw['define_ret']:
-					if 'quote' in kw and kw['quote']:
-						self.define(kw['define_name'], str(lo))
-					else:
-						self.define(kw['define_name'], lo)
-				else:
-					self.define(kw['define_name'], 1)
-			self.end_msg(str(val))
-			return val
+def try_to_compile(self, kw):
+        #self.check_cc(**kw)
+        #print ('kw=\n%s' %  kw)
+        self.validate_c(kw)
+        #print ('kw=\n%s' %  kw)
+        self.run_c_code(**kw)
+@conf
+def confirm(self, e, val, **kw):
+        kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s == %s' % (e, val))})
+        self.try_to_compile(kw)
+        if 'define_name' in kw:
+                if 'define_ret' in kw and kw['define_ret']:
+                        if 'quote' in kw and kw['quote']:
+                                self.define(kw['define_name'], str(lo))
+                        else:
+                                self.define(kw['define_name'], lo)
+                else:
+                        self.define(kw['define_name'], 1)
+        self.end_msg(str(val))
+        return val
 
+@conf
+def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 	if 'msg' not in kw:
 		kw['msg'] = 'Checking for value of ' + e
 	if 'errmsg' not in kw:
@@ -54,7 +48,7 @@ def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 	
 	if guess != None:
 		try:
-			return confirm(e, guess, kw)
+                        return self.confirm(e, guess, **kw)
 		except:
 			pass
 		if guess > 0:
@@ -69,7 +63,7 @@ def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 
 		try:
 			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s >= %s' % (e, glo))})
-			try_to_compile(kw)
+			self.try_to_compile(kw)
 		except:
 			pass
 		else:
@@ -78,7 +72,7 @@ def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 		
 		try:
 			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s <= %s' % (e, ghi))})
-			try_to_compile(kw)
+			self.try_to_compile(kw)
 		except:
 			pass
 		else:
@@ -93,7 +87,7 @@ def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 		try:
 			#print ('compiling (%s)' %  cur)
 			kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + COMPUTE_INT_CODE % ('%s >= %s' % (e, cur))})
-			try_to_compile(kw)
+			self.try_to_compile(kw)
 		except:
 			#print ('cur(%d) is too high, set it as high' %  cur)
 			hi = cur
@@ -103,4 +97,11 @@ def compute_int(self, e, lo=-1, hi=1024, guess=None, **kw):
 			lo = cur
 	#e should be 'lo', if it succeeded
 	#try one more time to make sure
-	return confirm(e, lo, kw)
+	try:
+		return self.confirm(e, lo, **kw)
+	except:
+		if 'define_name' in kw:
+			self.undefine(kw['define_name'])
+		self.end_msg(kw['errmsg'], 'YELLOW')
+		if 'mandatory' not in kw or kw['mandatory']:
+			self.fatal("can't compute '%s'" % e) 

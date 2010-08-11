@@ -42,8 +42,8 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 @conf
 def compute_sizeof(self, t, lo=1, hi=17, **kw):
 	kw['msg'] = 'Checking for sizeof ' + t
-        kw['define_ret'] = True
-        kw['quote'] = False
+	kw['define_ret'] = True
+	kw['quote'] = False
 	# The cast to long int works around a bug in the HP C Compiler
 	# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 	# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
