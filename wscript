@@ -114,6 +114,20 @@ int main ()
   return (int)*size_int;
 }'''
 
+RES_QUERY_CODE='''
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
+
+int
+main ()
+{
+	res_query("test", 0, 0, (void *)0, 0);
+	return 0;
+}
+'''
+
 @conf
 def check_funcs(self, funcs, **kw):
 	for x in Utils.to_list(funcs):
@@ -138,8 +152,10 @@ def options(opt):
 	cfg = opt.parser.get_option_group('--prefix')
 	bld = opt.parser.get_option_group('-p')
 
+	cfg.add_option('--host', action='store', default=None, help='cross-compile to build programs to run on HOST')
+	cfg.add_option('--build', action='store', default=None, help=' configure for building on BUILD')
 	bld.add_option('--debug', action='store', default=glib_debug_default, dest='debug', metavar='yes/no/minimum', help='turn on debugging [default: %s]' % glib_debug_default)
-	bld.add_option('--cross-compile', action='store_true', default=False, dest='cross_compile', help='cross compile')
+	#bld.add_option('--cross-compile', action='store_true', default=False, dest='cross_compile', help='cross compile')
 	cfg.add_option('--enable-gc-friendly', action='store_true', default=False, dest='gc_friendly', help='turn on garbage collector friendliness') 
 	cfg.add_option('--disable-mem-pools', action='store_false', default=True, dest='mem_pools', help='disable all glib memory pools') 
 	cfg.add_option('--disable-threads', action='store_false', default=True, dest='threads', help='Disable basic thread support (will override --with-threads)') 
@@ -153,6 +169,11 @@ def options(opt):
 
 def configure(cfg):
 	cfg.check_tool('compiler_c')
+	try:
+		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='checking whether cross-compiling', okmsg='no', errmsg='yes')
+		cfg.env.cross_compile=False
+	except:
+		cfg.env.cross_compile=True
 	cfg.check_large_file()
 	cfg.check_cfg(atleast_pkgconfig_version='0.16')
 	cfg.find_program('perl', var='PERL')
@@ -297,6 +318,14 @@ def configure(cfg):
 	#Non win32 native
 	cfg.check_funcs_can_fail('strndup setresuid setreuid')
 	cfg.check_headers_can_fail('sys/prctl.h arpa/nameser_compat.h')
+	
+	try:
+		cfg.check_cc(fragment=RES_QUERY_CODE, uselib_store='ASYNCS_LIBADD', msg='checking for res_query')
+	except ConfigurationError:
+		try:
+			cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='checking res_query in resolv')
+		except ConfigurationError:
+			cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='checking res_query in bind')
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)

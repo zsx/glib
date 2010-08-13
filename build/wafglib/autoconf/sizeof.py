@@ -11,7 +11,7 @@ __all__ = ['check_sizeof']
 def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	if 'define_name' not in kw:
 		kw['define_name'] = 'SIZEOF_' + t.upper().replace(' ', '_').replace('*', 'P')
-	if self.options.cross_compile:
+	if getattr(self.env, 'cross_compile', False):
 		return self.compute_sizeof(t, lo, hi, **kw)
 	else:
 		if 'guess' in kw:
