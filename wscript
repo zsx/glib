@@ -165,9 +165,11 @@ def options(opt):
 	cfg.add_option('--with-threads', metavar='none/posix/dce/win32', action='store', default='', dest='want_threads', help="specify a thread implementation to use") 
 	cfg.add_option('--with-libiconv', metavar='no/yes/maybe/gnu/native', action='store', default='maybe', dest='libiconv', help="use the libiconv library") 
 	cfg.add_option('--enable-iconv-cache', action='store_true', default=None, dest='iconv_cache', help="cache iconv descriptors [default: auto]") 
+	cfg.add_option('--included-printf', action='store_true', default=False, dest='included_printf', help="use included pritnf [default: auto]") 
 	opt.tool_options('compiler_c')
 
 def configure(cfg):
+	glib_native_win32 = cfg.get_dest_binfmt() == 'pe' and sys.platform == 'win32'
 	cfg.check_tool('compiler_c')
 	try:
 		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='checking whether cross-compiling', okmsg='no', errmsg='yes')
@@ -254,7 +256,17 @@ def configure(cfg):
 	size_length = {}
 	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
 		size_length[x] = cfg.check_sizeof(x, mandatory = False)
-
+	if not glib_native_win32 and size_length['long long'] == 8:
+		glib_long_long_format = cfg.check_long_long_format()
+	elif size_length['__int64'] == 8:
+		# __int64 is a 64 bit integer.
+		cfg.start_msg('checking for format to printf and scanf a guint64')
+		# We know this is MSVCRT.DLL, and what the formats are
+		glib_long_long_format = 'I64'
+		cfg.end_msg(glib_long_long_format)
+		cfg.define('HAVE_LONG_LONG_FORMAT', 1)
+		cfg.define('HAVE_INT64_AND_I64', 1)
+		
 	for x in 'stat.st_mtimensec stat.st_mtim.tv_nsec stat.st_atimensec stat.st_atim.tv_nsec stat.st_ctimensec stat.st_ctim.tv_nsec'.split(' '):
 		cfg.check_member(x, mandatory = False)
 	for x in 'stat.st_blksize stat.st_blocks statfs.f_fstypename statfs.f_bavail'.split():
@@ -293,7 +305,8 @@ def configure(cfg):
 
 	# Check for some functions
 	cfg.check_funcs_can_fail('lstat strerror strsignal memmove vsnprintf stpcpy strcasecmp strncasecmp poll getcwd vasprintf setenv unsetenv getc_unlocked readlink symlink fdwalk memmem')
-	cfg.check_funcs_can_fail('chown lchmod lchown fchmod fchown link statvfs statfs utimes getgrgid getpwuid')
+	cfg.check_funcs_can_fail('chown lchmod lchown fchmod fchown link statvfs utimes getgrgid getpwuid') #statfs will be checked later
+
 	cfg.check_funcs_can_fail('getmntent_r setmntent endmntent hasmntopt getmntinfo')
 	# Check for high-resolution sleep functions
 	cfg.check_funcs_can_fail('nanosleep nsleep')
@@ -326,6 +339,37 @@ def configure(cfg):
 			cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='checking res_query in resolv')
 		except ConfigurationError:
 			cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='checking res_query in bind')
+	
+	try:
+		cfg.check_funcs('statfs')
+	except ConfigurationError:
+		pass
+	else:
+		#if statfs() takes 2 arguments (Posix) or 4 (Solaris)
+		cfg.check_statfs_args()
+	
+	need_included_printf = False
+	try:
+		cfg.check_vsnprintf_c99()
+	except ConfigurationError:
+		need_included_printf = True
+
+	try:
+		cfg.check_printf_unix98()
+	except ConfigurationError:
+		need_included_printf = True
+
+	if size_length['long long'] == 8 and not glib_long_long_format:
+		need_included_printf = True
+
+	if not cfg.options.included_printf and need_included_printf:
+		self.fatal("Your C library's printf doesn't appear to have the features that GLib needs, but you specified --enable-included-printf=no.")
+	if need_included_printf:
+		if not glib_long_long_format:
+			glib_long_long_format = 'll'
+		cfg.define('HAVE_VASPRINTF', 1)
+	else:
+		cfg.define('HAVE_GOOD_PRINTF', 1)
 
 	cfg.write_config_header('config.h')
 	print ("env = %s" % cfg.env)
