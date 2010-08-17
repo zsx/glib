@@ -22,6 +22,41 @@ int main()
 	return 0;
 }
 '''
+STATFS_CODE='''
+#include <unistd.h>
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifdef HAVE_SYS_VFS_H
+#include <sys/vfs.h>
+#endif
+#ifdef HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif
+#ifdef HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif
+
+int main()
+{
+	struct statfs st;
+	%s
+	return 0;
+}
+'''
+
+LONG_LONG_FORMAT_CODE='''
+#include <stdio.h>
+int main()
+{
+  long long b, a = -0x3AFAFAFAFAFAFAFALL;
+  char buffer[1000];
+  sprintf (buffer, "%%%su", a);
+  sscanf (buffer, "%%%su", &b);
+  exit (b!=a);
+}
+'''
+
 
 @conf
 def check_libiconv(self, iconv):
@@ -52,3 +87,52 @@ def is_gnu_library_2_1(self):
 		return False
 	else:	
 		return True
+
+@conf
+def check_statfs_args(self):
+	self.start_msg('checking for number of arguments to statfs()')
+	hw = {'fragment': STATFS_CODE % 'statfs(NULL, &st);'}
+	self.validate_c(hw)
+	try:
+		self.run_c_code(**hw)
+		self.define('STATFS_ARGS', 2)
+		self.end_msg('2')
+	except:
+		try:
+			hw.update({'fragment': STATFS_CODE % 'statfs(NULL, &st, sizeof(st), 0);'})
+			self.run_c_code(**hw)
+			self.define('STATFS_ARGS', 4)
+			self.end_msg('4')
+		except:	
+			self.undefine('STATFS_ARGS')
+			self.end_msg('Error', 'YELLOW')
+			self.fatal('unable to determine number of arguments to statfs()')
+
+@conf
+def check_long_long_format(self):
+	if getattr(self.env, 'cross_compile', False):
+		raise self.fatal("cross_compiling, can't determine long long format")
+	self.start_msg('checking for format to pritnf and scanf a guint64')
+	fmt = None
+	for x in ('ll', 'I64'):
+		hw = {'fragment': LONG_LONG_FORMAT_CODE % (x, x), 'execute':True}
+		self.validate_c(hw)
+		try:
+			self.run_c_code(**hw)
+			fmt = x
+			break
+		except:
+			pass
+
+	if not fmt:
+		self.define('HAVE_LONG_LONG_FORMAT', 1)
+	else:
+		self.undefine('HAVE_LONG_LONG_FORMAT')
+		self.undefine('HAVE_INT64_AND_I64')
+
+	if fmt == 'I64':
+		self.define('HAVE_INT64_AND_I64', 1)
+
+	self.end_msg(fmt)
+	return fmt
+	
