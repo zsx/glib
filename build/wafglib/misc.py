@@ -62,27 +62,27 @@ int main()
 def check_libiconv(self, iconv):
 	if iconv == 'maybe':
 		found_iconv = False
-		if self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', mandatory=False, uselib_store='ICONV'):
+		if self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'Checking for iconv_open in C library', mandatory=False, uselib_store='ICONV'):
 			found_iconv = True
-		elif self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', mandatory=False, defines=['USE_LIBICONV_GNU'], uselib_store='ICONV'):
+		elif self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='Checking for libiconv_open in GNU libiconv', mandatory=False, defines=['USE_LIBICONV_GNU'], uselib_store='ICONV'):
 			found_iconv = True
-		elif self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', mandatory=False, defines='USE_LIBICONV_NATIVE', uselib_store='ICONV'):
+		elif self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='Checking for iconv_open in the system library iconv', mandatory=False, defines='USE_LIBICONV_NATIVE', uselib_store='ICONV'):
 			found_iconv = True
 		if not found_iconv:
 			self.fatal('No iconv() implementation found in C library or libiconv')
 	elif iconv == 'no':
-		self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'checking for iconv_open in C library', uselib_store='ICONV')
+		self.check_cc(function_name='iconv_open', header_name='iconv.h', msg = 'Checking for iconv_open in C library', uselib_store='ICONV')
 	elif iconv in ('yes', 'gnu'):
-		self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='checking for libiconv_open in GNU libiconv', defines=['USE_LIBICONV_GNU'], uselib_store='ICONV')
+		self.check_cc(function_name='libiconv_open', header_name='iconv.h', lib='iconv', msg='Checking for libiconv_open in GNU libiconv', defines=['USE_LIBICONV_GNU'], uselib_store='ICONV')
 	elif iconv == 'native':
-		self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='checking for iconv_open in the system library iconv', defines='USE_LIBICONV_NATIVE', uselib_store='ICONV')
+		self.check_cc(function_name='iconv_open', header_name='iconv.h', lib='iconv', msg='Checking for iconv_open in the system library iconv', defines='USE_LIBICONV_NATIVE', uselib_store='ICONV')
 	else:
 		self.fatal('Unknown parameter to --with-libiconv')
 
 @conf
 def is_gnu_library_2_1(self):
 	try:
-		self.check_cc(fragment=GNU_2_1_CODE, msg="checking whether glibc 2.1", errmsg='No')
+		self.check_cc(fragment=GNU_2_1_CODE, msg="Checking whether glibc 2.1", errmsg='No')
 	except ConfigurationError:
 		return False
 	else:	
@@ -90,7 +90,7 @@ def is_gnu_library_2_1(self):
 
 @conf
 def check_statfs_args(self):
-	self.start_msg('checking for number of arguments to statfs()')
+	self.start_msg('Checking for number of arguments to statfs()')
 	hw = {'fragment': STATFS_CODE % 'statfs(NULL, &st);'}
 	self.validate_c(hw)
 	try:
@@ -112,7 +112,7 @@ def check_statfs_args(self):
 def check_long_long_format(self):
 	if getattr(self.env, 'cross_compile', False):
 		raise self.fatal("cross_compiling, can't determine long long format")
-	self.start_msg('checking for format to pritnf and scanf a guint64')
+	self.start_msg('Checking for format to pritnf and scanf a guint64')
 	fmt = None
 	for x in ('ll', 'I64'):
 		hw = {'fragment': LONG_LONG_FORMAT_CODE % (x, x), 'execute':True}

@@ -169,10 +169,10 @@ def options(opt):
 
 def configure(cfg):
 	platinfo = PlatInfo()
-	cfg.start_msg('checking build system type:')
+	cfg.start_msg('Checking build system type:')
 	cfg.end_msg(platinfo.fullname())
 
-	cfg.start_msg('checking host system type:')
+	cfg.start_msg('Checking host system type:')
 	cfg.env.host = cfg.options.host
 	if not cfg.env.host:
 		cfg.env.host = platinfo
@@ -183,7 +183,7 @@ def configure(cfg):
 
 	cfg.check_tool('compiler_c')
 	try:
-		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='checking whether cross-compiling', okmsg='no', errmsg='yes')
+		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='Checking whether cross-compiling', okmsg='no', errmsg='yes')
 		cfg.env.cross_compile=False
 	except:
 		cfg.env.cross_compile=True
@@ -201,18 +201,18 @@ def configure(cfg):
 
 	# DU4 native cc currently needs -std1 for ANSI mode (instead of K&R)
 	try:
-		cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', msg='checking for extra flags for ansi library types', okmsg='None')
+		cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', msg='Checking for extra flags for ansi library types', okmsg='None')
 	except ConfigurationError:
 		try:
-			cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', msg='checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI')
+			cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', msg='Checking for extra flags for ansi library types', okmsg='None', uselib_store='ANSI')
 		except ConfigurationError:
-			cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='checking for -std1 for ansi library types', okmsg='-std1', errmsg="No ANSI protypes found in library (-std1 didn't work)", uselib_store='ANSI', mandatory=False)
+			cfg.check_cc(fragment='#include <math.h>\nint main (void) {return (log(1) != log(1.));}', lib='m', ccflags='-std1', msg='Checking for -std1 for ansi library types', okmsg='-std1', errmsg="No ANSI protypes found in library (-std1 didn't work)", uselib_store='ANSI', mandatory=False)
 
 	# NeXTStep cc seems to need this
 	try:
-		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', msg='checking for extra flags for posix compliance', okmsg='None', uselib_store='POSIX')
+		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', msg='Checking for extra flags for posix compliance', okmsg='None', uselib_store='POSIX')
 	except ConfigurationError:
-		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='checking for -posix for posix compliance', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
+		cfg.check_cc(fragment='#include <dirent.h>\nint main (void) {DIR *dir;\nreturn 0;}', ccflags='-posix', msg='Checking for -posix for posix compliance', errmsg="Could not determine POSIX flag (-posix didn't work)", uselib_store='POSIX', mandatory=False)
 	
 	cfg.check_cc(function_name='vprintf', header_name=['stdarg.h', 'stdio.h'])
 	cfg.check_alloca()
@@ -230,7 +230,7 @@ def configure(cfg):
 	cfg.define_cond('DISABLE_MEM_POOLS', not cfg.options.mem_pools)
 	cfg.define_cond('ENABLE_GC_FRIENDLY_DEFAULT', cfg.options.gc_friendly)
 	if cfg.env.host.os == 'macosx':
-		cfg.check_header(['Carbon/Carbon.h', 'CoreServices/CoreServices.h'], define_name='HAVE_CARBON', uselib_store='CARBON', mandatory=False)
+		cfg.check_header(['Carbon/Carbon.h', 'CoreServices/CoreServices.h'], define_name='HAVE_CARBON', uselib_store='CARBON', msg='Checking for Mac OS X Carbon support', mandatory=False)
 	for x in 'dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h \
 	sys/time.h sys/times.h sys/wait.h unistd.h values.h \
 	sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
@@ -247,7 +247,7 @@ def configure(cfg):
 	cfg.check_funcs_can_fail('mmap posix_memalign memalign valloc fsync pipe2')
 	cfg.check_funcs_can_fail('atexit on_exit timegm gmtime_r')
 	cfg.check_const()
-	cfg.check_cc(fragment=GMEM_CODE, define_name='SANE_MALLOC_PROTOS', msg='Checking whether malloc() and friends prototypes are gmem.h compatible', errmsg='No', mandatory=False)
+	cfg.check_cc(fragment=GMEM_CODE, define_name='SANE_MALLOC_PROTOS', msg='Checking whether malloc() & friends prototypes gmem.h compatible', errmsg='No', mandatory=False)
 	try:
 		cfg.check_cc(fragment=STACK_GROWS_CODE, msg='Checking for growing stack pointer', errmsg='No', execute=True)
 	except:
@@ -272,7 +272,7 @@ def configure(cfg):
 		glib_long_long_format = cfg.check_long_long_format()
 	elif size_length['__int64'] == 8:
 		# __int64 is a 64 bit integer.
-		cfg.start_msg('checking for format to printf and scanf a guint64')
+		cfg.start_msg('Checking for format to printf and scanf a guint64')
 		# We know this is MSVCRT.DLL, and what the formats are
 		glib_long_long_format = 'I64'
 		cfg.end_msg(glib_long_long_format)
@@ -285,7 +285,7 @@ def configure(cfg):
 		cfg.check_member(x, headers = INCLUDE_STAT, mandatory = False)
 	
 	try:
-		cfg.check_cc(fragment='#include <langinfo.h>\nint main () { char* cs = nl_langinfo(CODESET); return 0; }', define_name='HAVE_LANGINFO_CODESET', msg='checking for nl_langinfo and CODESET')
+		cfg.check_cc(fragment='#include <langinfo.h>\nint main () { char* cs = nl_langinfo(CODESET); return 0; }', define_name='HAVE_LANGINFO_CODESET', msg='Checking for nl_langinfo and CODESET')
 	except ConfigurationError:
 		cfg.undefine('HAVE_LANGINFO_CODESET')
 	try:
@@ -293,7 +293,7 @@ def configure(cfg):
 	except ConfigurationError:
 		cfg.undefine('HAVE_SETLOCALE')
 	
-	cfg.start_msg('checking for appropriate definition for size_t')
+	cfg.start_msg('Checking for appropriate definition for size_t')
 	size_t = cfg.check_sizeof('size_t')
 	glib_size_type = None
 	for t in ('short', 'int', 'long', 'long long', '__int64'): 
@@ -346,12 +346,12 @@ def configure(cfg):
 		cfg.check_headers_can_fail('sys/prctl.h arpa/nameser_compat.h')
 	
 		try:
-			cfg.check_cc(fragment=RES_QUERY_CODE, uselib_store='ASYNCS_LIBADD', msg='checking for res_query')
+			cfg.check_cc(fragment=RES_QUERY_CODE, uselib_store='ASYNCS_LIBADD', msg='Checking for res_query')
 		except ConfigurationError:
 			try:
-				cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='checking res_query in resolv')
+				cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='Checking res_query in resolv')
 			except ConfigurationError:
-				cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='checking res_query in bind')
+				cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='Checking res_query in bind')
 	if cfg.env.host.os == 'solaris':
 		#Needed to get declarations for msg_control and msg_controllen on Solaries
 		cfg.define('_XOPEN_SOURCE_EXTENDED', 1)

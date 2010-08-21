@@ -49,7 +49,7 @@ def check_header(self, h, **kw):
 		code = '\n'.join(map(lambda x: '#include <%s>' % x, h))
 
 	if 'msg' not in kw:
-		kw['msg'] = 'checking for %r' % h
+		kw['msg'] = 'Checking for %r' % h
 	if 'errmsg' not in kw:
 		kw['errmsg'] = 'not found'
 	if 'define_name' not in kw:

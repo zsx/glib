@@ -25,7 +25,7 @@ main (void)
 def check_printf_unix98(self, **kw):
 	if getattr(self.env, 'cross_compile', False):
 		raise self.fatal('cross_compiling, no printf_unix98')
-	kw.update({'fragment':PRINTF_UNIX98_CODE, 'msg':'checking whether printf supports positional parameters', 'define_name':'HAVE_UNIX98_PRINTF'})
+	kw.update({'fragment':PRINTF_UNIX98_CODE, 'msg':'Checking whether printf supports positional parameters', 'define_name':'HAVE_UNIX98_PRINTF'})
 	try:
 		self.check_cc(**kw)
 	except ConfigurationError:

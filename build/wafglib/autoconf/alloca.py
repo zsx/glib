@@ -41,10 +41,10 @@ main ()
 def check_alloca(self):
 	# The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 	# for constant arguments.  Useless!
-	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='checking for alloca.h', define_name='HAVE_ALLOCA_H', mandatory=False)
+	self.check_cc(fragment='#include <alloca.h>\nint main(void){char *p = (char *) alloca (2 * sizeof (int));if (p) return 0; return 1;}', msg='Checking for alloca.h', define_name='HAVE_ALLOCA_H', mandatory=False)
 
 	try:
-		self.check_cc(fragment=ALLOCA_CODE, msg='checking for alloca', define_name='HAVE_ALLOCA')
+		self.check_cc(fragment=ALLOCA_CODE, msg='Checking for alloca', define_name='HAVE_ALLOCA')
 	except ConfigurationError:
 		# The SVR3 libPW and SVR4 libucb both contain incompatible functions
 		# that cause trouble.  Some versions do not even contain alloca or
@@ -54,7 +54,7 @@ def check_alloca(self):
 		#self.define('C_ALLOCA', 1)
 		raise
 	try:
-		self.check_cpp(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="checking whether 'alloca.c' needs Cray hooks", errmsg='No')
+		self.check_cpp(fragment='#if ! defined CRAY || defined CRAY2\n#error "Not CRAY"\n#endif\n', msg="Checking whether 'alloca.c' needs Cray hooks", errmsg='No')
 	except ConfigurationError:
 		#Not Cray
 		self.undefine('CRAY_STACKSEG_END')

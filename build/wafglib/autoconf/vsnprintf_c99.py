@@ -49,7 +49,7 @@ main(void)
 def check_vsnprintf_c99(self, **kw):
 	if getattr(self.env, 'cross_compile', False):
 		raise self.fatal('cross_compiling, no vsnprintf_c99')
-	kw.update({'fragment':VSNPRINTF_C99_CODE, 'msg':'checking for C99 vsnprintf', 'execute':True, 'define_name':'HAVE_C99_VSNPRINTF'})
+	kw.update({'fragment':VSNPRINTF_C99_CODE, 'msg':'Checking for C99 vsnprintf', 'execute':True, 'define_name':'HAVE_C99_VSNPRINTF'})
 	try:
 		self.check_cc(**kw)
 	except ConfigurationError:
