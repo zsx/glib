@@ -128,6 +128,16 @@ main ()
 }
 '''
 
+VARARGS_CODE='''
+int a(int p1, int p2, int p3) {}
+int main() 
+{
+#define call_a(...) a(1, __VA_ARGS__)
+	call_a(2, 3);
+	return 0;
+}
+'''
+
 @conf
 def check_funcs(self, funcs, **kw):
 	for x in Utils.to_list(funcs):
@@ -164,8 +174,11 @@ def options(opt):
 	cfg.add_option('--with-threads', metavar='none/posix/dce/win32', action='store', default='', dest='want_threads', help="specify a thread implementation to use") 
 	cfg.add_option('--with-libiconv', metavar='no/yes/maybe/gnu/native', action='store', default='maybe', dest='libiconv', help="use the libiconv library") 
 	cfg.add_option('--enable-iconv-cache', action='store_true', default=None, dest='iconv_cache', help="cache iconv descriptors [default: auto]") 
-	cfg.add_option('--included-printf', action='store_true', default=False, dest='included_printf', help="use included pritnf [default: auto]") 
+	cfg.add_option('--disable-iconv-cache', action='store_false', default=None, dest='iconv_cache', help="cache iconv descriptors [default: auto]") 
+	cfg.add_option('--enable-included-printf', action='store_true', default=None, dest='included_printf', help="use included pritnf [default: auto]") 
+	cfg.add_option('--disable-included-printf', action='store_false', default=None, dest='included_printf', help="use included pritnf [default: auto]") 
 	opt.tool_options('compiler_c')
+	opt.tool_options('compiler_cxx')
 
 def configure(cfg):
 	platinfo = PlatInfo()
@@ -181,6 +194,7 @@ def configure(cfg):
 	cfg.end_msg(cfg.env.host.fullname())
 	glib_native_win32 = (cfg.env.host.os == 'win32')
 
+	cfg.check_tool('compiler_cxx')
 	cfg.check_tool('compiler_c')
 	try:
 		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='Checking whether cross-compiling', okmsg='no', errmsg='yes')
@@ -218,9 +232,14 @@ def configure(cfg):
 	cfg.check_alloca()
 	cfg.check_stdc_headers()
 
-	if cfg.options.iconv_cache == None and cfg.get_dest_binfmt() != 'pe' and not cfg.is_gnu_library_2_1():
+	cfg.start_msg('Checking whether to cache iconv descriptors')
+	if cfg.options.iconv_cache == None and not cfg.is_gnu_library_2_1():
 		cfg.options.iconv_cache = True
 	cfg.define_cond('NEED_ICONV_CACHE', cfg.options.iconv_cache)
+	if cfg.options.iconv_cache:
+		cfg.end_msg('yes')
+	else:
+		cfg.end_msg('no')
 	
 	try:
 		cfg.check_cfg(package='zlib')
@@ -264,12 +283,26 @@ def configure(cfg):
 		#define STMT_TEST STMT_START { i = 0; } STMT_END
 		int main(void) { int i = 1; STMT_TEST; return i; }''',
 		msg='Checking for do while(0) macros', define_name='HAVE_DOWHILE_MACROS')
+	try:
+		cfg.check_cc(fragment=VARARGS_CODE, msg='Checking for ISO C99 varargs macros in C')
+	except:
+		g_have_iso_c_varargs = False
+	else:
+		g_have_iso_c_varargs = True
+
+	try:
+		cfg.check_cxx(fragment=VARARGS_CODE, msg='Checking for ISO C99 varargs macros in C++')
+	except:
+		g_have_iso_cxx_varargs = False
+		raise
+	else:
+		g_have_iso_cxx_varargs = True
 
 	size_length = {}
 	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
-		size_length[x] = cfg.check_sizeof(x, mandatory = False)
+		size_length[x] = cfg.check_sizeof(x, compiler='c', mandatory = False)
 	if not glib_native_win32 and size_length['long long'] == 8:
-		glib_long_long_format = cfg.check_long_long_format()
+		glib_long_long_format = cfg.check_long_long_format(compiler='c')
 	elif size_length['__int64'] == 8:
 		# __int64 is a 64 bit integer.
 		cfg.start_msg('Checking for format to printf and scanf a guint64')
@@ -280,9 +313,9 @@ def configure(cfg):
 		cfg.define('HAVE_INT64_AND_I64', 1)
 		
 	for x in 'stat.st_mtimensec stat.st_mtim.tv_nsec stat.st_atimensec stat.st_atim.tv_nsec stat.st_ctimensec stat.st_ctim.tv_nsec'.split(' '):
-		cfg.check_member(x, mandatory = False)
+		cfg.check_member(x, compiler='c', mandatory = False)
 	for x in 'stat.st_blksize stat.st_blocks statfs.f_fstypename statfs.f_bavail'.split():
-		cfg.check_member(x, headers = INCLUDE_STAT, mandatory = False)
+		cfg.check_member(x, compiler='c', headers = INCLUDE_STAT, mandatory = False)
 	
 	try:
 		cfg.check_cc(fragment='#include <langinfo.h>\nint main () { char* cs = nl_langinfo(CODESET); return 0; }', define_name='HAVE_LANGINFO_CODESET', msg='Checking for nl_langinfo and CODESET')
@@ -294,7 +327,7 @@ def configure(cfg):
 		cfg.undefine('HAVE_SETLOCALE')
 	
 	cfg.start_msg('Checking for appropriate definition for size_t')
-	size_t = cfg.check_sizeof('size_t')
+	size_t = cfg.check_sizeof('size_t', compiler='c')
 	glib_size_type = None
 	for t in ('short', 'int', 'long', 'long long', '__int64'): 
 		if size_length[t] == size_t:
@@ -329,14 +362,14 @@ def configure(cfg):
 		glib_inet_includes = "#include <winsock2.h>"
 	else:
 		glib_inet_includes="#include <sys/types.h>\n#include <sys/socket.h>"
-	cfg.compute_int('AF_INET', headers=glib_inet_includes, guess=2)
-	cfg.compute_int('AF_INET6', headers=glib_inet_includes, guess=10)
+	cfg.compute_int('AF_INET', compiler='c', headers=glib_inet_includes, guess=2)
+	cfg.compute_int('AF_INET6', compiler='c', headers=glib_inet_includes, guess=10)
 	# winsock defines this even though it doesn't support it
-	cfg.compute_int('AF_UNIX', headers=glib_inet_includes, guess=1)
+	cfg.compute_int('AF_UNIX', compiler='c', headers=glib_inet_includes, guess=1)
 
-	cfg.compute_int('MSG_PEEK', headers=glib_inet_includes, guess=2)
-	cfg.compute_int('MSG_OOB', headers=glib_inet_includes, guess=1)
-	cfg.compute_int('MSG_DONTROUTE', headers=glib_inet_includes, guess=4)
+	cfg.compute_int('MSG_PEEK', compiler='c', headers=glib_inet_includes, guess=2)
+	cfg.compute_int('MSG_OOB', compiler='c', headers=glib_inet_includes, guess=1)
+	cfg.compute_int('MSG_DONTROUTE', compiler='c', headers=glib_inet_includes, guess=4)
 	cfg.check_funcs_can_fail('getprotobyname_r endservent')
 	cfg.check_headers_can_fail('netdb.h wspiapi.h')
 	
@@ -364,7 +397,7 @@ def configure(cfg):
 		pass
 	else:
 		#if statfs() takes 2 arguments (Posix) or 4 (Solaris)
-		cfg.check_statfs_args()
+		cfg.check_statfs_args(compiler='c')
 	
 	need_included_printf = False
 	try:
@@ -381,7 +414,7 @@ def configure(cfg):
 		need_included_printf = True
 
 	if not cfg.options.included_printf and need_included_printf:
-		self.fatal("Your C library's printf doesn't appear to have the features that GLib needs, but you specified --enable-included-printf=no.")
+		cfg.fatal("Your C library's printf doesn't appear to have the features that GLib needs, but you specified --enable-included-printf=no.")
 	if need_included_printf:
 		if not glib_long_long_format:
 			glib_long_long_format = 'll'
