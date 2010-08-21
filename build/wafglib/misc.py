@@ -46,6 +46,7 @@ int main()
 '''
 
 LONG_LONG_FORMAT_CODE='''
+#include <stdlib.h>
 #include <stdio.h>
 int main()
 {
@@ -89,18 +90,18 @@ def is_gnu_library_2_1(self):
 		return True
 
 @conf
-def check_statfs_args(self):
+def check_statfs_args(self, **kw):
 	self.start_msg('Checking for number of arguments to statfs()')
-	hw = {'fragment': STATFS_CODE % 'statfs(NULL, &st);'}
-	self.validate_c(hw)
+	kw.update({'fragment': STATFS_CODE % 'statfs(NULL, &st);'})
+	self.validate_c(kw)
 	try:
-		self.run_c_code(**hw)
+		self.run_c_code(**kw)
 		self.define('STATFS_ARGS', 2)
 		self.end_msg('2')
 	except:
 		try:
-			hw.update({'fragment': STATFS_CODE % 'statfs(NULL, &st, sizeof(st), 0);'})
-			self.run_c_code(**hw)
+			kw.update({'fragment': STATFS_CODE % 'statfs(NULL, &st, sizeof(st), 0);'})
+			self.run_c_code(**kw)
 			self.define('STATFS_ARGS', 4)
 			self.end_msg('4')
 		except:	
@@ -109,16 +110,16 @@ def check_statfs_args(self):
 			self.fatal('unable to determine number of arguments to statfs()')
 
 @conf
-def check_long_long_format(self):
+def check_long_long_format(self, **kw):
 	if getattr(self.env, 'cross_compile', False):
 		raise self.fatal("cross_compiling, can't determine long long format")
 	self.start_msg('Checking for format to pritnf and scanf a guint64')
 	fmt = None
 	for x in ('ll', 'I64'):
-		hw = {'fragment': LONG_LONG_FORMAT_CODE % (x, x), 'execute':True}
-		self.validate_c(hw)
+		kw.update({'fragment': LONG_LONG_FORMAT_CODE % (x, x), 'execute':True})
+		self.validate_c(kw)
 		try:
-			self.run_c_code(**hw)
+			self.run_c_code(**kw)
 			fmt = x
 			break
 		except:
