@@ -35,7 +35,7 @@ if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for pyt
 glib_major_version = 2
 glib_minor_version = 25
 glib_micro_version = 12
-#the following to variables are required
+#the following two variables are required
 VERSION = '%d.%d.%d.' % (glib_major_version, glib_minor_version, glib_micro_version)
 APPNAME = 'glib'
 
@@ -153,7 +153,6 @@ def options(opt):
 	bld = opt.parser.get_option_group('-p')
 
 	cfg.add_option('--host', action='store', default=None, help='cross-compile to build programs to run on HOST')
-	cfg.add_option('--build', action='store', default=None, help=' configure for building on BUILD')
 	bld.add_option('--debug', action='store', default=glib_debug_default, dest='debug', metavar='yes/no/minimum', help='turn on debugging [default: %s]' % glib_debug_default)
 	#bld.add_option('--cross-compile', action='store_true', default=False, dest='cross_compile', help='cross compile')
 	cfg.add_option('--enable-gc-friendly', action='store_true', default=False, dest='gc_friendly', help='turn on garbage collector friendliness') 
@@ -169,7 +168,19 @@ def options(opt):
 	opt.tool_options('compiler_c')
 
 def configure(cfg):
-	glib_native_win32 = cfg.get_dest_binfmt() == 'pe' and sys.platform == 'win32'
+	platinfo = PlatInfo()
+	cfg.start_msg('checking build system type:')
+	cfg.end_msg(platinfo.fullname())
+
+	cfg.start_msg('checking host system type:')
+	cfg.env.host = cfg.options.host
+	if not cfg.env.host:
+		cfg.env.host = platinfo
+	else:
+		cfg.env.host = PlatInfo.from_name(cfg.env.host)
+	cfg.end_msg(cfg.env.host.fullname())
+	glib_native_win32 = (cfg.env.host.os == 'win32')
+
 	cfg.check_tool('compiler_c')
 	try:
 		cfg.check_cc(fragment='int main(){return 0;}', execute=True, msg='checking whether cross-compiling', okmsg='no', errmsg='yes')
@@ -183,7 +194,7 @@ def configure(cfg):
 	cfg.check_python_version(minver=(2, 4))
 	
 	#iconv detection
-	if cfg.get_dest_binfmt() == 'pe':
+	if glib_native_win32:
 		cfg.options.libiconv = 'native'
 	else:
 		cfg.check_libiconv(cfg.options.libiconv)
@@ -329,17 +340,23 @@ def configure(cfg):
 	cfg.check_headers_can_fail('netdb.h wspiapi.h')
 	
 	#Non win32 native
-	cfg.check_funcs_can_fail('strndup setresuid setreuid')
-	cfg.check_headers_can_fail('sys/prctl.h arpa/nameser_compat.h')
+	if not glib_native_win32:
+		cfg.check_funcs_can_fail('strndup setresuid setreuid')
+		cfg.check_headers_can_fail('sys/prctl.h arpa/nameser_compat.h')
 	
-	try:
-		cfg.check_cc(fragment=RES_QUERY_CODE, uselib_store='ASYNCS_LIBADD', msg='checking for res_query')
-	except ConfigurationError:
 		try:
-			cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='checking res_query in resolv')
+			cfg.check_cc(fragment=RES_QUERY_CODE, uselib_store='ASYNCS_LIBADD', msg='checking for res_query')
 		except ConfigurationError:
-			cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='checking res_query in bind')
-	
+			try:
+				cfg.check_cc(fragment=RES_QUERY_CODE, lib='resolv', uselib_store='ASYNCS_LIBADD', msg='checking res_query in resolv')
+			except ConfigurationError:
+				cfg.check_cc(fragment=RES_QUERY_CODE, lib='bind', uselib_store='ASYNCS_LIBADD', msg='checking res_query in bind')
+	if cfg.env.host.os == 'solaris':
+		#Needed to get declarations for msg_control and msg_controllen on Solaries
+		cfg.define('_XOPEN_SOURCE_EXTENDED', 1)
+		cfg.define('_XOPEN_SOURCE', 2)
+		cfg.define('__EXTENSIONS__', 1)
+
 	try:
 		cfg.check_funcs('statfs')
 	except ConfigurationError:
