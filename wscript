@@ -229,7 +229,8 @@ def configure(cfg):
 
 	cfg.define_cond('DISABLE_MEM_POOLS', not cfg.options.mem_pools)
 	cfg.define_cond('ENABLE_GC_FRIENDLY_DEFAULT', cfg.options.gc_friendly)
-	cfg.check_header(['Carbon/Carbon.h', 'CoreServices/CoreServices.h'], define_name='HAVE_CARBON', uselib_store='CARBON', mandatory=False)
+	if cfg.env.host.os == 'macosx':
+		cfg.check_header(['Carbon/Carbon.h', 'CoreServices/CoreServices.h'], define_name='HAVE_CARBON', uselib_store='CARBON', mandatory=False)
 	for x in 'dirent.h float.h limits.h pwd.h grp.h sys/param.h sys/poll.h sys/resource.h \
 	sys/time.h sys/times.h sys/wait.h unistd.h values.h \
 	sys/select.h sys/types.h stdint.h inttypes.h sched.h malloc.h \
