@@ -129,7 +129,7 @@ main ()
 '''
 
 VARARGS_CODE='''
-int a(int p1, int p2, int p3) {}
+int a(int p1, int p2, int p3) {return 0;}
 int main() 
 {
 #define call_a(...) a(1, __VA_ARGS__)
@@ -294,7 +294,6 @@ def configure(cfg):
 		cfg.check_cxx(fragment=VARARGS_CODE, msg='Checking for ISO C99 varargs macros in C++')
 	except:
 		g_have_iso_cxx_varargs = False
-		raise
 	else:
 		g_have_iso_cxx_varargs = True
 
