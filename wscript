@@ -138,6 +138,47 @@ int main()
 }
 '''
 
+VARARGS_GNUC_CODE='''
+int a(int p1, int p2, int p3) {return 0;}
+int main() 
+{
+#define call_a(params...) a(1, params)
+	call_a(2, 3);
+	return 0;
+}
+'''
+
+GNUC_VISIBILITY_CODE='''
+void
+__attribute__ ((visibility ("hidden")))
+     f_hidden (void)
+{
+}
+void
+__attribute__ ((visibility ("internal")))
+     f_internal (void)
+{
+}
+void
+__attribute__ ((visibility ("protected")))
+     f_protected (void)
+{
+}
+void
+__attribute__ ((visibility ("default")))
+     f_default (void)
+{
+}
+int main (int argc, char **argv)
+{
+	f_hidden();
+	f_internal();
+	f_protected();
+	f_default();
+	return 0;
+}
+'''
+
 @conf
 def check_funcs(self, funcs, **kw):
 	for x in Utils.to_list(funcs):
@@ -296,6 +337,20 @@ def configure(cfg):
 		g_have_iso_cxx_varargs = False
 	else:
 		g_have_iso_cxx_varargs = True
+
+	try:
+		cfg.check_cc(fragment=VARARGS_GNUC_CODE, msg='Checking for GNU varargs macros')
+	except:
+		g_have_gnuc_varargs = False
+	else:
+		g_have_gnuc_varargs = True
+
+	try:
+		cfg.check_compile_warn(fragment=GNUC_VISIBILITY_CODE, msg='Checking for GNUC visibility attributes')
+	except:
+		g_have_gnuc_visibility = False
+	else:
+		g_have_gnuc_visibility = True
 
 	size_length = {}
 	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
