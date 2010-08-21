@@ -6,6 +6,9 @@ from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
+from io import StringIO
+import logging
+import re
 
 GNU_2_1_CODE='''
 #include <features.h>
@@ -136,4 +139,26 @@ def check_long_long_format(self, **kw):
 
 	self.end_msg(fmt)
 	return fmt
-	
+
+@conf
+def check_compile_warn(self, **kw):
+	err = StringIO()
+	hdr = logging.StreamHandler(err)
+	if 'msvc' in (self.env.CC_NAME, self.env.CXX_NAME):
+		#msvc outputs warnings to stdout
+		hdr.setLevel(logging.DEBUG)
+	else:
+		hdr.setLevel(logging.ERROR)
+	self.logger.addHandler(hdr)
+	self.check(**kw)
+	self.logger.removeHandler(hdr)
+	err_str = err.getvalue()
+	if 'msvc' in (self.env.CC_NAME, self.env.CXX_NAME):
+		warn = re.compile(r'^.*\(\d+\)\s+:\s+warning\s+C\d+:.*$', re.MULTILINE)
+		mo = warn.search(err_str)
+		if mo:
+			self.fatal(mo.group(0))
+	else:
+		if err_str:
+			self.fatal(err_str)
+
