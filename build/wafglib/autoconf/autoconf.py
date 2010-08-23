@@ -31,10 +31,10 @@ def check_cpp(self, **kw):
 	else:
 		nul = '/dev/null'
 	try:
-		for x in ('rule', 'features', 'target'):
-			if x in kw:
-				del kw[x]
-		self.check_cc(rule = '"${CC}" -E ${CPPFLAGS} ${SRC} >' + nul, target=[], features=[], **kw)
+		kw.update({'rule':'"${CC}" -E ${CPPFLAGS} ${SRC} >' + nul,
+			   'target':[],
+			   'features':[]})
+		self.check_cc(**kw)
 	except :
 		if 'define_name' in kw:
 			self.undefine(kw['define_name'])
