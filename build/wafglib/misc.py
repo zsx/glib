@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from waflib.Context import STDOUT, STDERR
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
-from waflib.TaskGen import feature, before
-from waflib import Utils
 from io import StringIO
 import logging
 import re
@@ -60,7 +57,6 @@ int main()
   exit (b!=a);
 }
 '''
-
 
 @conf
 def check_libiconv(self, iconv):
@@ -161,4 +157,3 @@ def check_compile_warn(self, **kw):
 	else:
 		if err_str:
 			self.fatal(err_str)
-
