@@ -351,6 +351,11 @@ def configure(cfg):
 		g_have_gnuc_visibility = False
 	else:
 		g_have_gnuc_visibility = True
+	if 'sun' in cfg.env.CC_NAME:
+		#FIXME: check suncc version?
+		g_have_sunstudio_visibility = True
+
+	cfg.check_endian()
 
 	size_length = {}
 	for x in ('char', 'short', 'int', 'long', 'void *', 'long long', '__int64'):
