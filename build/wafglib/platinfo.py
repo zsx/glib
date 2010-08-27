@@ -596,7 +596,7 @@ class PlatInfo(object):
         }
         for line in stdout.splitlines(0):
             for name, pattern in patterns.items():
-                match = pattern.search(line)
+                match = pattern.search(line.decode())
                 if match:
                     value = match.group(1)
                     if value != "n/a":
