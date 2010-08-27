@@ -6,7 +6,7 @@ from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from waflib.TaskGen import feature, before
 from waflib import Utils
-from .defaults import INCLUDES_DEFAULT
+from autoconf import defaults
 
 __all__ = ['check_cpp', 'check_member', 'check_header', 'check_const']
 
@@ -60,7 +60,7 @@ def check_header(self, h, **kw):
 def check_member(self, m, **kw):
 	self.start_msg('Checking for struct member ' + m)
 	dot = m.find('.')
-	kw['fragment'] = kw.get('headers', INCLUDES_DEFAULT) + STRUCT_MEMBER_CODE % (m[:dot], m[dot + 1:])
+	kw['fragment'] = kw.get('headers', defaults.INCLUDES_DEFAULT) + STRUCT_MEMBER_CODE % (m[:dot], m[dot + 1:])
 	kw['define_name'] = 'HAVE_STRUCT_' + m.replace('.', '_').upper()
 	self.validate_c(kw)
 	ret = None

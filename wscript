@@ -11,26 +11,9 @@ from waflib.TaskGen import feature, before
 from waflib import Utils
 #from build.waflib import *
 sys.path.insert(0, 'build')
-#sys.path.insert(0, 'build')
-if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
-	#FIXME: Untested
-	import __builtin__
-
-	bimport = __builtin__.__import__
-	dots = re.compile(r'^(\.+)(.*)')
-	def import2(name, globals={}, locals={}, fromlist=[], level=-1):
-		mo = dots.match(name) #relative import
-		if mo:
-			name = mo.group(2)
-			if len(mo.group(1)) > 1:
-				level = len(mo.group(1)) - 1
-		return bimport(name, globals, locals, fromlist, level)
-	__builtin__.__import__ = import2
+sys.path.insert(1, os.path.join('build', 'wafglib'))
 
 from wafglib import *
-
-if sys.version_info[0] < 3 and sys.version_info[1] < 5: #relative import for python older than 2.5
-	__builtin__.__import__ = bimport
 
 glib_major_version = 2
 glib_minor_version = 25

@@ -2,8 +2,8 @@
 # encoding: utf-8
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
-from .defaults import INCLUDES_DEFAULT
-from .compute_int import compute_int
+from autoconf import defaults
+from autoconf import compute_int
 
 __all__ = ['check_sizeof']
 
@@ -16,7 +16,7 @@ def check_sizeof(self, t, lo = 1, hi=17, **kw):
 	else:
 		if 'guess' in kw:
 			del kw['guess']
-		kw.update({'fragment': kw.get('headers', INCLUDES_DEFAULT) + 'int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
+		kw.update({'fragment': kw.get('headers', defaults.INCLUDES_DEFAULT) + 'int main() {printf("%%d", sizeof(%s));return 0;}' % t, 
 			   'execute':True, 
                            'errmsg':'Unknown', 
                            'define_name':kw['define_name'], 
