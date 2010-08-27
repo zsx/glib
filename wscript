@@ -12,6 +12,7 @@ from waflib import Utils
 #from build.waflib import *
 sys.path.insert(0, 'build')
 sys.path.insert(1, os.path.join('build', 'wafglib'))
+sys.path.insert(2, os.path.join('build', 'wafglib', 'github'))
 
 from wafglib import *
 

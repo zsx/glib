@@ -1,3 +1,3 @@
-[submodule "build/wafglib/lib"]
-	path = build/wafglib/lib
+[submodule "build/wafglib/github"]
+	path = build/wafglib/github
 	url = git@github.com:zsx/waflib.git
