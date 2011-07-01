@@ -7,15 +7,15 @@
     <GlibDoInstall>
 mkdir $(CopyDir)\bin
 
-copy $(SolutionDir)$(Configuration)\$(Platform)\bin\*.dll $(CopyDir)\bin
+copy &quot;$(SolutionDir)$(Configuration)\$(Platform)\bin\*.dll&quot; $(CopyDir)\bin
 
-copy $(SolutionDir)$(Configuration)\$(Platform)\bin\glib-genmarshal.exe $(CopyDir)\bin
+copy &quot;$(SolutionDir)$(Configuration)\$(Platform)\bin\glib-genmarshal.exe&quot; $(CopyDir)\bin
 
-copy $(SolutionDir)$(Configuration)\$(Platform)\bin\gspawn-win32-helper*.exe $(CopyDir)\bin
+copy &quot;$(SolutionDir)$(Configuration)\$(Platform)\bin\gspawn-win32-helper*.exe&quot; $(CopyDir)\bin
 
-copy $(SolutionDir)$(Configuration)\$(Platform)\bin\glib-compile-schemas.exe $(CopyDir)\bin
+copy &quot;$(SolutionDir)$(Configuration)\$(Platform)\bin\glib-compile-schemas.exe&quot; $(CopyDir)\bin
 
-copy $(SolutionDir)$(Configuration)\$(Platform)\bin\gsettings.exe $(CopyDir)\bin
+copy &quot;$(SolutionDir)$(Configuration)\$(Platform)\bin\gsettings.exe&quot; $(CopyDir)\bin
 
 
 mkdir $(CopyDir)\include\glib-$(ApiVersion)\glib
